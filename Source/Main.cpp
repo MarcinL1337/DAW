@@ -1,26 +1,27 @@
-#include "MainComponent.h"
+#include <memory>
 
-//==============================================================================
+#include "MainComponent.h"
+#include "MainWindow.h"
+
 class GuiAppApplication final : public juce::JUCEApplication
 {
 public:
-    //==============================================================================
-    GuiAppApplication() {}
+    GuiAppApplication() = default;
 
     // We inject these as compile definitions from the CMakeLists.txt
     // If you've enabled the juce header with `juce_generate_juce_header(<thisTarget>)`
     // you could `#include <JuceHeader.h>` and use `ProjectInfo::projectName` etc. instead.
-    const juce::String getApplicationName() override       { return "Nazwa aplikacji"; }
-    const juce::String getApplicationVersion() override    { return "Wersja aplikacji"; }
+    const juce::String getApplicationName() override       { return "MyDAW"; }
+    const juce::String getApplicationVersion() override    { return "1.0.0"; }
     bool moreThanOneInstanceAllowed() override             { return true; }
 
     //==============================================================================
     void initialise (const juce::String& commandLine) override
     {
-        // This method is where you should put your application's initialisation code..
         juce::ignoreUnused (commandLine);
 
-        mainWindow.reset (new MainWindow (getApplicationName()));
+        mainWindow = std::make_unique<MainWindow> (getApplicationName());
+        mainWindow->initialise();
     }
 
     void shutdown() override
@@ -51,46 +52,6 @@ public:
         This class implements the desktop window that contains an instance of
         our MainComponent class.
     */
-    class MainWindow final : public juce::DocumentWindow
-    {
-    public:
-        explicit MainWindow (juce::String name)
-            : DocumentWindow (name,
-                              juce::Desktop::getInstance().getDefaultLookAndFeel()
-                                                          .findColour (backgroundColourId),
-                              allButtons)
-        {
-            setUsingNativeTitleBar (true);
-            setContentOwned (new MainComponent(), true);
-
-           #if JUCE_IOS || JUCE_ANDROID
-            setFullScreen (true);
-           #else
-            setResizable (true, true);
-            centreWithSize (getWidth(), getHeight());
-           #endif
-
-            setVisible (true);
-        }
-
-        void closeButtonPressed() override
-        {
-            // This is called when the user tries to close this window. Here, we'll just
-            // ask the app to quit when this happens, but you can change this to do
-            // whatever you need.
-            getInstance()->systemRequestedQuit();
-        }
-
-        /* Note: Be careful if you override any DocumentWindow methods - the base
-           class uses a lot of them, so by overriding you might break its functionality.
-           It's best to do all your work in your content component instead, but if
-           you really have to override any DocumentWindow methods, make sure your
-           subclass also calls the superclass's method.
-        */
-
-    private:
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
-    };
 
 private:
     std::unique_ptr<MainWindow> mainWindow;

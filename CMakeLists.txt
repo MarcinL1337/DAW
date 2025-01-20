@@ -32,23 +32,11 @@ set(SourceFiles
         Source/Main.cpp
         Source/MainComponent.h
         Source/MainComponent.cpp
+        Source/MainWindow.h
+        Source/MainWindow.cpp
+        Source/Menu.h
+        Source/Menu.cpp
 )
-
-# Change these to your own preferences
-# juce_add_plugin(${PROJECT_NAME}
-#         COMPANY_NAME theaudioprogrammer
-#         IS_SYNTH FALSE
-#         NEEDS_MIDI_INPUT FALSE
-#         NEEDS_MIDI_OUTPUT FALSE
-#         IS_MIDI_EFFECT FALSE
-#         EDITOR_WANTS_KEYBOARD_FOCUS FALSE
-#         JUCE_VST3_CAN_REPLACE_VST2 FALSE
-#         COPY_PLUGIN_AFTER_BUILD TRUE
-#         PLUGIN_MANUFACTURER_CODE Tap1
-#         PLUGIN_CODE Reg0
-#         FORMATS VST3 AU Standalone
-#         PRODUCT_NAME "TapPluginTemplate"        
-# )
 
 juce_add_gui_app(${PROJECT_NAME}
     # VERSION ...                       # Set this if the app version is different to the project version
