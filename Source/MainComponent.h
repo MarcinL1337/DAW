@@ -12,7 +12,7 @@ public:
     void resized() override;
 
 private:
-    MenuBar menuBar{};
+    std::unique_ptr<MenuBar> menuBar;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

@@ -4,6 +4,8 @@
 MainComponent::MainComponent()
 {
     setSize (1600, 1000);
+    menuBar = std::make_unique<MenuBar>();
+    addAndMakeVisible(menuBar.get());
 }
 
 //==============================================================================
@@ -17,7 +19,6 @@ void MainComponent::paint (juce::Graphics& g)
     g.setColour (juce::Colours::white);
     g.drawText ("Hello World!", getLocalBounds(), juce::Justification::centred, true);
 
-    addAndMakeVisible(menuBar);
 }
 
 void MainComponent::resized()
@@ -26,5 +27,5 @@ void MainComponent::resized()
     // If you add any child components, this is where you should
     // update their positions.
 
-    menuBar.setBounds(0, 0, getWidth(), 50);
+    // menuBar->setBounds(100, 100, getWidth(), 50);
 }
