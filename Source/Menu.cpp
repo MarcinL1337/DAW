@@ -82,6 +82,26 @@ void MenuBar::getCommandInfo(juce::CommandID commandID, juce::ApplicationCommand
 }
 
 bool MenuBar::perform(const InvocationInfo& info) {
-    // perform actions for each command
+    switch (info.commandID) {
+        case NewFile:
+            // what should clicking NewFile do? etc.
+            break;
+        case OpenFile:
+            break;
+        case SaveFile:
+            break;
+        case SaveAsFile:
+            break;
+        case Undo:
+            break;
+        case Redo:
+            break;
+        case View1:
+            break;
+        case Help1:
+            break;
+        default:
+            return false;
+    }
     return true;
 }

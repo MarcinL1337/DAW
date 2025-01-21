@@ -43,12 +43,6 @@ public:
         ignoreUnused (commandLine);
     }
 
-    //==============================================================================
-    /*
-        This class implements the desktop window that contains an instance of
-        our MainComponent class.
-    */
-
 private:
     std::unique_ptr<MainWindow> mainWindow;
 };
