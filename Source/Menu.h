@@ -10,7 +10,7 @@ class MenuBar : public juce::Component,
 {
 public:
     MenuBar();
-    ~MenuBar() override = default;
+    ~MenuBar() override;
 
 
 private:
