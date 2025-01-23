@@ -12,7 +12,7 @@ MainWindow::MainWindow (const juce::String& name)
     setResizable (true, true);
     centreWithSize (getWidth(), getHeight());
 
-    setVisible (true);
+    Component::setVisible (true);
 }
 
 void MainWindow::closeButtonPressed()
@@ -22,5 +22,5 @@ void MainWindow::closeButtonPressed()
 
 void MainWindow::initialise()
 {
-
+    setFullScreen(true);
 }

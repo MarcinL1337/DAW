@@ -1,6 +1,6 @@
 #include "Menu.h"
 
-MenuBar::MenuBar() {
+Menu::Menu() {
     menuBarComponent = std::make_unique<juce::MenuBarComponent>(this);
     addAndMakeVisible(menuBarComponent.get());
     setApplicationCommandManagerToWatch(&commandManager);
@@ -9,21 +9,21 @@ MenuBar::MenuBar() {
     setSize (500, 500);
 }
 
-MenuBar::~MenuBar() {
+Menu::~Menu() {
     commandManager.setFirstCommandTarget (nullptr);
 }
 
-void MenuBar::resized() {
+void Menu::resized() {
     auto localBounds = getLocalBounds();
 
     menuBarComponent->setBounds (localBounds.removeFromTop (juce::LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight()));
 }
 
-juce::StringArray MenuBar::getMenuBarNames() {
+juce::StringArray Menu::getMenuBarNames() {
     return menuBarNames;
 }
 
-juce::PopupMenu MenuBar::getMenuForIndex(int index, [[maybe_unused]] const juce::String& name) {
+juce::PopupMenu Menu::getMenuForIndex(int index, [[maybe_unused]] const juce::String& name) {
     juce::PopupMenu options;
 
     switch (index) {
@@ -50,13 +50,13 @@ juce::PopupMenu MenuBar::getMenuForIndex(int index, [[maybe_unused]] const juce:
     return options;
 }
 
-void MenuBar::menuItemSelected([[maybe_unused]] int menuID, [[maybe_unused]] int index) {}
+void Menu::menuItemSelected([[maybe_unused]] int menuID, [[maybe_unused]] int index) {}
 
-juce::ApplicationCommandTarget* MenuBar::getNextCommandTarget() {
+juce::ApplicationCommandTarget* Menu::getNextCommandTarget() {
     return findFirstTargetParentComponent();
 }
 
-void MenuBar::getAllCommands(juce::Array<juce::CommandID>& c) {
+void Menu::getAllCommands(juce::Array<juce::CommandID>& c) {
     const juce::Array<juce::CommandID> allCommands {
         NewFile,
         OpenFile,
@@ -70,7 +70,7 @@ void MenuBar::getAllCommands(juce::Array<juce::CommandID>& c) {
     c.addArray(allCommands);
 }
 
-void MenuBar::getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) {
+void Menu::getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) {
     switch (commandID) {
         case NewFile:
             result.setInfo("NewFile", "Creates a new file", "File", 0);
@@ -108,7 +108,7 @@ void MenuBar::getCommandInfo(juce::CommandID commandID, juce::ApplicationCommand
     }
 }
 
-bool MenuBar::perform(const InvocationInfo& info) {
+bool Menu::perform(const InvocationInfo& info) {
     switch (info.commandID) {
         case NewFile:
             // what should clicking NewFile do? etc.

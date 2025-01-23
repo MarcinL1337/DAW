@@ -1,16 +1,15 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
-#include <utility>
 
 
-class MenuBar : public juce::Component,
-                public juce::ApplicationCommandTarget,
-                public juce::MenuBarModel
+class Menu final : public juce::Component,
+                      public juce::ApplicationCommandTarget,
+                      public juce::MenuBarModel
 {
 public:
-    MenuBar();
-    ~MenuBar() override;
+    Menu();
+    ~Menu() override;
 
 
 private:
