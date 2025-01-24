@@ -36,6 +36,8 @@ set(SourceFiles
         Source/MainWindow.cpp
         Source/Menu.h
         Source/Menu.cpp
+        Source/Toolbar.h
+        Source/Toolbar.cpp
 )
 
 juce_add_gui_app(${PROJECT_NAME}

@@ -1,6 +1,7 @@
 #include "Menu.h"
 
-Menu::Menu() {
+Menu::Menu()
+{
     menuBarComponent = std::make_unique<juce::MenuBarComponent>(this);
     addAndMakeVisible(menuBarComponent.get());
     setApplicationCommandManagerToWatch(&commandManager);
@@ -9,39 +10,43 @@ Menu::Menu() {
     setSize (500, 500);
 }
 
-Menu::~Menu() {
+Menu::~Menu()
+{
     commandManager.setFirstCommandTarget (nullptr);
 }
 
-void Menu::resized() {
+void Menu::resized()
+{
     auto localBounds = getLocalBounds();
 
     menuBarComponent->setBounds (localBounds.removeFromTop (juce::LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight()));
 }
 
-juce::StringArray Menu::getMenuBarNames() {
+juce::StringArray Menu::getMenuBarNames()
+{
     return menuBarNames;
 }
 
-juce::PopupMenu Menu::getMenuForIndex(int index, [[maybe_unused]] const juce::String& name) {
+juce::PopupMenu Menu::getMenuForIndex(int index, [[maybe_unused]] const juce::String& name)
+{
     juce::PopupMenu options;
 
     switch (index) {
-        case File:
-            options.addCommandItem(&commandManager, NewFile);
-            options.addCommandItem(&commandManager, OpenFile);
-            options.addCommandItem(&commandManager, SaveFile);
-            options.addCommandItem(&commandManager, SaveAsFile);
+        case file:
+            options.addCommandItem(&commandManager, newFile);
+            options.addCommandItem(&commandManager, openFile);
+            options.addCommandItem(&commandManager, saveFile);
+            options.addCommandItem(&commandManager, saveAsFile);
             break;
-        case Edit:
-            options.addCommandItem(&commandManager, Undo);
-            options.addCommandItem(&commandManager, Redo);
+        case edit:
+            options.addCommandItem(&commandManager, undo);
+            options.addCommandItem(&commandManager, redo);
             break;
-        case View:
-            options.addCommandItem(&commandManager, View1);
+        case view:
+            options.addCommandItem(&commandManager, view1);
             break;
-        case Help:
-            options.addCommandItem(&commandManager, Help1);
+        case help:
+            options.addCommandItem(&commandManager, help1);
             break;
         default:
             std::unreachable();
@@ -52,54 +57,57 @@ juce::PopupMenu Menu::getMenuForIndex(int index, [[maybe_unused]] const juce::St
 
 void Menu::menuItemSelected([[maybe_unused]] int menuID, [[maybe_unused]] int index) {}
 
-juce::ApplicationCommandTarget* Menu::getNextCommandTarget() {
+juce::ApplicationCommandTarget* Menu::getNextCommandTarget()
+{
     return findFirstTargetParentComponent();
 }
 
-void Menu::getAllCommands(juce::Array<juce::CommandID>& c) {
+void Menu::getAllCommands(juce::Array<juce::CommandID>& c)
+{
     const juce::Array<juce::CommandID> allCommands {
-        NewFile,
-        OpenFile,
-        SaveFile,
-        SaveAsFile,
-        Undo,
-        Redo,
-        View1,
-        Help1
+        newFile,
+        openFile,
+        saveFile,
+        saveAsFile,
+        undo,
+        redo,
+        view1,
+        help1
     };
     c.addArray(allCommands);
 }
 
-void Menu::getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) {
+void Menu::getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result)
+{
     switch (commandID) {
-        case NewFile:
+        case newFile:
             result.setInfo("NewFile", "Creates a new file", "File", 0);
             result.addDefaultKeypress ('n', juce::ModifierKeys::ctrlModifier);
             break;
-        case OpenFile:
+        case openFile:
             result.setInfo("OpenFile", "Opens a file", "File", 0);
             result.addDefaultKeypress ('o', juce::ModifierKeys::ctrlModifier);
             break;
-        case SaveFile:
+        case saveFile:
             result.setInfo("SaveFile", "Saves a file", "File", 0);
             result.addDefaultKeypress ('s', juce::ModifierKeys::ctrlModifier);
             break;
-        case SaveAsFile:
+        case saveAsFile:
             result.setInfo("SaveAsFile", "Saves as a specified file", "File", 0);
             result.addDefaultKeypress ('s', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier);
             break;
-        case Undo:
+        case undo:
             result.setInfo("Undo", "Undo a recent change", "Edit", 0);
             result.addDefaultKeypress ('z', juce::ModifierKeys::ctrlModifier);
             break;
-        case Redo:
+        case redo:
             result.setInfo("Redo", "Redo a recent change", "Edit", 0);
             result.addDefaultKeypress ('y', juce::ModifierKeys::ctrlModifier);
             break;
-        case View1:
+        case view1:
             result.setInfo("View", "Views something :)", "View", 0);
             break;
-        case Help1:
+        case help1:
             result.setInfo("Help", "Shows a help menu", "Help", 0);
             result.addDefaultKeypress ('h', juce::ModifierKeys::ctrlModifier);
             break;
@@ -108,24 +116,26 @@ void Menu::getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInf
     }
 }
 
-bool Menu::perform(const InvocationInfo& info) {
-    switch (info.commandID) {
-        case NewFile:
+bool Menu::perform(const InvocationInfo& info)
+{
+    switch (info.commandID)
+        {
+        case newFile:
             // what should clicking NewFile do? etc.
             break;
-        case OpenFile:
+        case openFile:
             break;
-        case SaveFile:
+        case saveFile:
             break;
-        case SaveAsFile:
+        case saveAsFile:
             break;
-        case Undo:
+        case undo:
             break;
-        case Redo:
+        case redo:
             break;
-        case View1:
+        case view1:
             break;
-        case Help1:
+        case help1:
             break;
         default:
             return false;

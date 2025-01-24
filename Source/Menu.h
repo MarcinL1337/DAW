@@ -4,8 +4,8 @@
 
 
 class Menu final : public juce::Component,
-                      public juce::ApplicationCommandTarget,
-                      public juce::MenuBarModel
+                   public juce::ApplicationCommandTarget,
+                   public juce::MenuBarModel
 {
 public:
     Menu();
@@ -29,25 +29,25 @@ private:
     juce::StringArray menuBarNames{"File", "Edit", "View", "Help" };
 
     enum TopLevelMenuOptions {
-        File = 0,
-        Edit,
-        View,
-        Help
+        file = 0,
+        edit,
+        view,
+        help
     };
 
     // TODO: Better idea of representation instead of comments like that
     enum LowerLevelMenuOptions {
         //File
-        NewFile = 0,
-        OpenFile,
-        SaveFile,
-        SaveAsFile,
+        newFile = 1,
+        openFile,
+        saveFile,
+        saveAsFile,
         //Edit
-        Undo,
-        Redo,
+        undo,
+        redo,
         //View
-        View1,
+        view1,
         //Help
-        Help1
+        help1
     };
 };
