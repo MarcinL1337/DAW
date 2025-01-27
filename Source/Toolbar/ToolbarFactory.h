@@ -36,7 +36,5 @@ private:
 		startRecording,
 		stopRecording
 	};
-
-	juce::ToolbarButton* previousButton;
 };
 

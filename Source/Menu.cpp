@@ -7,7 +7,6 @@ Menu::Menu()
     setApplicationCommandManagerToWatch(&commandManager);
     commandManager.registerAllCommandsForTarget(this);
     commandManager.setFirstCommandTarget (this);
-    setSize (500, 500);
 }
 
 Menu::~Menu()
@@ -18,8 +17,13 @@ Menu::~Menu()
 void Menu::resized()
 {
     auto localBounds = getLocalBounds();
+    menuBarComponent->setBounds(localBounds.removeFromTop (juce::LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight()));
+}
 
-    menuBarComponent->setBounds (localBounds.removeFromTop (juce::LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight()));
+void Menu::paint (juce::Graphics& g)
+{
+    g.setColour(juce::Colours::black);
+    g.drawRect(getLocalBounds());
 }
 
 juce::StringArray Menu::getMenuBarNames()

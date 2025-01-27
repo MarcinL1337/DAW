@@ -1,6 +1,6 @@
 #include "ToolbarFactory.h"
 
-ToolbarFactory::ToolbarFactory() : previousButton(nullptr) {}
+ToolbarFactory::ToolbarFactory() {}
 
 void ToolbarFactory::getAllToolbarItemIds (juce::Array <int>& ids)
 {
@@ -21,15 +21,17 @@ void ToolbarFactory::getAllToolbarItemIds (juce::Array <int>& ids)
 void ToolbarFactory::getDefaultItemSet (juce::Array <int>& ids)
 {
 	const juce::Array<int> toolbarDefaultButtons {
-		// separatorBarId,
-		// spacerId,
-		// flexibleSpacerId,
 		previous,
+		separatorBarId,
 		next,
+		separatorBarId,
 		replay,
+		separatorBarId,
 		playPause,
-		stopRecording,
-		startRecording
+		separatorBarId,
+		startRecording,
+		separatorBarId,
+		stopRecording
 	};
 	ids.addArray(toolbarDefaultButtons);
 }
@@ -38,12 +40,6 @@ juce::ToolbarItemComponent* ToolbarFactory::createItem (int itemId)
 {
 	switch (itemId)
 	{
-		// case separatorBarId:
-		// 	return createButtonFromImage(playPause, "Play/Pause");
-		// case spacerId:
-		// 	return createButtonFromImage(playPause, "Play/Pause");
-		// case flexibleSpacerId:
-		// 	return createButtonFromImage(playPause, "Play/Pause");
 		case previous:
 			return createButtonFromImage(previous, "Play previous");
 		case next:

@@ -13,9 +13,8 @@ public:
     void resized() override;
 
 private:
-    std::unique_ptr<Menu> topLevelMenu;
-    // MainToolbar mainToolbar;
-    std::unique_ptr<MainToolbar> mainToolbar;
+    Menu topLevelMenu;
+    MainToolbar mainToolbar;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };

@@ -11,14 +11,9 @@ public:
     Menu();
     ~Menu() override;
 
-    auto getMenuHeight() { return menuHeight; }
-    auto getMenuWidth() { return menuWidth; }
-    auto getXPosition() { return xPosition; }
-    auto getYPosition() { return yPosition; }
-
-
 private:
     void resized() override;
+    void paint(juce::Graphics &g) override;
 
     juce::StringArray getMenuBarNames() override;
     juce::PopupMenu getMenuForIndex(int index, const juce::String& name) override;
@@ -55,9 +50,4 @@ private:
         //Help
         help1
     };
-
-    const int menuHeight{50};
-    const int menuWidth{getWidth()};
-    const int xPosition{0};
-    const int yPosition{0};
 };

@@ -15,5 +15,4 @@ void MainToolbar::paint (juce::Graphics& g)
 {
 	g.setColour (juce::Colours::black);
 	g.drawRect (getLocalBounds());
-	g.fillAll (juce::Colours::brown);
 }
