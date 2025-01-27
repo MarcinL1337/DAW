@@ -1,6 +1,6 @@
 #include "ToolbarFactory.h"
 
-ToolbarFactory::ToolbarFactory() {}
+ToolbarFactory::ToolbarFactory() { }
 
 void ToolbarFactory::getAllToolbarItemIds (juce::Array <int>& ids)
 {
@@ -41,17 +41,30 @@ juce::ToolbarItemComponent* ToolbarFactory::createItem (int itemId)
 	switch (itemId)
 	{
 		case previous:
-			return createButtonFromImage(previous, "Play previous");
+			previousButton = createButtonFromImage(previous, "Play previous");
+			previousButton->addListener(this);
+			// add button on click
+			return previousButton;
 		case next:
-			return createButtonFromImage(next, "Next");
+			nextButton = createButtonFromImage(next, "Next");
+			nextButton->addListener(this);
+			return nextButton;
 		case replay:
-			return createButtonFromImage(replay, "Replay");
+			replayButton = createButtonFromImage(replay, "Replay");
+			replayButton->addListener(this);
+			return replayButton;
 		case playPause:
-			return createButtonFromImage(playPause, "Play/Pause");
+			playPauseButton = createButtonFromImage(playPause, "Play/Pause");
+			playPauseButton->addListener(this);
+			return playPauseButton;
 		case startRecording:
-			return createButtonFromImage(startRecording, "Start recording");
+			startRecordingButton = createButtonFromImage(startRecording, "Start recording");
+			startRecordingButton->addListener(this);
+			return startRecordingButton;
 		case stopRecording:
-			return createButtonFromImage(stopRecording, "Stop recording");
+			stopRecordingButton = createButtonFromImage(stopRecording, "Stop recording");
+			stopRecordingButton->addListener(this);
+			return stopRecordingButton;
 		default:
 			std::unreachable();
 	}
@@ -95,4 +108,19 @@ juce::ToolbarButton* ToolbarFactory::createButtonFromImage(int itemId, [[maybe_u
 	assert(png.has_value() and pngSize.has_value());
 
 	return new juce::ToolbarButton (itemId, "juce!", juce::Drawable::createFromImageData(png.value(), pngSize.value()), {});
+}
+
+void ToolbarFactory::buttonClicked(juce::Button *button)
+{
+
+}
+
+void ToolbarFactory::playTrack()
+{
+	setCurrentTrackState(TrackPlayingState::playing);
+}
+
+void ToolbarFactory::stopTrack()
+{
+	setCurrentTrackState(TrackPlayingState::stopped);
 }

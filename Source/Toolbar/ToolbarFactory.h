@@ -5,7 +5,8 @@
 #include <cassert>
 
 
-class ToolbarFactory final : public juce::ToolbarItemFactory
+class ToolbarFactory final : public juce::ToolbarItemFactory,
+							 public juce::Button::Listener
 {
 public:
     ToolbarFactory();
@@ -15,7 +16,13 @@ private:
     void getAllToolbarItemIds (juce::Array <int>& ids) override;
     void getDefaultItemSet (juce::Array <int>& ids) override;
     juce::ToolbarItemComponent* createItem (int itemId) override;
+	void buttonClicked (juce::Button* button) override;
+
 	juce::ToolbarButton* createButtonFromImage(int itemId, const juce::String& shortDescription);
+	auto getCurrentTrackState() const { return currentTrackState; }
+	void setCurrentTrackState(auto newTrackState) { currentTrackState = newTrackState; }
+	void playTrack();
+	void stopTrack();
 
 	enum SpecialItemIds
     {
@@ -36,5 +43,20 @@ private:
 		startRecording,
 		stopRecording
 	};
+
+	enum class TrackPlayingState
+	{
+		stopped = 0,
+		playing
+	};
+
+	TrackPlayingState currentTrackState{ TrackPlayingState::stopped };
+
+	juce::ToolbarButton* previousButton{nullptr};
+	juce::ToolbarButton* nextButton{nullptr};
+	juce::ToolbarButton* playPauseButton{nullptr};
+	juce::ToolbarButton* replayButton{nullptr};
+	juce::ToolbarButton* startRecordingButton{nullptr};
+	juce::ToolbarButton* stopRecordingButton{nullptr};
 };
 
