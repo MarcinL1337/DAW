@@ -11,6 +11,11 @@ public:
     Menu();
     ~Menu() override;
 
+    auto getMenuHeight() { return menuHeight; }
+    auto getMenuWidth() { return menuWidth; }
+    auto getXPosition() { return xPosition; }
+    auto getYPosition() { return yPosition; }
+
 
 private:
     void resized() override;
@@ -50,4 +55,9 @@ private:
         //Help
         help1
     };
+
+    const int menuHeight{50};
+    const int menuWidth{getWidth()};
+    const int xPosition{0};
+    const int yPosition{0};
 };

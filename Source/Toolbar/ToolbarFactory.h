@@ -1,17 +1,21 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include "BinaryData.h"
+#include <cassert>
 
-class Toolbar : public juce::ToolbarItemFactory
+
+class ToolbarFactory final : public juce::ToolbarItemFactory
 {
 public:
-    Toolbar();
-    ~Toolbar() override;
+    ToolbarFactory();
+    ~ToolbarFactory() override = default;
 
 private:
     void getAllToolbarItemIds (juce::Array <int>& ids) override;
     void getDefaultItemSet (juce::Array <int>& ids) override;
     juce::ToolbarItemComponent* createItem (int itemId) override;
+	juce::ToolbarButton* createButtonFromImage(int itemId, const juce::String& shortDescription);
 
 	enum SpecialItemIds
     {
@@ -27,10 +31,12 @@ private:
 	{
 		previous = 1,
 		next,
-		restart,
+		replay,
 		playPause,
-		stopRecording,
-		startRecording
+		startRecording,
+		stopRecording
 	};
+
+	juce::ToolbarButton* previousButton;
 };
 

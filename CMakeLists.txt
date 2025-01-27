@@ -36,8 +36,10 @@ set(SourceFiles
         Source/MainWindow.cpp
         Source/Menu.h
         Source/Menu.cpp
-        Source/Toolbar.h
-        Source/Toolbar.cpp
+        Source/Toolbar/ToolbarFactory.h
+        Source/Toolbar/ToolbarFactory.cpp
+        Source/Toolbar/MainToolbar.h
+        Source/Toolbar/MainToolbar.cpp
 )
 
 juce_add_gui_app(${PROJECT_NAME}
@@ -62,9 +64,22 @@ target_compile_definitions(${PROJECT_NAME}
         JUCE_VST3_CAN_REPLACE_VST2=0
 )
 
+juce_add_binary_data(BinaryData SOURCES
+        Assets/ToolbarImages/nextButton.png
+        Assets/ToolbarImages/pauseButton.png
+        Assets/ToolbarImages/playButton.png
+        Assets/ToolbarImages/playPauseButton.png
+        Assets/ToolbarImages/playPauseButton2.png
+        Assets/ToolbarImages/previousButton.png
+        Assets/ToolbarImages/recordButton.png
+        Assets/ToolbarImages/replayButton.png
+        Assets/ToolbarImages/stopButton.png
+)
+
 # JUCE libraries to bring into our project
 target_link_libraries(${PROJECT_NAME}
         PUBLIC
+        BinaryData
         juce::juce_analytics
         juce::juce_audio_basics
         juce::juce_audio_devices
