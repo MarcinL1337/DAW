@@ -2,8 +2,8 @@
 
 MainComponent::MainComponent()
 {
-    menuBar = std::make_unique<Menu>();
-    addAndMakeVisible(menuBar.get());
+    addAndMakeVisible(topLevelMenu);
+    addAndMakeVisible(mainToolbar);
 }
 
 void MainComponent::paint (juce::Graphics& g)
@@ -17,5 +17,8 @@ void MainComponent::resized()
     // If you add any child components, this is where you should
     // update their positions.
 
-    menuBar->setBounds(0, 0, getWidth(), 50);
+    topLevelMenu.setBounds(getLocalBounds().removeFromTop(juce::LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight()));
+    mainToolbar.setBounds(0, 25, getWidth(), 45);
+
 }
+

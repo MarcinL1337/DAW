@@ -15,7 +15,6 @@ public:
     const juce::String getApplicationVersion() override    { return "1.0.0"; }
     bool moreThanOneInstanceAllowed() override             { return true; }
 
-    //==============================================================================
     void initialise (const juce::String& commandLine) override
     {
         ignoreUnused (commandLine);
@@ -29,7 +28,6 @@ public:
         mainWindow = nullptr;
     }
 
-    //==============================================================================
     void systemRequestedQuit() override
     {
         quit();
