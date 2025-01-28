@@ -1,7 +1,5 @@
 #include "ToolbarFactory.h"
 
-ToolbarFactory::ToolbarFactory() { }
-
 void ToolbarFactory::getAllToolbarItemIds (juce::Array <int>& ids)
 {
 	const juce::Array<int> toolbarButtons {
@@ -110,17 +108,69 @@ juce::ToolbarButton* ToolbarFactory::createButtonFromImage(int itemId, [[maybe_u
 	return new juce::ToolbarButton (itemId, "juce!", juce::Drawable::createFromImageData(png.value(), pngSize.value()), {});
 }
 
+void ToolbarFactory::temporaryButtonsFunction(const juce::String buttonName)
+{
+	juce::DialogWindow *dialogWindow;
+	juce::DialogWindow::LaunchOptions launchOptions;
+
+	auto *label = new juce::Label();
+	label->setText(buttonName + " clicked", juce::dontSendNotification);
+	label->setColour(juce::Label::textColourId, juce::Colours::whitesmoke);
+	label->setJustificationType(juce::Justification::centred);
+	launchOptions.content.setOwned(label);
+	launchOptions.content->setVisible(true);
+
+
+	launchOptions.dialogTitle = "Dialogowe okno!";
+	launchOptions.dialogBackgroundColour = juce::Colour (0xff0e345a);
+	launchOptions.escapeKeyTriggersCloseButton = true;
+	launchOptions.useNativeTitleBar = false;
+	launchOptions.resizable = true;
+
+	dialogWindow = launchOptions.launchAsync();
+	dialogWindow->centreWithSize(300, 300);
+}
+
 void ToolbarFactory::buttonClicked(juce::Button *button)
 {
-
+	if (button == previousButton) { previousButtonClicked(); }
+	if (button == nextButton) { nextButtonClicked(); }
+	if (button == replayButton) { replayButtonClicked(); }
+	if (button == playPauseButton) { playPauseButtonClicked(); }
+	if (button == startRecordingButton) { startRecordingButtonClicked(); }
+	if (button == stopRecordingButton) { stopRecordingButtonClicked(); }
 }
 
-void ToolbarFactory::playTrack()
+void ToolbarFactory::previousButtonClicked()
 {
-	setCurrentTrackState(TrackPlayingState::playing);
+    temporaryButtonsFunction("previousButton");
 }
-
-void ToolbarFactory::stopTrack()
+void ToolbarFactory::nextButtonClicked()
 {
-	setCurrentTrackState(TrackPlayingState::stopped);
+    temporaryButtonsFunction("nextButton");
+}
+void ToolbarFactory::replayButtonClicked()
+{
+    temporaryButtonsFunction("replayButton");
+}
+void ToolbarFactory::playPauseButtonClicked()
+{
+	if(getCurrentTrackState() == TrackPlayingState::playing)
+	{
+		setCurrentTrackState(TrackPlayingState::stopped);
+		temporaryButtonsFunction("stopButton");
+	}
+	else
+	{
+		setCurrentTrackState(TrackPlayingState::playing);
+		temporaryButtonsFunction("playButton");
+	}
+}
+void ToolbarFactory::startRecordingButtonClicked()
+{
+    temporaryButtonsFunction("startRecordingButton");
+}
+void ToolbarFactory::stopRecordingButtonClicked()
+{
+    temporaryButtonsFunction("stopRecordingButton");
 }

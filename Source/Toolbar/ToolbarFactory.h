@@ -9,7 +9,7 @@ class ToolbarFactory final : public juce::ToolbarItemFactory,
 							 public juce::Button::Listener
 {
 public:
-    ToolbarFactory();
+    ToolbarFactory() = default;
     ~ToolbarFactory() override = default;
 
 private:
@@ -21,8 +21,13 @@ private:
 	juce::ToolbarButton* createButtonFromImage(int itemId, const juce::String& shortDescription);
 	auto getCurrentTrackState() const { return currentTrackState; }
 	void setCurrentTrackState(auto newTrackState) { currentTrackState = newTrackState; }
-	void playTrack();
-	void stopTrack();
+	void temporaryButtonsFunction(juce::String buttonName);
+	void previousButtonClicked();
+	void nextButtonClicked();
+	void replayButtonClicked();
+	void playPauseButtonClicked();
+	void startRecordingButtonClicked();
+	void stopRecordingButtonClicked();
 
 	enum SpecialItemIds
     {
