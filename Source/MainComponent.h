@@ -9,12 +9,12 @@ class MainComponent final : public juce::Component
 public:
     MainComponent();
 
-    void paint (juce::Graphics&) override;
+    void paint(juce::Graphics&) override;
     void resized() override;
 
 private:
     Menu topLevelMenu;
     MainToolbar mainToolbar;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
