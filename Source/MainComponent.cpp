@@ -6,9 +6,9 @@ MainComponent::MainComponent()
     addAndMakeVisible(mainToolbar);
 }
 
-void MainComponent::paint (juce::Graphics& g)
+void MainComponent::paint(juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 }
 
 void MainComponent::resized()
@@ -17,8 +17,8 @@ void MainComponent::resized()
     // If you add any child components, this is where you should
     // update their positions.
 
-    topLevelMenu.setBounds(getLocalBounds().removeFromTop(juce::LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight()));
+    topLevelMenu.setBounds(
+        getLocalBounds().removeFromTop(juce::LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight()));
     mainToolbar.setBounds(0, 25, getWidth(), 45);
-
 }
 

@@ -1,26 +1,18 @@
 #include "MainWindow.h"
 
-MainWindow::MainWindow (const juce::String& name)
-        : DocumentWindow (name,
-                          juce::Desktop::getInstance().getDefaultLookAndFeel()
-                                                      .findColour (backgroundColourId),
-                          allButtons)
+MainWindow::MainWindow(const juce::String& name) :
+    DocumentWindow(name, juce::Desktop::getInstance().getDefaultLookAndFeel().findColour(backgroundColourId),
+                   allButtons)
 {
-    setUsingNativeTitleBar (true);
-    setContentOwned (new MainComponent(), true);
+    setUsingNativeTitleBar(true);
+    setContentOwned(new MainComponent(), true);
 
-    setResizable (true, true);
-    centreWithSize (getWidth(), getHeight());
+    setResizable(true, true);
+    centreWithSize(getWidth(), getHeight());
 
-    Component::setVisible (true);
+    Component::setVisible(true);
 }
 
-void MainWindow::closeButtonPressed()
-{
-    juce::JUCEApplication::getInstance()->systemRequestedQuit();
-}
+void MainWindow::closeButtonPressed() { juce::JUCEApplication::getInstance()->systemRequestedQuit(); }
 
-void MainWindow::initialise()
-{
-    setFullScreen(true);
-}
+void MainWindow::initialise() { setFullScreen(true); }

@@ -2,7 +2,6 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 
-
 class Menu final : public juce::Component,
                    public juce::ApplicationCommandTarget,
                    public juce::MenuBarModel
@@ -13,7 +12,7 @@ public:
 
 private:
     void resized() override;
-    void paint(juce::Graphics &g) override;
+    void paint(juce::Graphics& g) override;
 
     juce::StringArray getMenuBarNames() override;
     juce::PopupMenu getMenuForIndex(int index, const juce::String& name) override;
@@ -26,9 +25,10 @@ private:
     std::unique_ptr<juce::MenuBarComponent> menuBarComponent;
     juce::ApplicationCommandManager commandManager;
 
-    juce::StringArray menuBarNames{"File", "Edit", "View", "Help" };
+    juce::StringArray menuBarNames{"File", "Edit", "View", "Help"};
 
-    enum TopLevelMenuOptions {
+    enum TopLevelMenuOptions
+    {
         file = 0,
         edit,
         view,
@@ -36,18 +36,19 @@ private:
     };
 
     // TODO: Better idea of representation instead of comments like that
-    enum LowerLevelMenuOptions {
-        //File
+    enum LowerLevelMenuOptions
+    {
+        // File
         newFile = 1,
         openFile,
         saveFile,
         saveAsFile,
-        //Edit
+        // Edit
         undo,
         redo,
-        //View
+        // View
         view1,
-        //Help
+        // Help
         help1
     };
 };
