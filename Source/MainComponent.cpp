@@ -6,7 +6,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(mainToolbar);
     addAndMakeVisible(trackPlayer);
     addAndMakeVisible(timeline);
-    // timeline.toFront(false);
+    addAndMakeVisible(sideMenu);
     flexBoxInit();
 }
 
@@ -23,17 +23,24 @@ void MainComponent::flexBoxInit()
     const float trackPlayerHeight =
         getParentHeight() - (topLevelMenuHeight + mainToolbarHeight + timelineHeight);  // temporary
     std::cout << "trackPlayerHeight = " << trackPlayerHeight << std::endl;
+    std::cout << "getParentWidth() = " << getParentWidth() << std::endl;
+    std::cout << "getParentHeight() = " << getParentHeight() << std::endl;
 
     topLevelFlexBox.flexDirection = juce::FlexBox::Direction::column;
     topLevelFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
 
-    mainContentFlexBox.flexDirection = juce::FlexBox::Direction::column;
-    mainContentFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
+    mainContentFlexBox.flexDirection = juce::FlexBox::Direction::row;
+
+    trackPlayerFlexBox.flexDirection = juce::FlexBox::Direction::column;
+    trackPlayerFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
 
     topLevelFlexBox.items.add(juce::FlexItem(0, topLevelMenuHeight, topLevelMenu));
     topLevelFlexBox.items.add(juce::FlexItem(0, mainToolbarHeight, mainToolbar));
     topLevelFlexBox.items.add(juce::FlexItem(0, trackPlayerHeight + timelineHeight, mainContentFlexBox).withFlex(1.0));
 
-    mainContentFlexBox.items.add(juce::FlexItem(0, timelineHeight, timeline));
-    mainContentFlexBox.items.add(juce::FlexItem(0, /* 1369 - pozostałe */ 1249, trackPlayer));
+    mainContentFlexBox.items.add(juce::FlexItem(sideMenuWidth, 1299, sideMenu));
+    mainContentFlexBox.items.add(juce::FlexItem(2560.0f - sideMenuWidth, 0, trackPlayerFlexBox));
+
+    trackPlayerFlexBox.items.add(juce::FlexItem(0, timelineHeight, timeline));
+    trackPlayerFlexBox.items.add(juce::FlexItem(0, /* 1369 - pozostałe */ 1249, trackPlayer));
 }

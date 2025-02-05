@@ -47,6 +47,8 @@ set(SourceFiles
         Source/TrackPlayer/TrackPlayer.cpp
         Source/TrackPlayer/Timeline.h
         Source/TrackPlayer/Timeline.cpp
+        Source/TrackPlayer/ClipsBoxes.h
+        Source/TrackPlayer/ClipsBoxes.cpp
 
         Source/SideMenu/SideMenu.h
         Source/SideMenu/SideMenu.cpp

@@ -2,7 +2,7 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 
-class SideMenu final : juce::Component
+class SideMenu final : public juce::Component
 {
 public:
     SideMenu() = default;
