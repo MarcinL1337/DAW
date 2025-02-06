@@ -22,9 +22,6 @@ void MainComponent::flexBoxInit()
     constexpr int timelineHeight{50};
     const float trackPlayerHeight =
         getParentHeight() - (topLevelMenuHeight + mainToolbarHeight + timelineHeight);  // temporary
-    std::cout << "trackPlayerHeight = " << trackPlayerHeight << std::endl;
-    std::cout << "getParentWidth() = " << getParentWidth() << std::endl;
-    std::cout << "getParentHeight() = " << getParentHeight() << std::endl;
 
     topLevelFlexBox.flexDirection = juce::FlexBox::Direction::column;
     topLevelFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;

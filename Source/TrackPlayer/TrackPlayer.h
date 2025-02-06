@@ -7,6 +7,8 @@ class TrackPlayer final : public juce::Component
 {
 public:
     TrackPlayer();
+    TrackPlayer(const TrackPlayer&) = delete;
+    TrackPlayer& operator=(const TrackPlayer&) = delete;
     ~TrackPlayer() override = default;
 
     void paint(juce::Graphics& g) override;
@@ -16,5 +18,5 @@ public:
 
 private:
     juce::FlexBox clipsBoxes;
-    juce::Array<ClipsBox> clipsBoxesArray{};
+    std::vector<std::unique_ptr<ClipsBox>> clipsBoxesVector;
 };

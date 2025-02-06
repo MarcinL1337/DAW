@@ -1,10 +1,6 @@
 #include "TrackPlayer.h"
 
-TrackPlayer::TrackPlayer()
-{
-    flexBoxInit();
-    for(auto& box: clipsBoxesArray) { addAndMakeVisible(box); }
-}
+TrackPlayer::TrackPlayer() { flexBoxInit(); }
 
 void TrackPlayer::paint(juce::Graphics& g)
 {
@@ -13,14 +9,23 @@ void TrackPlayer::paint(juce::Graphics& g)
     std::cout << "TrackPlayer: " << getLocalBounds().getHeight() << " x " << getLocalBounds().getWidth() << std::endl;
 }
 
-void TrackPlayer::resized() {}
+void TrackPlayer::resized()
+{
+    for(auto i{0}; i < 30; i++)
+    {
+        clipsBoxesVector.at(i)->setBounds(0, i * clipsBoxesVector.at(i)->getClipBoxWidth(), getWidth(), getHeight());
+    }
+}
 
 void TrackPlayer::flexBoxInit()
 {
-    for(auto i{0}; i < 10; i++)
+    clipsBoxesVector.clear();
+    for(auto i{0}; i < 30; i++)
     {
-        ClipsBox clipsBox{0.0, static_cast<float>(50.0 * (i + 1))};
-        clipsBoxesArray.add(clipsBox);
-        clipsBoxes.items.add(juce::FlexItem(static_cast<float>(getWidth()), 50.0, clipsBox));
+        float x{0.0f};
+        float y{0.0f};
+        auto clipsBox = std::make_unique<ClipsBox>(x, y);
+        clipsBoxesVector.push_back(std::move(clipsBox));
+        addAndMakeVisible(clipsBoxesVector.back().get());
     }
 }

@@ -18,6 +18,7 @@ public:
 
     float getMainToolbarHeight() const { return mainToolbarHeight; }
     float getTopLevelMenuHeight() const { return topLevelMenuHeight; }
+    float getSideMenuHeight() const { return sideMenuWidth; }
 
 private:
     Menu topLevelMenu{};

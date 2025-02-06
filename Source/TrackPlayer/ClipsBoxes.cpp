@@ -2,11 +2,6 @@
 
 ClipsBox::ClipsBox(const float x_coord, const float y_coord) : x(x_coord), y(y_coord) {}
 
-ClipsBox::ClipsBox(const ClipsBox& other) : x(other.x), y(other.y)
-{
-    std::cout << "ClipsBox(): x = " << x << ", y = " << y << std::endl;
-}
-
 void ClipsBox::paint(juce::Graphics& g)
 {
     const auto parentWidth{getWidth()};
@@ -14,7 +9,12 @@ void ClipsBox::paint(juce::Graphics& g)
 
     g.setColour(juce::Colours::lightgrey);
 
-    for(int i{0}; i < static_cast<int>(startAmountOfBoxes); i++) { g.drawRect(x, y * i, startBoxWidth, boxHeight); }
+    for(int i{0}; i < static_cast<int>(startAmountOfBoxes); i++)
+    {
+        g.drawRect(i * startBoxWidth, y, startBoxWidth, boxHeight, 0.75);
+    }
+
+    std::cout << "ClipsBoxes: " << getLocalBounds().getHeight() << " x " << getLocalBounds().getWidth() << std::endl;
 }
 
 void ClipsBox::resized() {}
