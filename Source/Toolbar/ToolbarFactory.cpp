@@ -30,7 +30,6 @@ juce::ToolbarItemComponent* ToolbarFactory::createItem(int itemId)
         case previous:
             previousButton = createButtonFromImage(previous, "Play previous");
             previousButton->addListener(this);
-            // add button on click
             return previousButton;
         case next:
             nextButton = createButtonFromImage(next, "Next");

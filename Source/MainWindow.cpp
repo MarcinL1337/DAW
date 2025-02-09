@@ -8,8 +8,6 @@ MainWindow::MainWindow(const juce::String& name) :
     setContentOwned(new MainComponent(), true);
 
     setResizable(true, true);
-    centreWithSize(getWidth(), getHeight());
-
     Component::setVisible(true);
 }
 

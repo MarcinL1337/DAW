@@ -2,8 +2,13 @@
 
 MainComponent::MainComponent()
 {
+    // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
+    setSize(getParentWidth(), getParentHeight());
     addAndMakeVisible(topLevelMenu);
     addAndMakeVisible(mainToolbar);
+    addAndMakeVisible(trackPlayer);
+    addAndMakeVisible(timeline);
+    addAndMakeVisible(sideMenu);
     flexBoxInit();
 }
 
@@ -12,21 +17,31 @@ void MainComponent::paint(juce::Graphics& g)
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 }
 
-void MainComponent::resized()
-{
-    // This is called when the MainComponent is resized.
-    // If you add any child components, this is where you should
-    // update their positions.
-    mainFlexBox.performLayout(getLocalBounds());
-}
+void MainComponent::resized() { topLevelFlexBox.performLayout(getLocalBounds()); }
 
 void MainComponent::flexBoxInit()
 {
-    mainFlexBox.flexDirection = juce::FlexBox::Direction::column;
-    mainFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
+    topLevelFlexBox.flexDirection = juce::FlexBox::Direction::column;
+    topLevelFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
 
-    mainFlexBox.items.add(juce::FlexItem(0, topLevelMenuHeight, topLevelMenu));
-    mainFlexBox.items.add(juce::FlexItem(0, mainToolbarHeight, mainToolbar));
-    mainFlexBox.items.add(juce::FlexItem(mainContentFlexBox).withFlex(1.0));
-    mainContentFlexBox.items.add(juce::FlexItem(mainWindowFlexBox).withFlex(1.0));
+    mainContentFlexBox.flexDirection = juce::FlexBox::Direction::row;
+
+    trackPlayerFlexBox.flexDirection = juce::FlexBox::Direction::column;
+    trackPlayerFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
+
+    topLevelFlexBox.items.add(juce::FlexItem(topLevelMenu)
+                                  .withFlex(0, 1, TopLevelMenuConstants::topLevelMenuHeightRatio * getParentHeight()));
+    topLevelFlexBox.items.add(
+        juce::FlexItem(mainToolbar).withFlex(0, 1, MainToolbarConstants::mainToolbarHeightRatio * getParentHeight()));
+    topLevelFlexBox.items.add(juce::FlexItem(mainContentFlexBox).withFlex(1));
+
+    mainContentFlexBox.items.add(
+        juce::FlexItem(sideMenu).withFlex(0, 1, SideMenuConstants::sideMenuWidthRatio * getWidth()));
+    mainContentFlexBox.items.add(juce::FlexItem(trackPlayerFlexBox).withFlex(1));
+
+    trackPlayerFlexBox.items.add(juce::FlexItem(timeline)
+                                     .withFlex(0, 1, TrackPlayerConstants::timelineHeightRatio * getParentHeight())
+                                     .withMinHeight(TrackPlayerConstants::minTimelineHeightRatio * getParentHeight()));
+    trackPlayerFlexBox.items.add(
+        juce::FlexItem(trackPlayer).withFlex(0, 1, TrackPlayerConstants::trackPlayerHeightRatio * getParentHeight()));
 }

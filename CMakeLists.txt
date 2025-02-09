@@ -22,9 +22,9 @@ include(${CPM_DOWNLOAD_LOCATION})
 
 # Bring in JUCE locally
 CPMAddPackage(
-    NAME juce
-    GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-    GIT_TAG origin/master
+        NAME juce
+        GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
+        GIT_TAG origin/master
 )
 
 # Make sure you include any new source files here
@@ -34,21 +34,33 @@ set(SourceFiles
         Source/MainComponent.cpp
         Source/MainWindow.h
         Source/MainWindow.cpp
-        Source/Menu.h
-        Source/Menu.cpp
+
+        Source/TopMenu/Menu.h
+        Source/TopMenu/Menu.cpp
+
         Source/Toolbar/ToolbarFactory.h
         Source/Toolbar/ToolbarFactory.cpp
         Source/Toolbar/MainToolbar.h
         Source/Toolbar/MainToolbar.cpp
+
+        Source/TrackPlayer/TrackPlayer.h
+        Source/TrackPlayer/TrackPlayer.cpp
+        Source/TrackPlayer/Timeline.h
+        Source/TrackPlayer/Timeline.cpp
+        Source/TrackPlayer/ClipsBoxes.h
+        Source/TrackPlayer/ClipsBoxes.cpp
+
+        Source/SideMenu/SideMenu.h
+        Source/SideMenu/SideMenu.cpp
 )
 
 juce_add_gui_app(${PROJECT_NAME}
-    # VERSION ...                       # Set this if the app version is different to the project version
-    # ICON_BIG ...                      # ICON_* arguments specify a path to an image file to use as an icon
-    # ICON_SMALL ...
-    # DOCUMENT_EXTENSIONS ...           # Specify file extensions that should be associated with this app
-    # COMPANY_NAME ...                  # Specify the name of the app's author
-    PRODUCT_NAME "MyDAW")               # The name of the final executable, which can differ from the target name
+        # VERSION ...                       # Set this if the app version is different to the project version
+        # ICON_BIG ...                      # ICON_* arguments specify a path to an image file to use as an icon
+        # ICON_SMALL ...
+        # DOCUMENT_EXTENSIONS ...           # Specify file extensions that should be associated with this app
+        # COMPANY_NAME ...                  # Specify the name of the app's author
+        PRODUCT_NAME "MyDAW")               # The name of the final executable, which can differ from the target name
 
 # How we want our SourceFiles to appear in our IDE
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SourceFiles})
@@ -58,7 +70,7 @@ target_sources(${PROJECT_NAME} PRIVATE ${SourceFiles})
 
 # These are some toggleable options from the JUCE CMake API
 target_compile_definitions(${PROJECT_NAME}
-    PUBLIC
+        PUBLIC
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
         JUCE_VST3_CAN_REPLACE_VST2=0
