@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include "../Constants.h"
 
 class ClipsBox : public juce::Component
 {
@@ -13,13 +14,13 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    float getClipBoxHeight() const { return startBoxWidth; }
-    float getClipBoxWidth() const { return boxHeight; }
+    float getGridBoxWidth() const { return currentGridBoxWidth; }
+    float getGridBoxHeight() const { return currentGridBoxHeight; }
 
 private:
     float x{};
     float y{};
 
-    const float startBoxWidth{70.0};
-    const float boxHeight{85.0};
+    const float currentGridBoxWidth{TrackPlayerConstants::startBoxWidth};
+    const float currentGridBoxHeight{TrackPlayerConstants::startBoxHeight};
 };

@@ -11,12 +11,7 @@ Menu::Menu()
 
 Menu::~Menu() { commandManager.setFirstCommandTarget(nullptr); }
 
-void Menu::resized()
-{
-    auto localBounds = getLocalBounds();
-    menuBarComponent->setBounds(
-        localBounds.removeFromTop(juce::LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight()));
-}
+void Menu::resized() { menuBarComponent->setBounds(getLocalBounds()); }
 
 void Menu::paint(juce::Graphics& g)
 {
@@ -26,7 +21,7 @@ void Menu::paint(juce::Graphics& g)
 
 juce::StringArray Menu::getMenuBarNames() { return menuBarNames; }
 
-juce::PopupMenu Menu::getMenuForIndex(int index, [[maybe_unused]] const juce::String& name)
+juce::PopupMenu Menu::getMenuForIndex(const int index, [[maybe_unused]] const juce::String& name)
 {
     juce::PopupMenu options;
 
@@ -65,7 +60,7 @@ void Menu::getAllCommands(juce::Array<juce::CommandID>& c)
     c.addArray(allCommands);
 }
 
-void Menu::getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result)
+void Menu::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo& result)
 {
     switch(commandID)
     {

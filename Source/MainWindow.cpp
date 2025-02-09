@@ -8,16 +8,9 @@ MainWindow::MainWindow(const juce::String& name) :
     setContentOwned(new MainComponent(), true);
 
     setResizable(true, true);
-    centreWithSize(getWidth(), getHeight());
-
     Component::setVisible(true);
 }
 
 void MainWindow::closeButtonPressed() { juce::JUCEApplication::getInstance()->systemRequestedQuit(); }
 
-void MainWindow::initialise()
-{
-    setFullScreen(true);
-    std::cout << "MainWindow.getWidth(): " << getWidth() << std::endl;
-    std::cout << "MainWindow.getHeight(): " << getHeight() << std::endl;
-}
+void MainWindow::initialise() { setFullScreen(true); }

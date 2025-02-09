@@ -1,31 +1,39 @@
 #include "TrackPlayer.h"
 
-TrackPlayer::TrackPlayer() { flexBoxInit(); }
+TrackPlayer::TrackPlayer()
+{
+    addAndMakeVisible(trackPlayerViewport);
+    trackPlayerViewport.setScrollBarsShown(true, true);
+    trackPlayerViewport.setViewedComponent(&clipsBoxesComponent, false);
+    flexBoxInit();
+}
 
 void TrackPlayer::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightgrey);
     g.drawRect(getLocalBounds());
-    std::cout << "TrackPlayer: " << getLocalBounds().getHeight() << " x " << getLocalBounds().getWidth() << std::endl;
 }
 
 void TrackPlayer::resized()
 {
-    for(auto i{0}; i < 30; i++)
+    trackPlayerViewport.setSize(getWidth(), getHeight());
+    clipsBoxesComponent.setSize(getWidth() * 2, getHeight() * 2);
+    for(auto i{0}; i < 20; i++)
     {
-        clipsBoxesVector.at(i)->setBounds(0, i * clipsBoxesVector.at(i)->getClipBoxWidth(), getWidth(), getHeight());
+        clipsBoxesVector.at(i)->setBounds(
+            0, i * clipsBoxesVector.at(i)->getGridBoxHeight(), getWidth() * 2, getHeight() * 2);
     }
 }
 
 void TrackPlayer::flexBoxInit()
 {
     clipsBoxesVector.clear();
-    for(auto i{0}; i < 30; i++)
+    for(auto i{0}; i < 20; i++)
     {
         float x{0.0f};
         float y{0.0f};
         auto clipsBox = std::make_unique<ClipsBox>(x, y);
         clipsBoxesVector.push_back(std::move(clipsBox));
-        addAndMakeVisible(clipsBoxesVector.back().get());
+        clipsBoxesComponent.addAndMakeVisible(clipsBoxesVector.back().get());
     }
 }

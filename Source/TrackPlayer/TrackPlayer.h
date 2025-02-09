@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include "../Constants.h"
 #include "ClipsBoxes.h"
 
 class TrackPlayer final : public juce::Component
@@ -17,6 +18,8 @@ public:
     void flexBoxInit();
 
 private:
-    juce::FlexBox clipsBoxes;
-    std::vector<std::unique_ptr<ClipsBox>> clipsBoxesVector;
+    juce::FlexBox clipsBoxes{};
+    Component clipsBoxesComponent{};
+    juce::Viewport trackPlayerViewport{};
+    std::vector<std::unique_ptr<ClipsBox>> clipsBoxesVector{};
 };
