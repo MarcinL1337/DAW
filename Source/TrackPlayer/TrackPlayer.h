@@ -3,6 +3,7 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "../Constants.h"
 #include "ClipsBoxes.h"
+#include "Timeline.h"
 
 class TrackPlayer final : public juce::Component
 {
@@ -16,10 +17,18 @@ public:
     void resized() override;
 
     void flexBoxInit();
+    void drawBoxes();
+    void viewportsInit();
+
+    int getClipsBoxesComponentWidth() const { return clipsBoxesComponent.getWidth(); }
 
 private:
-    juce::FlexBox clipsBoxes{};
-    Component clipsBoxesComponent{};
+    const int tempNumOfBoxes{51};
+    juce::FlexBox trackPlayerFlexBox{};
+    juce::FlexBox clipsBoxesFlexBox{};
     juce::Viewport trackPlayerViewport{};
+    juce::Viewport timelineViewport{};
+    Timeline timeline{tempNumOfBoxes};
+    Component clipsBoxesComponent{};
     std::vector<std::unique_ptr<ClipsBox>> clipsBoxesVector{};
 };

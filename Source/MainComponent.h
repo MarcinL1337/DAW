@@ -22,7 +22,6 @@ private:
     MainToolbar mainToolbar{};
     TrackPlayer trackPlayer{};
     SideMenu sideMenu{};
-    Timeline timeline{};
 
     juce::FlexBox topLevelFlexBox{};
     juce::FlexBox mainContentFlexBox{};
