@@ -14,6 +14,8 @@ namespace TrackPlayerConstants
 {
 constexpr float startBoxWidth{70.0f};
 constexpr float startBoxHeight{85.0f};
+constexpr uint8_t startNumOfBoxes{51u};
+constexpr uint8_t startNumOfBoxesRows{20u};
 
 constexpr float timelineHeightRatio{0.1f};
 constexpr float minTimelineHeightRatio{0.05f};

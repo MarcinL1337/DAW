@@ -23,12 +23,11 @@ public:
     int getClipsBoxesComponentWidth() const { return clipsBoxesComponent.getWidth(); }
 
 private:
-    const int tempNumOfBoxes{51};
     juce::FlexBox trackPlayerFlexBox{};
     juce::FlexBox clipsBoxesFlexBox{};
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
-    Timeline timeline{tempNumOfBoxes};
+    Timeline timeline{TrackPlayerConstants::startNumOfBoxes};
     Component clipsBoxesComponent{};
     std::vector<std::unique_ptr<ClipsBox>> clipsBoxesVector{};
 };

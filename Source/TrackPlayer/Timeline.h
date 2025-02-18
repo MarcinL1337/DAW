@@ -5,7 +5,7 @@
 class Timeline final : public juce::Component
 {
 public:
-    Timeline(int numOfBoxes = 42);
+    explicit Timeline(int numOfBoxes);
     ~Timeline() override = default;
 
     void paint(juce::Graphics& g) override;

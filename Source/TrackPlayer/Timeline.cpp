@@ -8,9 +8,8 @@ void Timeline::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightgrey);
     g.drawRect(getLocalBounds());
-    std::cout << "Timeline: " << getWidth() << " x " << getHeight() << " | x = " << getX() << ", y = " << getY()
-              << std::endl;
-    for(auto i{0}; i < tempNumOfSeconds; i++)
+    // TODO: make this painting cleaner
+    for(auto i{0u}; i < tempNumOfSeconds; i++)
     {
         g.drawText(std::to_string(i),
                    i * TrackPlayerConstants::startBoxWidth + 3,

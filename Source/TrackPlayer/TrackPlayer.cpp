@@ -2,7 +2,6 @@
 
 TrackPlayer::TrackPlayer()
 {
-    // addAndMakeVisible(timeline);
     addAndMakeVisible(trackPlayerViewport);
     addAndMakeVisible(timelineViewport);
     viewportsInit();
@@ -19,20 +18,16 @@ void TrackPlayer::paint(juce::Graphics& g)
 
 void TrackPlayer::resized()
 {
-    // std::cout << "clipsBoxesComponent: " << clipsBoxesComponent.getHeight() << " x " <<
-    // clipsBoxesComponent.getWidth()
-    //           << " | x = " << clipsBoxesComponent.getX() << ", y = " << clipsBoxesComponent.getY() << std::endl;
-    // std::cout << "timeline: " << timeline.getHeight() << " x " << timeline.getWidth() << " | x = " << timeline.getX()
-    //           << ", y = " << timeline.getY() << std::endl;
     trackPlayerFlexBox.performLayout(getLocalBounds());
     trackPlayerViewport.setBounds(clipsBoxesComponent.getX(),
                                   clipsBoxesComponent.getY() + timeline.getHeight(),
                                   getWidth(),
                                   getHeight() - timeline.getHeight());
     timelineViewport.setBounds(timeline.getX(), timeline.getY(), getWidth(), timeline.getHeight());
-    clipsBoxesComponent.setSize(getWidth() * 2, getHeight() * 2);
-    timeline.setSize(clipsBoxesComponent.getWidth(), timeline.getHeight());
-    for(auto i{0}; i < 20; i++)
+    clipsBoxesComponent.setSize(TrackPlayerConstants::startNumOfBoxes * TrackPlayerConstants::startBoxWidth,
+                                TrackPlayerConstants::startNumOfBoxesRows * TrackPlayerConstants::startBoxHeight);
+    timeline.setSize(clipsBoxesComponent.getWidth() + 10 /* temporary */, timeline.getHeight());
+    for(auto i{0u}; i < TrackPlayerConstants::startNumOfBoxesRows; i++)
     {
         clipsBoxesVector.at(i)->setBounds(0,
                                           i * clipsBoxesVector.at(i)->getGridBoxHeight() + clipsBoxesComponent.getY(),
@@ -48,7 +43,6 @@ void TrackPlayer::flexBoxInit()
 
     clipsBoxesFlexBox.flexDirection = juce::FlexBox::Direction::column;
     clipsBoxesFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
-    std::cout << getParentHeight() << std::endl;
 
     trackPlayerFlexBox.items.add(juce::FlexItem(timeline)
                                      .withFlex(0, 1, TrackPlayerConstants::timelineHeightRatio * getParentHeight())
@@ -61,11 +55,11 @@ void TrackPlayer::flexBoxInit()
 void TrackPlayer::drawBoxes()
 {
     clipsBoxesVector.clear();
-    for(auto i{0}; i < 20; i++)
+    for(auto i{0u}; i < TrackPlayerConstants::startNumOfBoxesRows; i++)
     {
         float x{0.0f};
         float y{static_cast<float>(clipsBoxesComponent.getY())};
-        auto clipsBox = std::make_unique<ClipsBox>(x, y, tempNumOfBoxes);
+        auto clipsBox = std::make_unique<ClipsBox>(x, y, TrackPlayerConstants::startNumOfBoxes);
         clipsBoxesVector.push_back(std::move(clipsBox));
         clipsBoxesComponent.addAndMakeVisible(clipsBoxesVector.back().get());
     }
