@@ -7,7 +7,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(topLevelMenu);
     addAndMakeVisible(mainToolbar);
     addAndMakeVisible(trackPlayer);
-    addAndMakeVisible(timeline);
+
     addAndMakeVisible(sideMenu);
     flexBoxInit();
 }
@@ -21,6 +21,7 @@ void MainComponent::resized() { topLevelFlexBox.performLayout(getLocalBounds());
 
 void MainComponent::flexBoxInit()
 {
+    std::cout << getParentHeight() << std::endl;
     topLevelFlexBox.flexDirection = juce::FlexBox::Direction::column;
     topLevelFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
 
@@ -39,9 +40,5 @@ void MainComponent::flexBoxInit()
         juce::FlexItem(sideMenu).withFlex(0, 1, SideMenuConstants::sideMenuWidthRatio * getWidth()));
     mainContentFlexBox.items.add(juce::FlexItem(trackPlayerFlexBox).withFlex(1));
 
-    trackPlayerFlexBox.items.add(juce::FlexItem(timeline)
-                                     .withFlex(0, 1, TrackPlayerConstants::timelineHeightRatio * getParentHeight())
-                                     .withMinHeight(TrackPlayerConstants::minTimelineHeightRatio * getParentHeight()));
-    trackPlayerFlexBox.items.add(
-        juce::FlexItem(trackPlayer).withFlex(0, 1, TrackPlayerConstants::trackPlayerHeightRatio * getParentHeight()));
+    trackPlayerFlexBox.items.add(juce::FlexItem(trackPlayer).withFlex(1));
 }

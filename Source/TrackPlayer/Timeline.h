@@ -5,7 +5,7 @@
 class Timeline final : public juce::Component
 {
 public:
-    Timeline() = default;
+    explicit Timeline(int numOfBoxes);
     ~Timeline() override = default;
 
     void paint(juce::Graphics& g) override;
@@ -13,4 +13,5 @@ public:
 
 private:
     juce::FlexBox timelineFlexBox;
+    const int tempNumOfSeconds{};
 };
