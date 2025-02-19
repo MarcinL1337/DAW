@@ -161,7 +161,8 @@ void ToolbarFactory::playPauseButtonClicked()
     else
     {
         setCurrentTrackState(TrackPlayingState::playing);
-        temporaryButtonsFunction("playButton");
+        // temporaryButtonsFunction("playButton");
+        mainAudio.play();
     }
 }
 void ToolbarFactory::startRecordingButtonClicked() { temporaryButtonsFunction("startRecordingButton"); }

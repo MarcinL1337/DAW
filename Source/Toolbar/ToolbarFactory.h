@@ -2,6 +2,7 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <cassert>
+#include "../Audio/MainAudio.h"
 #include "BinaryData.h"
 
 class ToolbarFactory final : public juce::ToolbarItemFactory,
@@ -9,6 +10,7 @@ class ToolbarFactory final : public juce::ToolbarItemFactory,
 {
 public:
     ToolbarFactory() = default;
+    ToolbarFactory(MainAudio& mainAudioRef) : mainAudio(mainAudioRef) {};
     ~ToolbarFactory() override = default;
 
 private:
@@ -62,5 +64,8 @@ private:
     juce::ToolbarButton* replayButton{nullptr};
     juce::ToolbarButton* startRecordingButton{nullptr};
     juce::ToolbarButton* stopRecordingButton{nullptr};
+
+    MainAudio& mainAudio;
+    // void setMainAudioRef(MainAudio& mainAudioRef) { mainAudio = mainAudioRef;}
 };
 

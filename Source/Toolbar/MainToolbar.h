@@ -6,7 +6,7 @@
 class MainToolbar final : public juce::Component
 {
 public:
-    MainToolbar();
+    MainToolbar(MainAudio& mainAudioRef);
     ~MainToolbar() override = default;
 
 private:

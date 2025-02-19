@@ -1,6 +1,6 @@
 #include "MainComponent.h"
 
-MainComponent::MainComponent()
+MainComponent::MainComponent() : mainToolbar(mainAudio)
 {
     // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
     setSize(getParentWidth(), getParentHeight());
@@ -10,6 +10,7 @@ MainComponent::MainComponent()
     addAndMakeVisible(timeline);
     addAndMakeVisible(sideMenu);
     flexBoxInit();
+    addTestTrack();
 }
 
 void MainComponent::paint(juce::Graphics& g)
@@ -44,4 +45,14 @@ void MainComponent::flexBoxInit()
                                      .withMinHeight(TrackPlayerConstants::minTimelineHeightRatio * getParentHeight()));
     trackPlayerFlexBox.items.add(
         juce::FlexItem(trackPlayer).withFlex(0, 1, TrackPlayerConstants::trackPlayerHeightRatio * getParentHeight()));
+}
+
+void MainComponent::addTestTrack()
+{
+    const juce::File audioFile("C:/Users/julek/CLionProjects/DAW/Source/Audio/test.mp3");
+
+    if(audioFile.existsAsFile())
+        mainAudio.addTrack(audioFile);
+    else
+        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon, "Error", "test.wav not found");
 }

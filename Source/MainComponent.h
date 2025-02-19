@@ -2,6 +2,7 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 
+#include "Audio/MainAudio.h"
 #include "Constants.h"
 #include "SideMenu/SideMenu.h"
 #include "Toolbar/MainToolbar.h"
@@ -18,8 +19,11 @@ public:
     void flexBoxInit();
 
 private:
+    MainAudio mainAudio{};
+    void addTestTrack();
+
     Menu topLevelMenu{};
-    MainToolbar mainToolbar{};
+    MainToolbar mainToolbar;
     TrackPlayer trackPlayer{};
     SideMenu sideMenu{};
     Timeline timeline{};

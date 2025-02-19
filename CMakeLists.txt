@@ -52,6 +52,11 @@ set(SourceFiles
 
         Source/SideMenu/SideMenu.h
         Source/SideMenu/SideMenu.cpp
+
+        Source/Audio/MainAudio.h
+        Source/Audio/MainAudio.cpp
+        Source/Audio/Track.h
+        Source/Audio/Track.cpp
 )
 
 juce_add_gui_app(${PROJECT_NAME}
@@ -74,6 +79,7 @@ target_compile_definitions(${PROJECT_NAME}
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
         JUCE_VST3_CAN_REPLACE_VST2=0
+        # JUCE_USE_MP3AUDIOFORMAT=1
 )
 
 juce_add_binary_data(BinaryData SOURCES

@@ -1,6 +1,6 @@
 #include "MainToolbar.h"
 
-MainToolbar::MainToolbar()
+MainToolbar::MainToolbar(MainAudio& mainAudioRef) : toolbarFactory(mainAudioRef)
 {
     addAndMakeVisible(toolbar);
     toolbar.addDefaultItems(toolbarFactory);
