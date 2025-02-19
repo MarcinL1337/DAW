@@ -4,6 +4,7 @@
 #include "../Constants.h"
 #include "ClipsBoxes.h"
 #include "Timeline.h"
+#include "TrackPlayerSideMenu.h"
 
 class TrackPlayer final : public juce::Component
 {
@@ -23,11 +24,13 @@ public:
     int getClipsBoxesComponentWidth() const { return clipsBoxesComponent.getWidth(); }
 
 private:
+    juce::FlexBox trackPlayerWrapperFlexBox{};
     juce::FlexBox trackPlayerFlexBox{};
     juce::FlexBox clipsBoxesFlexBox{};
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
     Timeline timeline{TrackPlayerConstants::startNumOfBoxes};
+    TrackPlayerSideMenu trackPlayerSideMenu{};
     Component clipsBoxesComponent{};
     std::vector<std::unique_ptr<ClipsBox>> clipsBoxesVector{};
 };
