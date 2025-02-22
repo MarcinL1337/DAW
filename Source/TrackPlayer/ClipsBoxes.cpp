@@ -1,8 +1,6 @@
 #include "ClipsBoxes.h"
 
-ClipsBox::ClipsBox(const float x_coord, const float y_coord, const int numOfBoxes) :
-    x(x_coord), y(y_coord), currentNumOfBoxes{numOfBoxes}
-{}
+ClipsBox::ClipsBox(const int numOfBoxes) : currentNumOfBoxes{numOfBoxes} {}
 
 void ClipsBox::paint(juce::Graphics& g)
 {
@@ -11,7 +9,7 @@ void ClipsBox::paint(juce::Graphics& g)
     for(auto i{0u}; i < currentNumOfBoxes; i++)
     {
         g.drawRect(i * TrackPlayerConstants::startBoxWidth,
-                   y,
+                   0.0,
                    TrackPlayerConstants::startBoxWidth,
                    TrackPlayerConstants::startBoxHeight,
                    0.75);
