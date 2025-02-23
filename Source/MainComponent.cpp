@@ -21,7 +21,6 @@ void MainComponent::resized() { topLevelFlexBox.performLayout(getLocalBounds());
 
 void MainComponent::flexBoxInit()
 {
-    std::cout << getParentHeight() << std::endl;
     topLevelFlexBox.flexDirection = juce::FlexBox::Direction::column;
     topLevelFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
 

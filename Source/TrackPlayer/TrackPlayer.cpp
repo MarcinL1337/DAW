@@ -4,9 +4,8 @@ TrackPlayer::TrackPlayer()
 {
     addAndMakeVisible(trackPlayerViewport);
     addAndMakeVisible(timelineViewport);
+    addAndMakeVisible(trackPlayerSideMenuViewport);
     viewportsInit();
-    flexBoxInit();
-    drawBoxes();
 }
 
 void TrackPlayer::paint(juce::Graphics& g)
@@ -14,42 +13,31 @@ void TrackPlayer::paint(juce::Graphics& g)
     g.setColour(juce::Colours::lightgrey);
     g.drawRect(getLocalBounds());
     timelineViewport.setViewPosition(trackPlayerViewport.getViewPositionX(), timelineViewport.getViewPositionY());
+    trackPlayerSideMenuViewport.setViewPosition(trackPlayerSideMenuViewport.getViewPositionX(),
+                                                trackPlayerViewport.getViewPositionY());
 }
 
 void TrackPlayer::resized()
 {
-    trackPlayerFlexBox.performLayout(getLocalBounds());
-    trackPlayerViewport.setBounds(clipsBoxesComponent.getX(),
-                                  clipsBoxesComponent.getY() + timeline.getHeight(),
-                                  getWidth(),
-                                  getHeight() - timeline.getHeight());
-    timelineViewport.setBounds(timeline.getX(), timeline.getY(), getWidth(), timeline.getHeight());
-    clipsBoxesComponent.setSize(TrackPlayerConstants::startNumOfBoxes * TrackPlayerConstants::startBoxWidth,
+    timeline.setSize(TrackPlayerConstants::startNumOfBoxes * TrackPlayerConstants::startBoxWidth,
+                     TrackPlayerConstants::timelineHeightRatio * getHeight());
+    clipsBoxesComponent.setSize(timeline.getWidth(),
                                 TrackPlayerConstants::startNumOfBoxesRows * TrackPlayerConstants::startBoxHeight);
-    timeline.setSize(clipsBoxesComponent.getWidth() + 10 /* temporary */, timeline.getHeight());
-    for(auto i{0u}; i < TrackPlayerConstants::startNumOfBoxesRows; i++)
-    {
-        clipsBoxesVector.at(i)->setBounds(0,
-                                          i * clipsBoxesVector.at(i)->getGridBoxHeight() + clipsBoxesComponent.getY(),
-                                          getWidth() * 2,
-                                          getHeight() * 2);
-    }
-}
+    trackPlayerSideMenu.setBounds(0,
+                                  0,
+                                  TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(),
+                                  clipsBoxesComponent.getHeight() + timeline.getHeight());
 
-void TrackPlayer::flexBoxInit()
-{
-    trackPlayerFlexBox.flexDirection = juce::FlexBox::Direction::column;
-    trackPlayerFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
+    drawBoxes();
+    drawTrackButtons();
 
-    clipsBoxesFlexBox.flexDirection = juce::FlexBox::Direction::column;
-    clipsBoxesFlexBox.flexWrap = juce::FlexBox::Wrap::noWrap;
-
-    trackPlayerFlexBox.items.add(juce::FlexItem(timeline)
-                                     .withFlex(0, 1, TrackPlayerConstants::timelineHeightRatio * getParentHeight())
-                                     .withMinHeight(TrackPlayerConstants::minTimelineHeightRatio * getParentHeight()));
-    trackPlayerFlexBox.items.add(juce::FlexItem(clipsBoxesFlexBox).withFlex(1));
-
-    clipsBoxesFlexBox.items.add(juce::FlexItem(clipsBoxesComponent));
+    timelineViewport.setBounds(getLocalBounds()
+                                   .removeFromRight(getWidth() - trackPlayerSideMenu.getWidth())
+                                   .removeFromTop(timeline.getHeight()));
+    trackPlayerViewport.setBounds(getLocalBounds()
+                                      .removeFromRight(getWidth() - trackPlayerSideMenu.getWidth())
+                                      .removeFromBottom(getHeight() - timeline.getHeight()));
+    trackPlayerSideMenuViewport.setBounds(0, timeline.getHeight(), trackPlayerSideMenu.getWidth(), getHeight());
 }
 
 void TrackPlayer::drawBoxes()
@@ -57,11 +45,47 @@ void TrackPlayer::drawBoxes()
     clipsBoxesVector.clear();
     for(auto i{0u}; i < TrackPlayerConstants::startNumOfBoxesRows; i++)
     {
-        float x{0.0f};
-        float y{static_cast<float>(clipsBoxesComponent.getY())};
-        auto clipsBox = std::make_unique<ClipsBox>(x, y, TrackPlayerConstants::startNumOfBoxes);
+        auto clipsBox = std::make_unique<ClipsBox>(TrackPlayerConstants::startNumOfBoxes);
+        clipsBox->setBounds(0,
+                            i * TrackPlayerConstants::startBoxHeight,
+                            clipsBoxesComponent.getWidth(),
+                            TrackPlayerConstants::startBoxHeight);
         clipsBoxesVector.push_back(std::move(clipsBox));
         clipsBoxesComponent.addAndMakeVisible(clipsBoxesVector.back().get());
+    }
+}
+
+void TrackPlayer::drawTrackButtons()
+{
+    trackButtonsVector.clear();
+    const auto startX{trackPlayerSideMenu.getWidth() - 2 * trackButtonsSize};
+    const auto xDifference{trackButtonsSize + 5};
+    for(auto i{0u}; i < TrackPlayerConstants::startNumOfBoxesRows + 1; i++)
+    {
+        auto recordButton = std::make_unique<juce::TextButton>("R");
+        auto soloButton = std::make_unique<juce::TextButton>("S");
+        auto muteButton = std::make_unique<juce::TextButton>("M");
+        auto trackLabel = std::make_unique<juce::Label>();
+
+        auto currentY{i * TrackPlayerConstants::startBoxHeight + 15};
+
+        recordButton->setBounds(startX, currentY, trackButtonsSize, trackButtonsSize);
+        recordButton->onClick = [i]() { std::cout << "Recording[" << i << "]" << std::endl; };
+
+        soloButton->setBounds(startX - xDifference, currentY, trackButtonsSize, trackButtonsSize);
+        soloButton->onClick = [i]() { std::cout << "Soloing[" << i << "]" << std::endl; };
+
+        muteButton->setBounds(startX - 2 * xDifference, currentY, trackButtonsSize, trackButtonsSize);
+        muteButton->onClick = [i]() { std::cout << "Muting[" << i << "]" << std::endl; };
+
+        trackLabel->setText("Track nr " + std::to_string(i + 1), juce::NotificationType::dontSendNotification);
+        trackLabel->setBounds(30, currentY, 100, trackButtonsSize);
+
+        trackButtonsVector.push_back({std::move(recordButton), std::move(soloButton), std::move(muteButton)});
+        for(auto& button: trackButtonsVector.back()) { trackPlayerSideMenu.addAndMakeVisible(button.get()); }
+
+        trackLabelsVector.push_back(std::move(trackLabel));
+        trackPlayerSideMenu.addAndMakeVisible(trackLabelsVector.back().get());
     }
 }
 
@@ -69,7 +93,12 @@ void TrackPlayer::viewportsInit()
 {
     trackPlayerViewport.setScrollBarsShown(true, true);
     trackPlayerViewport.setViewedComponent(&clipsBoxesComponent, false);
+    // TODO: Temporary. Question: Why stepY = 26 scrolls whole box Height which is 85?
+    trackPlayerViewport.setSingleStepSizes(8, 26);
 
     timelineViewport.setScrollBarsShown(false, false);
     timelineViewport.setViewedComponent(&timeline, false);
+
+    trackPlayerSideMenuViewport.setScrollBarsShown(false, false);
+    trackPlayerSideMenuViewport.setViewedComponent(&trackPlayerSideMenu, false);
 }

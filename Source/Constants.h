@@ -17,10 +17,13 @@ constexpr float startBoxHeight{85.0f};
 constexpr uint8_t startNumOfBoxes{51u};
 constexpr uint8_t startNumOfBoxesRows{20u};
 
-constexpr float timelineHeightRatio{0.1f};
+constexpr float timelineHeightRatio{0.08f};
 constexpr float minTimelineHeightRatio{0.05f};
 
 constexpr float trackPlayerHeightRatio{1.0f - timelineHeightRatio};
+
+constexpr float trackPlayerSideMenuWidthRatio{0.12f};
+constexpr float minTrackPlayerSideMenuWidthRatio{0.07f};
 
 }  // namespace TrackPlayerConstants
 
