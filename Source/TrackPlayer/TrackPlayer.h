@@ -17,8 +17,8 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    void flexBoxInit();
     void drawBoxes();
+    void drawTrackButtons();
     void viewportsInit();
 
     int getClipsBoxesComponentWidth() const { return clipsBoxesComponent.getWidth(); }
@@ -27,10 +27,18 @@ private:
     juce::FlexBox trackPlayerWrapperFlexBox{};
     juce::FlexBox trackPlayerFlexBox{};
     juce::FlexBox clipsBoxesFlexBox{};
+
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
+    juce::Viewport trackPlayerSideMenuViewport{};
+
     Timeline timeline{TrackPlayerConstants::startNumOfBoxes};
     TrackPlayerSideMenu trackPlayerSideMenu{};
     Component clipsBoxesComponent{};
+
+    using trackButtons = std::array<std::unique_ptr<juce::TextButton>, 3>;
     std::vector<std::unique_ptr<ClipsBox>> clipsBoxesVector{};
+    std::vector<trackButtons> trackButtonsVector{};
+
+    const int trackButtonsSize{30};
 };

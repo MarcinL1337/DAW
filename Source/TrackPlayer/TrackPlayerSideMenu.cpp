@@ -2,7 +2,7 @@
 
 void TrackPlayerSideMenu::paint(juce::Graphics& g)
 {
-    g.setColour(juce::Colours::whitesmoke);
+    g.setColour(juce::Colours::lightgrey);
     g.drawRect(getLocalBounds());
 }
 
