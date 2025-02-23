@@ -22,8 +22,8 @@ constexpr float minTimelineHeightRatio{0.05f};
 
 constexpr float trackPlayerHeightRatio{1.0f - timelineHeightRatio};
 
-constexpr float trackPlayerSideMenuWidthRatio{0.15f};
-constexpr float minTrackPlayerSideMenuWidthRatio{0.7f};
+constexpr float trackPlayerSideMenuWidthRatio{0.12f};
+constexpr float minTrackPlayerSideMenuWidthRatio{0.07f};
 
 }  // namespace TrackPlayerConstants
 

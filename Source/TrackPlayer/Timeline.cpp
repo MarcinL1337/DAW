@@ -7,9 +7,9 @@ Timeline::Timeline(const int numOfBoxes) : tempNumOfSeconds{numOfBoxes} {}
 void Timeline::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightgrey);
-    g.drawRect(getLocalBounds());
+
     // TODO: make this painting cleaner
-    for(auto i{0u}; i < tempNumOfSeconds; i++)
+    for(auto i{0u}; i <= tempNumOfSeconds; i++)
     {
         g.drawText(std::to_string(i),
                    i * TrackPlayerConstants::startBoxWidth + 3,
@@ -17,19 +17,19 @@ void Timeline::paint(juce::Graphics& g)
                    TrackPlayerConstants::startBoxWidth,
                    15,
                    juce::Justification::left);
-        if((i + 1) % 5 == 0)
+        if(i % 5 == 0)
         {
-            g.drawLine(TrackPlayerConstants::startBoxWidth * (i + 1),
+            g.drawLine(TrackPlayerConstants::startBoxWidth * i,
                        getHeight(),
-                       TrackPlayerConstants::startBoxWidth * (i + 1),
+                       TrackPlayerConstants::startBoxWidth * i,
                        getHeight() * 0.5,
                        1);
         }
         else
         {
-            g.drawLine(TrackPlayerConstants::startBoxWidth * (i + 1),
+            g.drawLine(TrackPlayerConstants::startBoxWidth * i,
                        getHeight(),
-                       TrackPlayerConstants::startBoxWidth * (i + 1),
+                       TrackPlayerConstants::startBoxWidth * i,
                        getHeight() * 0.66,
                        0.75);
         }

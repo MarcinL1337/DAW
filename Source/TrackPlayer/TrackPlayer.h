@@ -36,9 +36,11 @@ private:
     TrackPlayerSideMenu trackPlayerSideMenu{};
     Component clipsBoxesComponent{};
 
+    // TODO (maybe): change all vectors to static_vector
     using trackButtons = std::array<std::unique_ptr<juce::TextButton>, 3>;
     std::vector<std::unique_ptr<ClipsBox>> clipsBoxesVector{};
     std::vector<trackButtons> trackButtonsVector{};
+    std::vector<std::unique_ptr<juce::Label>> trackLabelsVector{};
 
     const int trackButtonsSize{30};
 };

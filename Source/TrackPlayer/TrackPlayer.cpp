@@ -23,8 +23,10 @@ void TrackPlayer::resized()
                      TrackPlayerConstants::timelineHeightRatio * getHeight());
     clipsBoxesComponent.setSize(timeline.getWidth(),
                                 TrackPlayerConstants::startNumOfBoxesRows * TrackPlayerConstants::startBoxHeight);
-    trackPlayerSideMenu.setBounds(
-        0, 0, TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(), clipsBoxesComponent.getHeight());
+    trackPlayerSideMenu.setBounds(0,
+                                  0,
+                                  TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(),
+                                  clipsBoxesComponent.getHeight() + timeline.getHeight());
 
     drawBoxes();
     drawTrackButtons();
@@ -56,25 +58,34 @@ void TrackPlayer::drawBoxes()
 void TrackPlayer::drawTrackButtons()
 {
     trackButtonsVector.clear();
+    const auto startX{trackPlayerSideMenu.getWidth() - 2 * trackButtonsSize};
+    const auto xDifference{trackButtonsSize + 5};
     for(auto i{0u}; i < TrackPlayerConstants::startNumOfBoxesRows + 1; i++)
     {
         auto recordButton = std::make_unique<juce::TextButton>("R");
         auto soloButton = std::make_unique<juce::TextButton>("S");
         auto muteButton = std::make_unique<juce::TextButton>("M");
+        auto trackLabel = std::make_unique<juce::Label>();
 
-        float currentY{/*timeline.getHeight() + */ i * TrackPlayerConstants::startBoxHeight + 15};
+        auto currentY{i * TrackPlayerConstants::startBoxHeight + 15};
 
-        recordButton->setBounds(10, currentY, trackButtonsSize, trackButtonsSize);
+        recordButton->setBounds(startX, currentY, trackButtonsSize, trackButtonsSize);
         recordButton->onClick = [i]() { std::cout << "Recording[" << i << "]" << std::endl; };
 
-        soloButton->setBounds(45, currentY, trackButtonsSize, trackButtonsSize);
+        soloButton->setBounds(startX - xDifference, currentY, trackButtonsSize, trackButtonsSize);
         soloButton->onClick = [i]() { std::cout << "Soloing[" << i << "]" << std::endl; };
 
-        muteButton->setBounds(80, currentY, trackButtonsSize, trackButtonsSize);
+        muteButton->setBounds(startX - 2 * xDifference, currentY, trackButtonsSize, trackButtonsSize);
         muteButton->onClick = [i]() { std::cout << "Muting[" << i << "]" << std::endl; };
+
+        trackLabel->setText("Track nr " + std::to_string(i + 1), juce::NotificationType::dontSendNotification);
+        trackLabel->setBounds(30, currentY, 100, trackButtonsSize);
 
         trackButtonsVector.push_back({std::move(recordButton), std::move(soloButton), std::move(muteButton)});
         for(auto& button: trackButtonsVector.back()) { trackPlayerSideMenu.addAndMakeVisible(button.get()); }
+
+        trackLabelsVector.push_back(std::move(trackLabel));
+        trackPlayerSideMenu.addAndMakeVisible(trackLabelsVector.back().get());
     }
 }
 
@@ -82,7 +93,7 @@ void TrackPlayer::viewportsInit()
 {
     trackPlayerViewport.setScrollBarsShown(true, true);
     trackPlayerViewport.setViewedComponent(&clipsBoxesComponent, false);
-    // Temporary. Question: Why stepY = 26 scrolls whole box Height which is 85?
+    // TODO: Temporary. Question: Why stepY = 26 scrolls whole box Height which is 85?
     trackPlayerViewport.setSingleStepSizes(8, 26);
 
     timelineViewport.setScrollBarsShown(false, false);
