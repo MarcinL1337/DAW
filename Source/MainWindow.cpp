@@ -13,4 +13,8 @@ MainWindow::MainWindow(const juce::String& name) :
 
 void MainWindow::closeButtonPressed() { juce::JUCEApplication::getInstance()->systemRequestedQuit(); }
 
-void MainWindow::initialise() { setFullScreen(true); }
+void MainWindow::initialise()
+{
+    setResizeLimits(1200, 600, 4000, 3000);
+    setFullScreen(true);
+}

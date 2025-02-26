@@ -1,12 +1,14 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include <cassert>
 #include "../Constants.h"
 #include "ClipsBoxes.h"
 #include "Timeline.h"
 #include "TrackPlayerSideMenu.h"
 
-class TrackPlayer final : public juce::Component
+class TrackPlayer final : public juce::Component,
+                          public juce::KeyListener
 {
 public:
     TrackPlayer();
@@ -16,18 +18,18 @@ public:
 
     void paint(juce::Graphics& g) override;
     void resized() override;
+    void mouseDown(const juce::MouseEvent& event) override;
+    bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
 
     void drawBoxes();
     void drawTrackButtons();
     void viewportsInit();
+    void addTrack();
 
-    int getClipsBoxesComponentWidth() const { return clipsBoxesComponent.getWidth(); }
+    uint16_t getCurrentNumberOfTracks() const { return currentNumberOfTracks; }
+    void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }
 
 private:
-    juce::FlexBox trackPlayerWrapperFlexBox{};
-    juce::FlexBox trackPlayerFlexBox{};
-    juce::FlexBox clipsBoxesFlexBox{};
-
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
     juce::Viewport trackPlayerSideMenuViewport{};
@@ -43,4 +45,5 @@ private:
     std::vector<std::unique_ptr<juce::Label>> trackLabelsVector{};
 
     const int trackButtonsSize{30};
+    uint16_t currentNumberOfTracks{1};
 };
