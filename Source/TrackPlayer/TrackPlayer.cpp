@@ -2,13 +2,10 @@
 
 TrackPlayer::TrackPlayer()
 {
-    addKeyListener(this);
-    setWantsKeyboardFocus(true);
     addAndMakeVisible(trackPlayerViewport);
     addAndMakeVisible(timelineViewport);
     addAndMakeVisible(trackPlayerSideMenuViewport);
     viewportsInit();
-    juce::Timer::callAfterDelay(100, [&] { grabKeyboardFocus(); });
 }
 
 void TrackPlayer::paint(juce::Graphics& g)
@@ -24,9 +21,12 @@ void TrackPlayer::resized()
 {
     timeline.setSize(TrackPlayerConstants::startNumOfBoxes * TrackPlayerConstants::startBoxWidth,
                      TrackPlayerConstants::timelineHeightRatio * getHeight());
-    clipsBoxesComponent.setSize(timeline.getWidth(), getCurrentNumberOfTracks() * TrackPlayerConstants::startBoxHeight);
-    trackPlayerSideMenu.setSize(TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(),
-                                clipsBoxesComponent.getHeight() + timeline.getHeight());
+    clipsBoxesComponent.setSize(timeline.getWidth(),
+                                TrackPlayerConstants::startNumOfBoxesRows * TrackPlayerConstants::startBoxHeight);
+    trackPlayerSideMenu.setBounds(0,
+                                  0,
+                                  TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(),
+                                  clipsBoxesComponent.getHeight() + timeline.getHeight());
 
     drawBoxes();
     drawTrackButtons();
@@ -40,28 +40,10 @@ void TrackPlayer::resized()
     trackPlayerSideMenuViewport.setBounds(0, timeline.getHeight(), trackPlayerSideMenu.getWidth(), getHeight());
 }
 
-void TrackPlayer::mouseDown(const juce::MouseEvent& event)
-{
-    juce::Point mouseClickPosition{event.getMouseDownPosition()};
-    if(reallyContains(mouseClickPosition, true) and event.mods.isRightButtonDown())
-    {
-        addTrack();
-    }
-}
-
-bool TrackPlayer::keyPressed(const juce::KeyPress& key, Component* originatingComponent)
-{
-    if(key.getModifiers().isShiftDown() and key.getTextCharacter() == '+')
-    {
-        addTrack();
-    }
-    return false;
-}
-
 void TrackPlayer::drawBoxes()
 {
     clipsBoxesVector.clear();
-    for(auto i{0u}; i < getCurrentNumberOfTracks(); i++)
+    for(auto i{0u}; i < TrackPlayerConstants::startNumOfBoxesRows; i++)
     {
         auto clipsBox = std::make_unique<ClipsBox>(TrackPlayerConstants::startNumOfBoxes);
         clipsBox->setBounds(0,
@@ -78,7 +60,7 @@ void TrackPlayer::drawTrackButtons()
     trackButtonsVector.clear();
     const auto startX{trackPlayerSideMenu.getWidth() - 2 * trackButtonsSize};
     const auto xDifference{trackButtonsSize + 5};
-    for(auto i{0u}; i < getCurrentNumberOfTracks(); i++)
+    for(auto i{0u}; i < TrackPlayerConstants::startNumOfBoxesRows + 1; i++)
     {
         auto recordButton = std::make_unique<juce::TextButton>("R");
         auto soloButton = std::make_unique<juce::TextButton>("S");
@@ -120,12 +102,3 @@ void TrackPlayer::viewportsInit()
     trackPlayerSideMenuViewport.setScrollBarsShown(false, false);
     trackPlayerSideMenuViewport.setViewedComponent(&trackPlayerSideMenu, false);
 }
-
-void TrackPlayer::addTrack()
-{
-    incrementCurrentNumberOfTracks();
-    trackPlayerSideMenu.incrementCurrentNumberOfTracks();
-    assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
-    this->resized();
-}
-
