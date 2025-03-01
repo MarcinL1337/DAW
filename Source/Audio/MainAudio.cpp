@@ -24,14 +24,13 @@ MainAudio::~MainAudio()
     graph.clear();
 }
 
-void MainAudio::addTrack(const juce::File& file)
+int MainAudio::addTrack(const juce::File& file)
 {
     juce::ScopedLock sl(lock);
     const auto track = new Track(*this);
     if(!track->loadFile(file))
-    {
         throw std::runtime_error("Failed to load file: " + file.getFullPathName().toStdString());
-    }
+
     const auto node = graph.addNode(std::unique_ptr<Track>(track));
     const TrackNode newTrackNode = {node->nodeID, track};
     trackNodes.add(newTrackNode);
@@ -40,6 +39,7 @@ void MainAudio::addTrack(const juce::File& file)
     track->prepareToPlay(audioDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate(),
                          audioDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples());
     rebuildGraph();
+    return trackNodes.indexOf(newTrackNode);
 }
 
 void MainAudio::removeTrack(const Track* track)
@@ -50,6 +50,27 @@ void MainAudio::removeTrack(const Track* track)
     rebuildGraph();
 }
 
+void MainAudio::setPanOfTrack(const int trackIndex, const float pan) const
+{
+    trackNodes[trackIndex].track->setPan(pan);
+}
+void MainAudio::setGainOfTrack(const int trackIndex, const float gain) const
+{
+    trackNodes[trackIndex].track->setGain(gain);
+}
+void MainAudio::setOffsetOfTrack(const int trackIndex, const float offset) const
+{
+    trackNodes[trackIndex].track->setOffset(offset);
+}
+void MainAudio::setSoloOfTrack(const int trackIndex, const bool solo) const
+{
+    trackNodes[trackIndex].track->setSolo(solo);
+}
+void MainAudio::setMuteOfTrack(const int trackIndex, const bool mute) const
+{
+    trackNodes[trackIndex].track->setMute(mute);
+}
+
 void MainAudio::play()
 {
     juce::ScopedLock sl(lock);
@@ -58,6 +79,12 @@ void MainAudio::play()
         startTime = juce::Time::getCurrentTime() - juce::RelativeTime::seconds(globalPositionSeconds);
         transportIsPlaying = true;
     }
+}
+
+void MainAudio::pause()
+{
+    juce::ScopedLock sl(lock);
+    transportIsPlaying = false;
 }
 
 void MainAudio::stop()

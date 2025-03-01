@@ -10,7 +10,7 @@ MainComponent::MainComponent() : mainToolbar(mainAudio)
     addAndMakeVisible(timeline);
     addAndMakeVisible(sideMenu);
     flexBoxInit();
-    addTestTrack();
+    addTestTracks();
 }
 
 void MainComponent::paint(juce::Graphics& g)
@@ -47,12 +47,32 @@ void MainComponent::flexBoxInit()
         juce::FlexItem(trackPlayer).withFlex(0, 1, TrackPlayerConstants::trackPlayerHeightRatio * getParentHeight()));
 }
 
-void MainComponent::addTestTrack()
+void MainComponent::addTestTracks()
 {
-    const juce::File audioFile("C:/Users/julek/CLionProjects/DAW/Source/Audio/test.mp3");
+    const juce::File dawDir =
+        juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
+    const juce::File countdownAudioFile = dawDir.getChildFile("Assets/Audio/countdown.wav");
+    const juce::File musicAudioFile = dawDir.getChildFile("Assets/Audio/test.mp3");
 
-    if(audioFile.existsAsFile())
-        mainAudio.addTrack(audioFile);
+    if(countdownAudioFile.existsAsFile())
+    {
+        const int trackId = mainAudio.addTrack(countdownAudioFile);
+        mainAudio.setPanOfTrack(trackId, 0.5f);
+        mainAudio.setGainOfTrack(trackId, -5.0f);
+        mainAudio.setOffsetOfTrack(trackId, 0.0f);
+    }
     else
-        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon, "Error", "test.wav not found");
+        juce::AlertWindow::showMessageBoxAsync(
+            juce::AlertWindow::WarningIcon, "Error", countdownAudioFile.getFullPathName() + " not found :c");
+
+    if(musicAudioFile.existsAsFile())
+    {
+        const int trackId = mainAudio.addTrack(musicAudioFile);
+        mainAudio.setPanOfTrack(trackId, -0.5f);
+        mainAudio.setGainOfTrack(trackId, -15.0f);
+        mainAudio.setOffsetOfTrack(trackId, 6.0f);
+    }
+    else
+        juce::AlertWindow::showMessageBoxAsync(
+            juce::AlertWindow::WarningIcon, "Error", musicAudioFile.getFullPathName() + " not found :c");
 }
