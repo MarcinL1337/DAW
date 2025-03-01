@@ -4,12 +4,11 @@
 
 class MainAudio;
 
-#define log(x) std::cout << x << std::endl
 class Track final : public juce::AudioProcessor
 {
 public:
     Track(MainAudio& mainAudioRef);
-    ~Track() override;
+    ~Track() override = default;
 
     bool loadFile(const juce::File& file);
 
@@ -18,7 +17,11 @@ public:
 
     void setGain(const float gainDb) { gainProcessor.setGainDecibels(gainDb); }
     void setPan(const float pan) { panProcessor.setPan(juce::jlimit(-1.0f, 1.0f, pan)); }
-    void setOffset(const double newOffsetSeconds) { this->offsetSeconds = newOffsetSeconds; }
+    void setOffset(const double newOffsetSeconds) { offsetSeconds = newOffsetSeconds; }
+    void setMute(const bool shouldMute) { mute = shouldMute; }
+    void setSolo(const bool shouldSolo) { solo = shouldSolo; }
+    bool isMuted() const { return mute; }
+    bool isSoloed() const { return solo; }
 
     // AudioProcessor
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
@@ -40,16 +43,21 @@ public:
     void setStateInformation(const void*, int) override {}
 
 private:
-    juce::AudioFormatManager formatManager;
     MainAudio& mainAudio;
+    juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReader> reader;
+    double fileSampleRate = {};
+    juce::AudioProcessorGraph::NodeID nodeID;
+    std::unique_ptr<juce::ResamplingAudioSource> resampler;
+    std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
+    bool isPrepared = false;
+
     juce::dsp::Gain<float> gainProcessor;
     juce::dsp::Panner<float> panProcessor;
-    juce::AudioProcessorGraph::NodeID nodeID;
     double offsetSeconds = 0.0;
-    double sampleRate = 44100.0;
-    int blockSize = 512;
-    bool isPrepared = false;
+    // TODO: implement mute and solo functionality
+    bool mute = false;
+    bool solo = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Track)
 };

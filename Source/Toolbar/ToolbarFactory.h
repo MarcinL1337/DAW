@@ -66,6 +66,5 @@ private:
     juce::ToolbarButton* stopRecordingButton{nullptr};
 
     MainAudio& mainAudio;
-    // void setMainAudioRef(MainAudio& mainAudioRef) { mainAudio = mainAudioRef;}
 };
 

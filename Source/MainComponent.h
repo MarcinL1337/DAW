@@ -17,10 +17,10 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     void flexBoxInit();
+    void addTestTracks();
 
 private:
     MainAudio mainAudio{};
-    void addTestTrack();
 
     Menu topLevelMenu{};
     MainToolbar mainToolbar;
