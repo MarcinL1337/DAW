@@ -3,14 +3,13 @@
 TrackPlayer::TrackPlayer()
 {
     addKeyListener(this);
+    addMouseListener(&timelineViewport, false);
     setWantsKeyboardFocus(true);
     addAndMakeVisible(trackPlayerViewport);
     addAndMakeVisible(timelineViewport);
     addAndMakeVisible(trackPlayerSideMenuViewport);
     addAndMakeVisible(timeBar);
-    addMouseListener(&timeBar, false);
     viewportsInit();
-    // timeBar.setAlwaysOnTop(true);
     juce::Timer::callAfterDelay(100, [&] { grabKeyboardFocus(); });
 }
 
@@ -30,7 +29,7 @@ void TrackPlayer::resized()
     clipsBoxesComponent.setSize(timeline.getWidth(), getCurrentNumberOfTracks() * TrackPlayerConstants::startBoxHeight);
     trackPlayerSideMenu.setSize(TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(),
                                 clipsBoxesComponent.getHeight() + timeline.getHeight());
-    timeBar.setBounds(trackPlayerSideMenu.getWidth() + 10, 0, 2, getHeight());
+    timeBar.setBounds(trackPlayerSideMenu.getWidth() + timeBarXOffset, 0, 2, getHeight());
 
     drawBoxes();
     drawTrackButtons();
@@ -50,6 +49,29 @@ void TrackPlayer::mouseDown(const juce::MouseEvent& event)
     if(reallyContains(mouseClickPosition, true) and event.mods.isRightButtonDown())
     {
         addTrack();
+    }
+
+    if((timeline.contains(mouseClickPosition) or timelineViewport.contains(mouseClickPosition)) and
+       event.mods.isLeftButtonDown())
+    {
+        lastMousePosition = event.position;
+        mouseDrag(event);
+        std::cerr << "mouseDown()" << std::endl;
+        // isDragging = true;
+    }
+}
+
+void TrackPlayer::mouseDrag(const juce::MouseEvent& event)
+{
+    std::cerr << "mouseDrag()" << std::endl;
+    if(event.position != lastMousePosition and
+       (timeline.reallyContains(event.position, true) or timelineViewport.reallyContains(event.position, true)) and
+       event.mods.isLeftButtonDown())
+    {
+        std::cerr << "mouseDrag() if" << std::endl;
+        timeBarXOffset = std::max(timeBarXOffset + static_cast<int>(event.position.x - lastMousePosition.x), 0);
+        resized();
+        lastMousePosition = event.position;
     }
 }
 

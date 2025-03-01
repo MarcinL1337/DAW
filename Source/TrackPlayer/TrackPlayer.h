@@ -20,6 +20,7 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
     void mouseDown(const juce::MouseEvent& event) override;
+    void mouseDrag(const juce::MouseEvent& event) override;
     bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
 
     void drawBoxes();
@@ -35,6 +36,8 @@ private:
     juce::Viewport timelineViewport{};
     juce::Viewport trackPlayerSideMenuViewport{};
 
+    juce::Point<float> lastMousePosition{};
+
     Timeline timeline{TrackPlayerConstants::startNumOfBoxes};
     TrackPlayerSideMenu trackPlayerSideMenu{};
     Component clipsBoxesComponent{};
@@ -48,4 +51,6 @@ private:
 
     const int trackButtonsSize{30};
     uint16_t currentNumberOfTracks{1};
+    int timeBarXOffset{0};
+    bool isDragging{false};
 };
