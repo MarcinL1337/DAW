@@ -4,6 +4,7 @@
 #include <cassert>
 #include "../Constants.h"
 #include "ClipsBoxes.h"
+#include "TimeBar.h"
 #include "Timeline.h"
 #include "TrackPlayerSideMenu.h"
 
@@ -37,6 +38,7 @@ private:
     Timeline timeline{TrackPlayerConstants::startNumOfBoxes};
     TrackPlayerSideMenu trackPlayerSideMenu{};
     Component clipsBoxesComponent{};
+    TimeBar timeBar{};
 
     // TODO (maybe): change all vectors to static_vector
     using trackButtons = std::array<std::unique_ptr<juce::TextButton>, 3>;

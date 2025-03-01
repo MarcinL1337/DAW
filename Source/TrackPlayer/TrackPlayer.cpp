@@ -7,7 +7,10 @@ TrackPlayer::TrackPlayer()
     addAndMakeVisible(trackPlayerViewport);
     addAndMakeVisible(timelineViewport);
     addAndMakeVisible(trackPlayerSideMenuViewport);
+    addAndMakeVisible(timeBar);
+    addMouseListener(&timeBar, false);
     viewportsInit();
+    // timeBar.setAlwaysOnTop(true);
     juce::Timer::callAfterDelay(100, [&] { grabKeyboardFocus(); });
 }
 
@@ -27,6 +30,7 @@ void TrackPlayer::resized()
     clipsBoxesComponent.setSize(timeline.getWidth(), getCurrentNumberOfTracks() * TrackPlayerConstants::startBoxHeight);
     trackPlayerSideMenu.setSize(TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(),
                                 clipsBoxesComponent.getHeight() + timeline.getHeight());
+    timeBar.setBounds(trackPlayerSideMenu.getWidth() + 10, 0, 2, getHeight());
 
     drawBoxes();
     drawTrackButtons();
@@ -83,6 +87,8 @@ void TrackPlayer::drawTrackButtons()
         auto recordButton = std::make_unique<juce::TextButton>("R");
         auto soloButton = std::make_unique<juce::TextButton>("S");
         auto muteButton = std::make_unique<juce::TextButton>("M");
+        // TODO (1): trackLabel text get blurry after adding track rows/resizing (why?)
+        // TODO (2): Labels makes painting MUCH slower, as it turns out, rendering text is expensive.
         auto trackLabel = std::make_unique<juce::Label>();
 
         auto currentY{i * TrackPlayerConstants::startBoxHeight + 15};
@@ -109,6 +115,7 @@ void TrackPlayer::drawTrackButtons()
 
 void TrackPlayer::viewportsInit()
 {
+    // TODO: scrollbars width/height messes up scrolling on the edges (max to the right or max to down)
     trackPlayerViewport.setScrollBarsShown(true, true);
     trackPlayerViewport.setViewedComponent(&clipsBoxesComponent, false);
     // TODO: Temporary. Question: Why stepY = 26 scrolls whole box Height which is 85?
