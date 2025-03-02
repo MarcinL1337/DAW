@@ -3,12 +3,12 @@
 TrackPlayer::TrackPlayer()
 {
     addKeyListener(this);
-    addMouseListener(&timelineViewport, false);
     setWantsKeyboardFocus(true);
     addAndMakeVisible(trackPlayerViewport);
     addAndMakeVisible(timelineViewport);
     addAndMakeVisible(trackPlayerSideMenuViewport);
     addAndMakeVisible(timeBar);
+    timeline.setInterceptsMouseClicks(false, false);
     viewportsInit();
     juce::Timer::callAfterDelay(100, [&] { grabKeyboardFocus(); });
 }
@@ -29,7 +29,8 @@ void TrackPlayer::resized()
     clipsBoxesComponent.setSize(timeline.getWidth(), getCurrentNumberOfTracks() * TrackPlayerConstants::startBoxHeight);
     trackPlayerSideMenu.setSize(TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(),
                                 clipsBoxesComponent.getHeight() + timeline.getHeight());
-    timeBar.setBounds(trackPlayerSideMenu.getWidth() + timeBarXOffset, 0, 2, getHeight());
+    timeBar.setBounds(trackPlayerSideMenu.getWidth() + timeBarXOffset, 0, 1, getHeight());
+    timeBarTestArea = timeBar.getBounds().expanded(10, 0).removeFromTop(timeline.getHeight());
 
     drawBoxes();
     drawTrackButtons();
@@ -50,28 +51,17 @@ void TrackPlayer::mouseDown(const juce::MouseEvent& event)
     {
         addTrack();
     }
-
-    if((timeline.contains(mouseClickPosition) or timelineViewport.contains(mouseClickPosition)) and
-       event.mods.isLeftButtonDown())
-    {
-        lastMousePosition = event.position;
-        mouseDrag(event);
-        std::cerr << "mouseDown()" << std::endl;
-        // isDragging = true;
-    }
+    lastMousePosition = event.getPosition();
 }
 
 void TrackPlayer::mouseDrag(const juce::MouseEvent& event)
 {
-    std::cerr << "mouseDrag()" << std::endl;
-    if(event.position != lastMousePosition and
-       (timeline.reallyContains(event.position, true) or timelineViewport.reallyContains(event.position, true)) and
-       event.mods.isLeftButtonDown())
+    if(timeBarTestArea.contains(lastMousePosition) and event.mods.isLeftButtonDown())
     {
-        std::cerr << "mouseDrag() if" << std::endl;
-        timeBarXOffset = std::max(timeBarXOffset + static_cast<int>(event.position.x - lastMousePosition.x), 0);
+        timeBarXOffset =
+            juce::jlimit(0, timeline.getWidth(), timeBarXOffset + event.getPosition().x - lastMousePosition.x);
+        lastMousePosition = event.getPosition();
         resized();
-        lastMousePosition = event.position;
     }
 }
 

@@ -36,7 +36,8 @@ private:
     juce::Viewport timelineViewport{};
     juce::Viewport trackPlayerSideMenuViewport{};
 
-    juce::Point<float> lastMousePosition{};
+    juce::Point<int> lastMousePosition{};
+    juce::Rectangle<int> timeBarTestArea{};
 
     Timeline timeline{TrackPlayerConstants::startNumOfBoxes};
     TrackPlayerSideMenu trackPlayerSideMenu{};
