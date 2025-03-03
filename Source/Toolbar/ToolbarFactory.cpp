@@ -1,5 +1,7 @@
 #include "ToolbarFactory.h"
 
+ToolbarFactory::ToolbarFactory(MainAudio& mainAudioRef) : mainAudio(mainAudioRef) {};
+
 void ToolbarFactory::getAllToolbarItemIds(juce::Array<int>& ids)
 {
     const juce::Array<int> toolbarButtons{
@@ -156,13 +158,17 @@ void ToolbarFactory::playPauseButtonClicked()
     if(getCurrentTrackState() == TrackPlayingState::playing)
     {
         setCurrentTrackState(TrackPlayingState::stopped);
-        temporaryButtonsFunction("stopButton");
+        mainAudio.pause();
     }
     else
     {
         setCurrentTrackState(TrackPlayingState::playing);
-        temporaryButtonsFunction("playButton");
+        mainAudio.play();
     }
 }
 void ToolbarFactory::startRecordingButtonClicked() { temporaryButtonsFunction("startRecordingButton"); }
-void ToolbarFactory::stopRecordingButtonClicked() { temporaryButtonsFunction("stopRecordingButton"); }
+void ToolbarFactory::stopRecordingButtonClicked()
+{
+    setCurrentTrackState(TrackPlayingState::stopped);
+    mainAudio.stop();
+}

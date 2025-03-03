@@ -54,6 +54,11 @@ set(SourceFiles
 
         Source/SideMenu/SideMenu.h
         Source/SideMenu/SideMenu.cpp
+
+        Source/Audio/MainAudio.h
+        Source/Audio/MainAudio.cpp
+        Source/Audio/Track.h
+        Source/Audio/Track.cpp
 )
 
 juce_add_gui_app(${PROJECT_NAME}

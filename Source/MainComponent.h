@@ -2,6 +2,7 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 
+#include "Audio/MainAudio.h"
 #include "Constants.h"
 #include "SideMenu/SideMenu.h"
 #include "Toolbar/MainToolbar.h"
@@ -16,10 +17,13 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     void flexBoxInit();
+    void addTestTracks();
 
 private:
+    MainAudio mainAudio{};
+
     Menu topLevelMenu{};
-    MainToolbar mainToolbar{};
+    MainToolbar mainToolbar;
     TrackPlayer trackPlayer{};
     SideMenu sideMenu{};
 

@@ -1,6 +1,6 @@
 #include "MainComponent.h"
 
-MainComponent::MainComponent()
+MainComponent::MainComponent() : mainToolbar(mainAudio)
 {
     // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
     setSize(getParentWidth(), getParentHeight());
@@ -10,6 +10,7 @@ MainComponent::MainComponent()
 
     addAndMakeVisible(sideMenu);
     flexBoxInit();
+    addTestTracks();
 }
 
 void MainComponent::paint(juce::Graphics& g)
@@ -40,4 +41,34 @@ void MainComponent::flexBoxInit()
     mainContentFlexBox.items.add(juce::FlexItem(trackPlayerFlexBox).withFlex(1));
 
     trackPlayerFlexBox.items.add(juce::FlexItem(trackPlayer).withFlex(1));
+}
+
+void MainComponent::addTestTracks()
+{
+    const juce::File dawDir =
+        juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
+    const juce::File countdownAudioFile = dawDir.getChildFile("Assets/Audio/countdown.wav");
+    const juce::File musicAudioFile = dawDir.getChildFile("Assets/Audio/test.mp3");
+
+    if(countdownAudioFile.existsAsFile())
+    {
+        const int trackId = mainAudio.addTrack(countdownAudioFile);
+        mainAudio.setPanOfTrack(trackId, 0.5f);
+        mainAudio.setGainOfTrack(trackId, -5.0f);
+        mainAudio.setOffsetOfTrack(trackId, 0.0f);
+    }
+    else
+        juce::AlertWindow::showMessageBoxAsync(
+            juce::AlertWindow::WarningIcon, "Error", countdownAudioFile.getFullPathName() + " not found :c");
+
+    if(musicAudioFile.existsAsFile())
+    {
+        const int trackId = mainAudio.addTrack(musicAudioFile);
+        mainAudio.setPanOfTrack(trackId, -0.5f);
+        mainAudio.setGainOfTrack(trackId, -15.0f);
+        mainAudio.setOffsetOfTrack(trackId, 6.0f);
+    }
+    else
+        juce::AlertWindow::showMessageBoxAsync(
+            juce::AlertWindow::WarningIcon, "Error", musicAudioFile.getFullPathName() + " not found :c");
 }
