@@ -8,6 +8,7 @@ public:
     struct TrackNode
     {
         juce::AudioProcessorGraph::NodeID nodeID;
+        // TODO: maybe change to std::unique_ptr
         Track* track{};
         bool operator==(const TrackNode& other) const { return nodeID == other.nodeID && track == other.track; }
     };
@@ -31,18 +32,18 @@ public:
     double getGlobalPosition() const;
 
 private:
+    void audioProcessorGraphInit();
+    void rebuildGraph();
+    void timerCallback() override;
+
     juce::AudioDeviceManager audioDeviceManager;
     juce::AudioProcessorPlayer processorPlayer;
     juce::AudioProcessorGraph graph;
     juce::AudioProcessorGraph::NodeID outputNodeID;
-    void audioProcessorGraphInit();
     juce::Array<TrackNode> trackNodes;
 
     juce::Time startTime;
-    double globalPositionSeconds = 0.0;
-    bool transportIsPlaying = false;
+    double globalPositionSeconds{0.0};
+    bool transportIsPlaying{false};
     juce::CriticalSection lock;
-
-    void timerCallback() override;
-    void rebuildGraph();
 };

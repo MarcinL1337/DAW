@@ -1,5 +1,7 @@
 #include "ToolbarFactory.h"
 
+ToolbarFactory::ToolbarFactory(MainAudio& mainAudioRef) : mainAudio(mainAudioRef) {};
+
 void ToolbarFactory::getAllToolbarItemIds(juce::Array<int>& ids)
 {
     const juce::Array<int> toolbarButtons{

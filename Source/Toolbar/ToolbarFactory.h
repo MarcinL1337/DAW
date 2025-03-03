@@ -10,7 +10,7 @@ class ToolbarFactory final : public juce::ToolbarItemFactory,
 {
 public:
     ToolbarFactory() = default;
-    ToolbarFactory(MainAudio& mainAudioRef) : mainAudio(mainAudioRef) {};
+    ToolbarFactory(MainAudio& mainAudioRef);
     ~ToolbarFactory() override = default;
 
 private:

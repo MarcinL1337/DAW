@@ -44,20 +44,20 @@ public:
 
 private:
     MainAudio& mainAudio;
+    std::unique_ptr<juce::AudioFormatReader> reader{nullptr};
+    std::unique_ptr<juce::ResamplingAudioSource> resampler{nullptr};
+    std::unique_ptr<juce::AudioFormatReaderSource> readerSource{nullptr};
     juce::AudioFormatManager formatManager;
-    std::unique_ptr<juce::AudioFormatReader> reader;
-    double fileSampleRate = {};
     juce::AudioProcessorGraph::NodeID nodeID;
-    std::unique_ptr<juce::ResamplingAudioSource> resampler;
-    std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
-    bool isPrepared = false;
+    double fileSampleRate{};
+    bool isPrepared{false};
 
     juce::dsp::Gain<float> gainProcessor;
     juce::dsp::Panner<float> panProcessor;
-    double offsetSeconds = 0.0;
+    double offsetSeconds{0.0};
     // TODO: implement mute and solo functionality
-    bool mute = false;
-    bool solo = false;
+    bool mute{false};
+    bool solo{false};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Track)
 };

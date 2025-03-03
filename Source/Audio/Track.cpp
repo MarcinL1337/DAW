@@ -17,21 +17,17 @@ void Track::releaseResources()
 {
     gainProcessor.reset();
     panProcessor.reset();
-    resampler.reset();
-    readerSource.reset();
-    reader.reset();
 }
 
 bool Track::loadFile(const juce::File& file)
 {
-    reader.reset(formatManager.createReaderFor(file));
+    std::unique_ptr<juce::AudioFormatReader> temp_reader(formatManager.createReaderFor(file));
+    reader = std::move(temp_reader);
     return reader != nullptr;
 }
 
 void Track::prepareToPlay(const double sampleRate, const int samplesPerBlock)
 {
-    resampler.reset();
-    readerSource.reset();
     if(reader)
     {
         fileSampleRate = reader->sampleRate;
@@ -41,8 +37,8 @@ void Track::prepareToPlay(const double sampleRate, const int samplesPerBlock)
         resampler->setResamplingRatio(fileSampleRate / sampleRate);
         resampler->prepareToPlay(samplesPerBlock, sampleRate);
     }
-    gainProcessor.prepare({sampleRate, static_cast<juce::uint32>(samplesPerBlock), reader->numChannels});
-    panProcessor.prepare({sampleRate, static_cast<juce::uint32>(samplesPerBlock), reader->numChannels});
+    gainProcessor.prepare({sampleRate, static_cast<uint32_t>(samplesPerBlock), reader->numChannels});
+    panProcessor.prepare({sampleRate, static_cast<uint32_t>(samplesPerBlock), reader->numChannels});
     isPrepared = resampler && reader;
 }
 
