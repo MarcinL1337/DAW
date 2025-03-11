@@ -6,9 +6,9 @@ Track::Track(MainAudio& mainAudioRef) :
                        .withInput("Input", juce::AudioChannelSet::stereo(), true)
                        .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
     mainAudio(mainAudioRef),
-    nodeID(juce::AudioProcessorGraph::NodeID()),
     resampler(nullptr),
-    readerSource(nullptr)
+    readerSource(nullptr),
+    nodeID(juce::AudioProcessorGraph::NodeID())
 {
     formatManager.registerBasicFormats();
 }
@@ -28,6 +28,7 @@ bool Track::loadFile(const juce::File& file)
 
 void Track::prepareToPlay(const double sampleRate, const int samplesPerBlock)
 {
+    deviceSampleRate = sampleRate;
     if(reader)
     {
         fileSampleRate = reader->sampleRate;
@@ -36,31 +37,43 @@ void Track::prepareToPlay(const double sampleRate, const int samplesPerBlock)
 
         resampler->setResamplingRatio(fileSampleRate / sampleRate);
         resampler->prepareToPlay(samplesPerBlock, sampleRate);
+        const juce::dsp::ProcessSpec spec{sampleRate, static_cast<uint32_t>(samplesPerBlock), reader->numChannels};
+        gainProcessor.prepare(spec);
+        panProcessor.prepare(spec);
     }
-    gainProcessor.prepare({sampleRate, static_cast<uint32_t>(samplesPerBlock), reader->numChannels});
-    panProcessor.prepare({sampleRate, static_cast<uint32_t>(samplesPerBlock), reader->numChannels});
     isPrepared = resampler && reader;
 }
 
 void Track::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     buffer.clear();
-    if(!isPrepared || !mainAudio.isPlaying())
+    if(!isPrepared || !mainAudio.isPlaying() || !reader || mute || (mainAudio.isAnySoloed() && !solo))
         return;
 
-    const double globalPosition = mainAudio.getGlobalPosition();
-    const double localPosition = globalPosition - offsetSeconds;
-    const double startSample = localPosition * fileSampleRate;
-    if(startSample < 0 || startSample >= reader->lengthInSamples - buffer.getNumSamples() ||
-       abs(readerSource->getNextReadPosition() - startSample) > 1500)
+    if(const auto* ph = getPlayHead())
     {
-        // TODO: check if tracks are in sync (because I don't think they are)
-        readerSource->setNextReadPosition(startSample);
-        return;
-    }
-    resampler->getNextAudioBlock(juce::AudioSourceChannelInfo(&buffer, 0, buffer.getNumSamples()));
+        auto positionInfo = ph->getPosition();
+        if(!positionInfo.hasValue())
+            return;
 
-    juce::dsp::AudioBlock<float> block(buffer);
-    gainProcessor.process(juce::dsp::ProcessContextReplacing(block));
-    panProcessor.process(juce::dsp::ProcessContextReplacing(block));
+        // TODO: maybe change to std::optional
+        juce::Optional<int64_t> optGlobalPositionSamples = positionInfo->getTimeInSamples();
+        if(!optGlobalPositionSamples.hasValue())
+            return;
+
+        const auto localPositionSamples = static_cast<int64_t>(
+            (static_cast<double>(*optGlobalPositionSamples - offsetSamples) / deviceSampleRate) * fileSampleRate);
+
+        if(localPositionSamples >= 0 && localPositionSamples < reader->lengthInSamples)
+        {
+            const int64_t positionDifference = std::abs(readerSource->getNextReadPosition() - localPositionSamples);
+            if(const auto threshold = static_cast<int64_t>(0.1 * fileSampleRate); positionDifference > threshold)
+                readerSource->setNextReadPosition(localPositionSamples);
+
+            resampler->getNextAudioBlock(juce::AudioSourceChannelInfo(&buffer, 0, buffer.getNumSamples()));
+            juce::dsp::AudioBlock<float> block(buffer);
+            gainProcessor.process(juce::dsp::ProcessContextReplacing(block));
+            panProcessor.process(juce::dsp::ProcessContextReplacing(block));
+        }
+    }
 }

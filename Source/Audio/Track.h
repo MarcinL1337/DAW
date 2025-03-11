@@ -17,7 +17,7 @@ public:
 
     void setGain(const float gainDb) { gainProcessor.setGainDecibels(gainDb); }
     void setPan(const float pan) { panProcessor.setPan(juce::jlimit(-1.0f, 1.0f, pan)); }
-    void setOffset(const double newOffsetSeconds) { offsetSeconds = newOffsetSeconds; }
+    void setOffset(const int64_t newOffsetSamples) { offsetSamples = newOffsetSamples; }
     void setMute(const bool shouldMute) { mute = shouldMute; }
     void setSolo(const bool shouldSolo) { solo = shouldSolo; }
     bool isMuted() const { return mute; }
@@ -49,13 +49,13 @@ private:
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource{nullptr};
     juce::AudioFormatManager formatManager;
     juce::AudioProcessorGraph::NodeID nodeID;
+    double deviceSampleRate{};
     double fileSampleRate{};
     bool isPrepared{false};
 
     juce::dsp::Gain<float> gainProcessor;
     juce::dsp::Panner<float> panProcessor;
-    double offsetSeconds{0.0};
-    // TODO: implement mute and solo functionality
+    int64_t offsetSamples{0};
     bool mute{false};
     bool solo{false};
 

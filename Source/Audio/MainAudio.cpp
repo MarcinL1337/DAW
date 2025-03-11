@@ -6,7 +6,7 @@ MainAudio::MainAudio()
     processorPlayer.setProcessor(&graph);
     audioDeviceManager.initialiseWithDefaultDevices(0, 2);
     audioDeviceManager.addAudioCallback(&processorPlayer);
-    startTimerHz(60);
+    graph.setPlayHead(this);
 }
 
 void MainAudio::audioProcessorGraphInit()
@@ -19,7 +19,6 @@ void MainAudio::audioProcessorGraphInit()
 
 MainAudio::~MainAudio()
 {
-    stopTimer();
     audioDeviceManager.removeAudioCallback(&processorPlayer);
     graph.clear();
 }
@@ -58,9 +57,9 @@ void MainAudio::setGainOfTrack(const int trackIndex, const float gain) const
 {
     trackNodes[trackIndex].track->setGain(gain);
 }
-void MainAudio::setOffsetOfTrack(const int trackIndex, const float offset) const
+void MainAudio::setOffsetOfTrackInSeconds(const int trackIndex, const double offsetSeconds) const
 {
-    trackNodes[trackIndex].track->setOffset(offset);
+    trackNodes[trackIndex].track->setOffset(offsetSeconds * getSampleRate());
 }
 void MainAudio::setSoloOfTrack(const int trackIndex, const bool solo) const
 {
@@ -74,11 +73,9 @@ void MainAudio::setMuteOfTrack(const int trackIndex, const bool mute) const
 void MainAudio::play()
 {
     juce::ScopedLock sl(lock);
-    if(!transportIsPlaying)
-    {
-        startTime = juce::Time::getCurrentTime() - juce::RelativeTime::seconds(globalPositionSeconds);
-        transportIsPlaying = true;
-    }
+    const auto timeOffset = juce::RelativeTime::seconds(static_cast<double>(currentPositionSamples) / getSampleRate());
+    startTime = juce::Time::getCurrentTime() - timeOffset;
+    transportIsPlaying = true;
 }
 
 void MainAudio::pause()
@@ -91,32 +88,18 @@ void MainAudio::stop()
 {
     juce::ScopedLock sl(lock);
     transportIsPlaying = false;
-    globalPositionSeconds = 0.0;
+    currentPositionSamples = 0;
 }
 
-void MainAudio::seek(const double positionSeconds)
+void MainAudio::seek(const int64_t positionSamples)
 {
     juce::ScopedLock sl(lock);
-    globalPositionSeconds = positionSeconds;
-    startTime = juce::Time::getCurrentTime() - juce::RelativeTime::seconds(globalPositionSeconds);
-}
-
-double MainAudio::getGlobalPosition() const
-{
-    return transportIsPlaying ? (juce::Time::getCurrentTime() - startTime).inSeconds() : globalPositionSeconds;
-}
-
-void MainAudio::timerCallback()
-{
-    if(transportIsPlaying)
-    {
-        juce::ScopedLock sl(lock);
-        globalPositionSeconds = (juce::Time::getCurrentTime() - startTime).inSeconds();
-    }
+    currentPositionSamples = positionSamples;
 }
 
 void MainAudio::rebuildGraph()
 {
+    juce::ScopedLock sl(lock);
     auto connections = graph.getConnections();
     for(const auto& connection: connections) graph.removeConnection(connection);
     for(auto& [nodeID, track]: trackNodes)
@@ -124,4 +107,33 @@ void MainAudio::rebuildGraph()
         graph.addConnection({{nodeID, 0}, {outputNodeID, 0}});
         graph.addConnection({{nodeID, 1}, {outputNodeID, 1}});
     }
+}
+
+juce::Optional<juce::AudioPlayHead::PositionInfo> MainAudio::getPosition() const
+{
+    juce::ScopedLock sl(lock);
+    PositionInfo info;
+    int64_t currentSamples;
+
+    if(transportIsPlaying)
+    {
+        const double elapsedSeconds = (juce::Time::getCurrentTime() - startTime).inSeconds();
+        currentSamples = static_cast<int64_t>(elapsedSeconds * getSampleRate());
+        currentPositionSamples = currentSamples;
+    }
+    else
+    {
+        currentSamples = currentPositionSamples;
+    }
+
+    info.setTimeInSamples(currentSamples);
+    info.setIsPlaying(transportIsPlaying);
+    info.setIsRecording(false);
+    return info;
+}
+
+bool MainAudio::isAnySoloed() const
+{
+    juce::ScopedLock sl(lock);
+    return std::ranges::any_of(trackNodes, [&](const TrackNode& tn) { return tn.track->isSoloed(); });
 }

@@ -2,7 +2,7 @@
 
 #include "Track.h"
 
-class MainAudio final : juce::Timer
+class MainAudio final : public juce::AudioPlayHead
 {
 public:
     struct TrackNode
@@ -20,21 +20,22 @@ public:
     void removeTrack(const Track* track);
     void setPanOfTrack(int trackIndex, float pan) const;
     void setGainOfTrack(int trackIndex, float gain) const;
-    void setOffsetOfTrack(int trackIndex, float offset) const;
+    void setOffsetOfTrackInSeconds(int trackIndex, double offsetSeconds) const;
     void setSoloOfTrack(int trackIndex, bool solo) const;
     void setMuteOfTrack(int trackIndex, bool mute) const;
 
     void play();
     void pause();
     void stop();
-    void seek(double positionSeconds);
+    void seek(int64_t positionSamples);
     bool isPlaying() const { return transportIsPlaying; }
-    double getGlobalPosition() const;
+    juce::Optional<PositionInfo> getPosition() const override;
+    bool isAnySoloed() const;
+    double getSampleRate() const { return audioDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate(); }
 
 private:
     void audioProcessorGraphInit();
     void rebuildGraph();
-    void timerCallback() override;
 
     juce::AudioDeviceManager audioDeviceManager;
     juce::AudioProcessorPlayer processorPlayer;
@@ -43,7 +44,7 @@ private:
     juce::Array<TrackNode> trackNodes;
 
     juce::Time startTime;
-    double globalPositionSeconds{0.0};
     bool transportIsPlaying{false};
+    mutable int64_t currentPositionSamples{0};
     juce::CriticalSection lock;
 };
