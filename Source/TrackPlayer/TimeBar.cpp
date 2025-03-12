@@ -5,7 +5,8 @@ TimeBar::TimeBar() {}
 void TimeBar::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::forestgreen);
-    g.drawLine(0, 0, 0, getHeight(), 4);
+    setAlpha(0.6);
+    g.fillRect(getLocalBounds());
 }
 
 void TimeBar::resized() {}

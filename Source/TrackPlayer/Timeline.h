@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include "TimeBar.h"
 
 class Timeline final : public juce::Component
 {
@@ -12,6 +13,7 @@ public:
     void resized() override;
 
 private:
-    juce::FlexBox timelineFlexBox;
     const int tempNumOfSeconds{};
+    juce::Point<int> lastMousePosition{};
+    bool isCurrentlyDraggingTimeBar{false};
 };

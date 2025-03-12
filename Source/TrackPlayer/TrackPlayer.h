@@ -21,10 +21,11 @@ public:
     void resized() override;
     void mouseDown(const juce::MouseEvent& event) override;
     void mouseDrag(const juce::MouseEvent& event) override;
+    void mouseUp(const juce::MouseEvent& event) override;
     bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
 
     void drawBoxes();
-    void drawTrackButtons();
+    void drawTrackButtons(juce::Graphics& g);
     void viewportsInit();
     void addTrack();
 
@@ -35,9 +36,6 @@ private:
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
     juce::Viewport trackPlayerSideMenuViewport{};
-
-    juce::Point<int> lastMousePosition{};
-    juce::Rectangle<int> timeBarTestArea{};
 
     Timeline timeline{TrackPlayerConstants::startNumOfBoxes};
     TrackPlayerSideMenu trackPlayerSideMenu{};
@@ -53,5 +51,6 @@ private:
     const int trackButtonsSize{30};
     uint16_t currentNumberOfTracks{1};
     int timeBarXOffset{0};
-    bool isDragging{false};
+    juce::Point<int> lastMousePosition{};
+    bool isCurrentlyDraggingTimeBar{false};
 };
