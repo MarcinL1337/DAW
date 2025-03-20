@@ -5,24 +5,16 @@
 class MainAudio final : public juce::AudioPlayHead
 {
 public:
-    struct TrackNode
-    {
-        juce::AudioProcessorGraph::NodeID nodeID;
-        // TODO: maybe change to std::unique_ptr
-        Track* track{};
-        bool operator==(const TrackNode& other) const { return nodeID == other.nodeID && track == other.track; }
-    };
-
     MainAudio();
     ~MainAudio() override;
 
-    int addTrack(const juce::File& file);  // returns index of the track in trackNodes
-    void removeTrack(const Track* track);
-    void setPanOfTrack(int trackIndex, float pan) const;
-    void setGainOfTrack(int trackIndex, float gain) const;
-    void setOffsetOfTrackInSeconds(int trackIndex, double offsetSeconds) const;
-    void setSoloOfTrack(int trackIndex, bool solo) const;
-    void setMuteOfTrack(int trackIndex, bool mute) const;
+    juce::AudioProcessorGraph::NodeID addTrack(const juce::File& file);  // returns index of the track in trackNodes
+    void removeTrack(juce::AudioProcessorGraph::NodeID nodeID);
+    void setPanOfTrack(juce::AudioProcessorGraph::NodeID nodeID, float pan) const;
+    void setGainOfTrack(juce::AudioProcessorGraph::NodeID nodeID, float gain) const;
+    void setOffsetOfTrackInSeconds(juce::AudioProcessorGraph::NodeID nodeID, double offsetSeconds) const;
+    void setSoloOfTrack(juce::AudioProcessorGraph::NodeID nodeID, bool solo) const;
+    void setMuteOfTrack(juce::AudioProcessorGraph::NodeID nodeID, bool mute) const;
 
     void play();
     void pause();
@@ -41,7 +33,6 @@ private:
     juce::AudioProcessorPlayer processorPlayer;
     juce::AudioProcessorGraph graph;
     juce::AudioProcessorGraph::NodeID outputNodeID;
-    juce::Array<TrackNode> trackNodes;
 
     juce::Time startTime;
     bool transportIsPlaying{false};

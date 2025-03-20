@@ -7,8 +7,7 @@ Track::Track(MainAudio& mainAudioRef) :
                        .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
     mainAudio(mainAudioRef),
     resampler(nullptr),
-    readerSource(nullptr),
-    nodeID(juce::AudioProcessorGraph::NodeID())
+    readerSource(nullptr)
 {
     formatManager.registerBasicFormats();
 }
@@ -44,10 +43,17 @@ void Track::prepareToPlay(const double sampleRate, const int samplesPerBlock)
     isPrepared = resampler && reader;
 }
 
+bool Track::processBlockChecker() const
+{
+    const bool muteAndSoloCheck = !mute && (!mainAudio.isAnySoloed() || solo);
+    // TODO: what if someone deletes audio file?
+    return isPrepared && mainAudio.isPlaying() && muteAndSoloCheck;
+}
+
 void Track::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     buffer.clear();
-    if(!isPrepared || !mainAudio.isPlaying() || !reader || mute || (mainAudio.isAnySoloed() && !solo))
+    if(!processBlockChecker())
         return;
 
     if(const auto* ph = getPlayHead())
@@ -56,8 +62,7 @@ void Track::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
         if(!positionInfo.hasValue())
             return;
 
-        // TODO: maybe change to std::optional
-        juce::Optional<int64_t> optGlobalPositionSamples = positionInfo->getTimeInSamples();
+        auto optGlobalPositionSamples = positionInfo->getTimeInSamples();
         if(!optGlobalPositionSamples.hasValue())
             return;
 

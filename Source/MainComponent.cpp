@@ -55,7 +55,7 @@ void MainComponent::addTestTracks()
 
     if(countdownAudioFile.existsAsFile())
     {
-        const int trackId = mainAudio.addTrack(countdownAudioFile);
+        const auto trackId = mainAudio.addTrack(countdownAudioFile);
         mainAudio.setPanOfTrack(trackId, 0.5f);
         mainAudio.setGainOfTrack(trackId, -5.0f);
         mainAudio.setOffsetOfTrackInSeconds(trackId, 0.0f);
@@ -66,7 +66,7 @@ void MainComponent::addTestTracks()
 
     if(musicAudioFile.existsAsFile())
     {
-        const int trackId = mainAudio.addTrack(musicAudioFile);
+        const auto trackId = mainAudio.addTrack(musicAudioFile);
         mainAudio.setPanOfTrack(trackId, 0);
         mainAudio.setGainOfTrack(trackId, -15.0f);
         mainAudio.setOffsetOfTrackInSeconds(trackId, 6.0f);
@@ -77,7 +77,7 @@ void MainComponent::addTestTracks()
 
     if(invertedMusicAudioFile.existsAsFile())
     {
-        const int trackId = mainAudio.addTrack(invertedMusicAudioFile);
+        const auto trackId = mainAudio.addTrack(invertedMusicAudioFile);
         mainAudio.setPanOfTrack(trackId, 0.6);
         mainAudio.setGainOfTrack(trackId, -15.0f);
         mainAudio.setOffsetOfTrackInSeconds(trackId, 6.0f);
@@ -88,7 +88,7 @@ void MainComponent::addTestTracks()
 
     if(mutedMusicAudioFile.existsAsFile())
     {
-        const int trackId = mainAudio.addTrack(mutedMusicAudioFile);
+        const auto trackId = mainAudio.addTrack(mutedMusicAudioFile);
         mainAudio.setPanOfTrack(trackId, 0);
         mainAudio.setGainOfTrack(trackId, -15.0f);
         mainAudio.setOffsetOfTrackInSeconds(trackId, 1.0f);
