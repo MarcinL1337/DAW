@@ -26,14 +26,14 @@ MainAudio::~MainAudio()
 juce::AudioProcessorGraph::NodeID MainAudio::addTrack(const juce::File& file)
 {
     juce::ScopedLock sl(lock);
-    const auto track = new Track(*this);
+    auto track = std::make_unique<Track>(*this);
     if(!track->loadFile(file))
         throw std::runtime_error("Failed to load file: " + file.getFullPathName().toStdString());
 
-    const auto node = graph.addNode(std::unique_ptr<Track>(track));
-
     track->prepareToPlay(audioDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate(),
                          audioDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples());
+
+    const auto node = graph.addNode(std::move(track));
     rebuildGraph();
     return node->nodeID;
 }
