@@ -19,6 +19,7 @@ constexpr uint8_t startNumOfBoxesRows{20u};
 
 constexpr float timelineHeightRatio{0.08f};
 constexpr float minTimelineHeightRatio{0.05f};
+constexpr uint8_t timeBarBoxSize{15u};
 
 constexpr float trackPlayerHeightRatio{1.0f - timelineHeightRatio};
 

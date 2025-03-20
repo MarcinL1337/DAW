@@ -23,6 +23,7 @@ public:
 
     void drawBoxes();
     void drawTrackButtons();
+    void drawTrackText(juce::Graphics& g) const;
     void viewportsInit();
     void addTrack();
 

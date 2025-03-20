@@ -2,7 +2,7 @@
 
 #include "TrackPlayer.h"
 
-Timeline::Timeline(const int numOfBoxes) : tempNumOfSeconds{numOfBoxes} {}
+Timeline::Timeline(const int numOfBoxes) : tempNumOfSeconds{numOfBoxes} { addAndMakeVisible(timeBar); }
 
 void Timeline::paint(juce::Graphics& g)
 {
@@ -36,4 +36,32 @@ void Timeline::paint(juce::Graphics& g)
     }
 }
 
-void Timeline::resized() {}
+void Timeline::resized()
+{
+    timeBar.setBounds(timeBarXOffset,
+                      getHeight() - TrackPlayerConstants::timeBarBoxSize,
+                      TrackPlayerConstants::timeBarBoxSize,
+                      TrackPlayerConstants::timeBarBoxSize);
+}
+
+void Timeline::mouseDown(const juce::MouseEvent& event)
+{
+    lastMousePosition = event.getPosition();
+    auto area{timeBar.getBounds()};
+    if(area.contains(lastMousePosition) and event.mods.isLeftButtonDown())
+    {
+        isCurrentlyDraggingTimeBar = true;
+    }
+}
+
+void Timeline::mouseUp(const juce::MouseEvent& event) { isCurrentlyDraggingTimeBar = false; }
+
+void Timeline::mouseDrag(const juce::MouseEvent& event)
+{
+    if(isCurrentlyDraggingTimeBar)
+    {
+        timeBarXOffset = juce::jlimit(0, getWidth(), timeBarXOffset + event.getPosition().x - lastMousePosition.x);
+        lastMousePosition = event.getPosition();
+        resized();
+    }
+}
