@@ -1,6 +1,6 @@
 #include "TimeBar.h"
 
-TimeBar::TimeBar() {}
+TimeBar::TimeBar() { setInterceptsMouseClicks(false, false); }
 
 void TimeBar::paint(juce::Graphics& g)
 {

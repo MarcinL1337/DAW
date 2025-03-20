@@ -4,7 +4,6 @@
 #include <cassert>
 #include "../Constants.h"
 #include "ClipsBoxes.h"
-#include "TimeBar.h"
 #include "Timeline.h"
 #include "TrackPlayerSideMenu.h"
 
@@ -20,12 +19,11 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
     void mouseDown(const juce::MouseEvent& event) override;
-    void mouseDrag(const juce::MouseEvent& event) override;
-    void mouseUp(const juce::MouseEvent& event) override;
     bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
 
     void drawBoxes();
-    void drawTrackButtons(juce::Graphics& g);
+    void drawTrackButtons();
+    void drawTrackText(juce::Graphics& g) const;
     void viewportsInit();
     void addTrack();
 
@@ -40,7 +38,6 @@ private:
     Timeline timeline{TrackPlayerConstants::startNumOfBoxes};
     TrackPlayerSideMenu trackPlayerSideMenu{};
     Component clipsBoxesComponent{};
-    TimeBar timeBar{};
 
     // TODO (maybe): change all vectors to static_vector
     using trackButtons = std::array<std::unique_ptr<juce::TextButton>, 3>;
@@ -50,7 +47,4 @@ private:
 
     const int trackButtonsSize{30};
     uint16_t currentNumberOfTracks{1};
-    int timeBarXOffset{0};
-    juce::Point<int> lastMousePosition{};
-    bool isCurrentlyDraggingTimeBar{false};
 };
