@@ -23,51 +23,48 @@ MainAudio::~MainAudio()
     graph.clear();
 }
 
-int MainAudio::addTrack(const juce::File& file)
+juce::AudioProcessorGraph::NodeID MainAudio::addTrack(const juce::File& file)
 {
     juce::ScopedLock sl(lock);
-    const auto track = new Track(*this);
+    auto track = std::make_unique<Track>(*this);
     if(!track->loadFile(file))
         throw std::runtime_error("Failed to load file: " + file.getFullPathName().toStdString());
 
-    const auto node = graph.addNode(std::unique_ptr<Track>(track));
-    const TrackNode newTrackNode = {node->nodeID, track};
-    trackNodes.add(newTrackNode);
-
-    track->setNodeID(node->nodeID);
     track->prepareToPlay(audioDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate(),
                          audioDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples());
+
+    const auto node = graph.addNode(std::move(track));
     rebuildGraph();
-    return trackNodes.indexOf(newTrackNode);
+    return node->nodeID;
 }
 
-void MainAudio::removeTrack(const Track* track)
+void MainAudio::removeTrack(const juce::AudioProcessorGraph::NodeID nodeID)
 {
     juce::ScopedLock sl(lock);
-    graph.removeNode(track->getNodeID());
-    trackNodes.removeIf([&](const TrackNode& tn) { return tn.track == track; });
+    graph.removeNode(nodeID);
     rebuildGraph();
 }
 
-void MainAudio::setPanOfTrack(const int trackIndex, const float pan) const
+void MainAudio::setPanOfTrack(const juce::AudioProcessorGraph::NodeID nodeID, const float pan) const
 {
-    trackNodes[trackIndex].track->setPan(pan);
+    dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setPan(pan);
 }
-void MainAudio::setGainOfTrack(const int trackIndex, const float gain) const
+void MainAudio::setGainOfTrack(const juce::AudioProcessorGraph::NodeID nodeID, const float gain) const
 {
-    trackNodes[trackIndex].track->setGain(gain);
+    dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setGain(gain);
 }
-void MainAudio::setOffsetOfTrackInSeconds(const int trackIndex, const double offsetSeconds) const
+void MainAudio::setOffsetOfTrackInSeconds(const juce::AudioProcessorGraph::NodeID nodeID,
+                                          const double offsetSeconds) const
 {
-    trackNodes[trackIndex].track->setOffset(offsetSeconds * getSampleRate());
+    dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setOffset(offsetSeconds * getSampleRate());
 }
-void MainAudio::setSoloOfTrack(const int trackIndex, const bool solo) const
+void MainAudio::setSoloOfTrack(const juce::AudioProcessorGraph::NodeID nodeID, const bool solo) const
 {
-    trackNodes[trackIndex].track->setSolo(solo);
+    dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setSolo(solo);
 }
-void MainAudio::setMuteOfTrack(const int trackIndex, const bool mute) const
+void MainAudio::setMuteOfTrack(const juce::AudioProcessorGraph::NodeID nodeID, const bool mute) const
 {
-    trackNodes[trackIndex].track->setMute(mute);
+    dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setMute(mute);
 }
 
 void MainAudio::play()
@@ -102,10 +99,12 @@ void MainAudio::rebuildGraph()
     juce::ScopedLock sl(lock);
     auto connections = graph.getConnections();
     for(const auto& connection: connections) graph.removeConnection(connection);
-    for(auto& [nodeID, track]: trackNodes)
+    for(auto& node: graph.getNodes())
     {
-        graph.addConnection({{nodeID, 0}, {outputNodeID, 0}});
-        graph.addConnection({{nodeID, 1}, {outputNodeID, 1}});
+        if(node->nodeID == outputNodeID)
+            continue;
+        graph.addConnection({{node->nodeID, 0}, {outputNodeID, 0}});
+        graph.addConnection({{node->nodeID, 1}, {outputNodeID, 1}});
     }
 }
 
@@ -135,5 +134,8 @@ juce::Optional<juce::AudioPlayHead::PositionInfo> MainAudio::getPosition() const
 bool MainAudio::isAnySoloed() const
 {
     juce::ScopedLock sl(lock);
-    return std::ranges::any_of(trackNodes, [&](const TrackNode& tn) { return tn.track->isSoloed(); });
+    return std::ranges::any_of(
+        graph.getNodes(),
+        [&](const juce::AudioProcessorGraph::Node* node)
+        { return node->nodeID == outputNodeID ? false : dynamic_cast<Track*>(node->getProcessor())->isSoloed(); });
 }

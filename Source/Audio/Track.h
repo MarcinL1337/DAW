@@ -12,9 +12,6 @@ public:
 
     bool loadFile(const juce::File& file);
 
-    void setNodeID(const juce::AudioProcessorGraph::NodeID newID) { nodeID = newID; }
-    juce::AudioProcessorGraph::NodeID getNodeID() const { return nodeID; }
-
     void setGain(const float gainDb) { gainProcessor.setGainDecibels(gainDb); }
     void setPan(const float pan) { panProcessor.setPan(juce::jlimit(-1.0f, 1.0f, pan)); }
     void setOffset(const int64_t newOffsetSamples) { offsetSamples = newOffsetSamples; }
@@ -25,6 +22,7 @@ public:
 
     // AudioProcessor
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
+    bool processBlockChecker() const;
     void releaseResources() override;
     void processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi) override;
 
@@ -48,7 +46,6 @@ private:
     std::unique_ptr<juce::ResamplingAudioSource> resampler{nullptr};
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource{nullptr};
     juce::AudioFormatManager formatManager;
-    juce::AudioProcessorGraph::NodeID nodeID;
     double deviceSampleRate{};
     double fileSampleRate{};
     bool isPrepared{false};
