@@ -31,13 +31,17 @@ void TrackPlayer::resized()
     trackPlayerSideMenu.setSize(TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(),
                                 clipsBoxesComponent.getHeight() + timeline.getHeight());
 
-    timelineViewport.setBounds(getLocalBounds()
-                                   .removeFromRight(getWidth() - trackPlayerSideMenu.getWidth())
-                                   .removeFromTop(timeline.getHeight()));
     trackPlayerViewport.setBounds(getLocalBounds()
                                       .removeFromRight(getWidth() - trackPlayerSideMenu.getWidth())
                                       .removeFromBottom(getHeight() - timeline.getHeight()));
-    trackPlayerSideMenuViewport.setBounds(0, timeline.getHeight(), trackPlayerSideMenu.getWidth(), getHeight());
+    timelineViewport.setBounds(getLocalBounds()
+                                   .removeFromRight(getWidth() - trackPlayerSideMenu.getWidth())
+                                   .removeFromTop(timeline.getHeight())
+                                   .withWidth(trackPlayerViewport.getViewWidth()));
+    trackPlayerSideMenuViewport.setBounds(0,
+                                          timeline.getHeight(),
+                                          trackPlayerSideMenu.getWidth(),
+                                          getHeight() - trackPlayerViewport.getScrollBarThickness());
     drawTrackButtons();
 }
 
@@ -121,8 +125,7 @@ void TrackPlayer::drawTrackText(juce::Graphics& g) const
 
 void TrackPlayer::viewportsInit()
 {
-    // TODO: scrollbars width/height messes up scrolling on the edges (max to the right or max to down)
-    trackPlayerViewport.setScrollBarsShown(true, true);
+    trackPlayerViewport.setScrollBarsShown(true, true, true, true);
     trackPlayerViewport.setViewedComponent(&clipsBoxesComponent, false);
     // TODO: Temporary. Question: Why stepY = 26 scrolls whole box Height which is 85?
     trackPlayerViewport.setSingleStepSizes(8, 26);
