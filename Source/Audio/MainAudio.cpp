@@ -23,7 +23,7 @@ MainAudio::~MainAudio()
     graph.clear();
 }
 
-juce::AudioProcessorGraph::NodeID MainAudio::addTrack(const juce::File& file)
+NodeID MainAudio::addTrack(const juce::File& file)
 {
     juce::ScopedLock sl(lock);
     auto track = std::make_unique<Track>(*this);
@@ -38,31 +38,30 @@ juce::AudioProcessorGraph::NodeID MainAudio::addTrack(const juce::File& file)
     return node->nodeID;
 }
 
-void MainAudio::removeTrack(const juce::AudioProcessorGraph::NodeID nodeID)
+void MainAudio::removeTrack(const NodeID nodeID)
 {
     juce::ScopedLock sl(lock);
     graph.removeNode(nodeID);
     rebuildGraph();
 }
 
-void MainAudio::setPanOfTrack(const juce::AudioProcessorGraph::NodeID nodeID, const float pan) const
+void MainAudio::setPanOfTrack(const NodeID nodeID, const float pan) const
 {
     dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setPan(pan);
 }
-void MainAudio::setGainOfTrack(const juce::AudioProcessorGraph::NodeID nodeID, const float gain) const
+void MainAudio::setGainOfTrack(const NodeID nodeID, const float gain) const
 {
     dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setGain(gain);
 }
-void MainAudio::setOffsetOfTrackInSeconds(const juce::AudioProcessorGraph::NodeID nodeID,
-                                          const double offsetSeconds) const
+void MainAudio::setOffsetOfTrackInSeconds(const NodeID nodeID, const double offsetSeconds) const
 {
     dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setOffset(offsetSeconds * getSampleRate());
 }
-void MainAudio::setSoloOfTrack(const juce::AudioProcessorGraph::NodeID nodeID, const bool solo) const
+void MainAudio::setSoloOfTrack(const NodeID nodeID, const bool solo) const
 {
     dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setSolo(solo);
 }
-void MainAudio::setMuteOfTrack(const juce::AudioProcessorGraph::NodeID nodeID, const bool mute) const
+void MainAudio::setMuteOfTrack(const NodeID nodeID, const bool mute) const
 {
     dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setMute(mute);
 }
