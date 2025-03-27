@@ -1,8 +1,10 @@
 #include "TrackPlayer.h"
 
-TrackPlayer::TrackPlayer()
+TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree) :
+    tree{parentTree}, timeline{TrackPlayerConstants::startNumOfBoxes, parentTree}
 {
     addKeyListener(this);
+    tree.addListener(this);
     setWantsKeyboardFocus(true);
     addAndMakeVisible(trackPlayerViewport);
     addAndMakeVisible(timelineViewport);
@@ -15,10 +17,16 @@ void TrackPlayer::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightgrey);
     g.drawRect(getLocalBounds());
-    g.setColour(juce::Colours::forestgreen);
     timelineViewport.setViewPosition(trackPlayerViewport.getViewPositionX(), timelineViewport.getViewPositionY());
     trackPlayerSideMenuViewport.setViewPosition(trackPlayerSideMenuViewport.getViewPositionX(),
                                                 trackPlayerViewport.getViewPositionY());
+
+    g.setColour(juce::Colours::forestgreen);
+    float timeBarPosition = trackPlayerSideMenu.getWidth() + TrackPlayerConstants::timeBarBoxSize / 2 +
+                            timeBarTime * TrackPlayerConstants::startBoxWidth;
+    g.drawLine(
+        timeBarPosition, timeline.getHeight(), timeBarPosition, std::max(getHeight(), clipsBoxesComponent.getHeight()));
+
     drawBoxes();
     drawTrackText(g);
 }
@@ -106,7 +114,7 @@ void TrackPlayer::drawTrackText(juce::Graphics& g) const
 {
     for(auto i{0u}; i < getCurrentNumberOfTracks(); i++)
     {
-        // TODO: to be changed, it's only as a placeholder to differentiate rows
+        // TODO: to be changed, it's only as a placeholder to differentiate rows + the numbers of tracks don't scroll
         auto currentY{i * TrackPlayerConstants::startBoxHeight + 15};
         g.setColour(juce::Colours::white);
         g.drawText("Track nr " + std::to_string(i + 1),
@@ -142,3 +150,12 @@ void TrackPlayer::addTrack()
     resized();
 }
 
+void TrackPlayer::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                           const juce::Identifier& property)
+{
+    if(property.toString() == "timeBarTime")
+    {
+        timeBarTime = tree["timeBarTime"];
+        repaint();
+    }
+}

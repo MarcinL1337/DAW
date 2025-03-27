@@ -2,7 +2,12 @@
 
 #include "TrackPlayer.h"
 
-Timeline::Timeline(const int numOfBoxes) : tempNumOfSeconds{numOfBoxes} { addAndMakeVisible(timeBar); }
+Timeline::Timeline(const int numOfBoxes, const juce::ValueTree& parentTree) :
+    tree{parentTree}, tempNumOfSeconds{numOfBoxes}
+{
+    addAndMakeVisible(timeBar);
+    tree.setProperty(timeBarTime, 0.0, nullptr);
+}
 
 void Timeline::paint(juce::Graphics& g)
 {
@@ -42,13 +47,14 @@ void Timeline::resized()
                       getHeight() - TrackPlayerConstants::timeBarBoxSize,
                       TrackPlayerConstants::timeBarBoxSize,
                       TrackPlayerConstants::timeBarBoxSize);
+    float timeBarTimeInSeconds{static_cast<float>(timeBarXOffset) / getWidth() * TrackPlayerConstants::startNumOfBoxes};
+    tree.setProperty(timeBarTime, timeBarTimeInSeconds, nullptr);
 }
 
 void Timeline::mouseDown(const juce::MouseEvent& event)
 {
     lastMousePosition = event.getPosition();
-    auto area{timeBar.getBounds()};
-    if(area.contains(lastMousePosition) and event.mods.isLeftButtonDown())
+    if(timeBar.getBounds().contains(lastMousePosition) and event.mods.isLeftButtonDown())
     {
         isCurrentlyDraggingTimeBar = true;
     }

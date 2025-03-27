@@ -8,18 +8,23 @@
 #include "TrackPlayerSideMenu.h"
 
 class TrackPlayer final : public juce::Component,
-                          public juce::KeyListener
+                          public juce::KeyListener,
+                          public juce::ValueTree::Listener
 {
 public:
-    TrackPlayer();
+    TrackPlayer(const juce::ValueTree& parentTree);
     TrackPlayer(const TrackPlayer&) = delete;
     TrackPlayer& operator=(const TrackPlayer&) = delete;
     ~TrackPlayer() override = default;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
+
     void mouseDown(const juce::MouseEvent& event) override;
     bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
+
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
 
     void drawBoxes();
     void drawTrackButtons();
@@ -35,7 +40,9 @@ private:
     juce::Viewport timelineViewport{};
     juce::Viewport trackPlayerSideMenuViewport{};
 
-    Timeline timeline{TrackPlayerConstants::startNumOfBoxes};
+    juce::ValueTree tree;
+
+    Timeline timeline;
     TrackPlayerSideMenu trackPlayerSideMenu{};
     Component clipsBoxesComponent{};
 
@@ -47,4 +54,5 @@ private:
 
     const int trackButtonsSize{30};
     uint16_t currentNumberOfTracks{1};
+    float timeBarTime{};
 };
