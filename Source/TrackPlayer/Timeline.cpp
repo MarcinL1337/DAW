@@ -47,7 +47,8 @@ void Timeline::resized()
                       getHeight() - TrackPlayerConstants::timeBarBoxSize,
                       TrackPlayerConstants::timeBarBoxSize,
                       TrackPlayerConstants::timeBarBoxSize);
-    float timeBarTimeInSeconds{static_cast<float>(timeBarXOffset) / getWidth() * TrackPlayerConstants::startNumOfBoxes};
+    float timeBarTimeInSeconds{(static_cast<float>(timeBarXOffset) + TrackPlayerConstants::timeBarBoxSize / 2.0f) /
+                               getWidth() * TrackPlayerConstants::startNumOfBoxes};
     tree.setProperty(timeBarTime, timeBarTimeInSeconds, nullptr);
 }
 
@@ -66,7 +67,9 @@ void Timeline::mouseDrag(const juce::MouseEvent& event)
 {
     if(isCurrentlyDraggingTimeBar)
     {
-        timeBarXOffset = juce::jlimit(0, getWidth(), timeBarXOffset + event.getPosition().x - lastMousePosition.x);
+        timeBarXOffset = juce::jlimit(-TrackPlayerConstants::timeBarBoxSize / 2.0f,
+                                      static_cast<float>(getWidth()),
+                                      static_cast<float>(timeBarXOffset + event.getPosition().x - lastMousePosition.x));
         lastMousePosition = event.getPosition();
         resized();
     }

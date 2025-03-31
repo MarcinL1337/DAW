@@ -4,15 +4,15 @@
 #include <cassert>
 #include "../Constants.h"
 #include "ClipsBoxes.h"
+#include "ClipsBoxesComponent.h"
 #include "Timeline.h"
 #include "TrackPlayerSideMenu.h"
 
 class TrackPlayer final : public juce::Component,
-                          public juce::KeyListener,
-                          public juce::ValueTree::Listener
+                          public juce::KeyListener
 {
 public:
-    TrackPlayer(const juce::ValueTree& parentTree);
+    explicit TrackPlayer(const juce::ValueTree& parentTree);
     TrackPlayer(const TrackPlayer&) = delete;
     TrackPlayer& operator=(const TrackPlayer&) = delete;
     ~TrackPlayer() override = default;
@@ -22,9 +22,6 @@ public:
 
     void mouseDown(const juce::MouseEvent& event) override;
     bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
-
-    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
-                                  const juce::Identifier& property) override;
 
     void drawBoxes();
     void drawTrackButtons();
@@ -44,15 +41,13 @@ private:
 
     Timeline timeline;
     TrackPlayerSideMenu trackPlayerSideMenu{};
-    Component clipsBoxesComponent{};
+    ClipsBoxesComponent clipsBoxesComponent;
 
     // TODO (maybe): change all vectors to static_vector
     using trackButtons = std::array<std::unique_ptr<juce::TextButton>, 3>;
     std::vector<std::unique_ptr<ClipsBox>> clipsBoxesVector{};
     std::vector<trackButtons> trackButtonsVector{};
-    std::vector<std::unique_ptr<juce::Label>> trackLabelsVector{};
 
     const int trackButtonsSize{30};
     uint16_t currentNumberOfTracks{1};
-    float timeBarTime{};
 };

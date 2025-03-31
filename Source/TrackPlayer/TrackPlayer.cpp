@@ -1,10 +1,9 @@
 #include "TrackPlayer.h"
 
 TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree) :
-    tree{parentTree}, timeline{TrackPlayerConstants::startNumOfBoxes, parentTree}
+    tree{parentTree}, timeline{TrackPlayerConstants::startNumOfBoxes, parentTree}, clipsBoxesComponent{parentTree}
 {
     addKeyListener(this);
-    tree.addListener(this);
     setWantsKeyboardFocus(true);
     addAndMakeVisible(trackPlayerViewport);
     addAndMakeVisible(timelineViewport);
@@ -21,12 +20,6 @@ void TrackPlayer::paint(juce::Graphics& g)
     trackPlayerSideMenuViewport.setViewPosition(trackPlayerSideMenuViewport.getViewPositionX(),
                                                 trackPlayerViewport.getViewPositionY());
 
-    g.setColour(juce::Colours::forestgreen);
-    float timeBarPosition = trackPlayerSideMenu.getWidth() + TrackPlayerConstants::timeBarBoxSize / 2 +
-                            timeBarTime * TrackPlayerConstants::startBoxWidth;
-    g.drawLine(
-        timeBarPosition, timeline.getHeight(), timeBarPosition, std::max(getHeight(), clipsBoxesComponent.getHeight()));
-
     drawBoxes();
     drawTrackText(g);
 }
@@ -35,6 +28,7 @@ void TrackPlayer::resized()
 {
     timeline.setSize(TrackPlayerConstants::startNumOfBoxes * TrackPlayerConstants::startBoxWidth,
                      TrackPlayerConstants::timelineHeightRatio * getHeight());
+    // TODO: set height to be std::max(startScreenHeight, NumOfRows*RowHeight)
     clipsBoxesComponent.setSize(timeline.getWidth(), getCurrentNumberOfTracks() * TrackPlayerConstants::startBoxHeight);
     trackPlayerSideMenu.setSize(TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(),
                                 clipsBoxesComponent.getHeight() + timeline.getHeight());
@@ -142,20 +136,11 @@ void TrackPlayer::viewportsInit()
     trackPlayerSideMenuViewport.setViewedComponent(&trackPlayerSideMenu, false);
 }
 
+// TODO: change this so it actually add tracks, not only increments the amount.
 void TrackPlayer::addTrack()
 {
     incrementCurrentNumberOfTracks();
     trackPlayerSideMenu.incrementCurrentNumberOfTracks();
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
     resized();
-}
-
-void TrackPlayer::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
-                                           const juce::Identifier& property)
-{
-    if(property.toString() == "timeBarTime")
-    {
-        timeBarTime = tree["timeBarTime"];
-        repaint();
-    }
 }

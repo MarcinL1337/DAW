@@ -27,6 +27,7 @@ void MainToolbar::paint(juce::Graphics& g)
 void MainToolbar::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                            const juce::Identifier& property)
 {
+    // TODO: FIX IT SO THAT THE HALF OF THE BOX MEASURES THE SECONDS!!!!!!!!!!!!!!!!!!!!!!
     if(property.toString() == "timeBarTime")
     {
         timeBarPosition = tree["timeBarTime"];
