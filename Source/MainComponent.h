@@ -20,11 +20,13 @@ public:
     void addTestTracks();
 
 private:
-    MainAudio mainAudio{};
+    juce::Identifier treeType{"mainComponentValueTree"};
+    juce::ValueTree tree{treeType};
 
+    MainAudio mainAudio{};
     Menu topLevelMenu{};
     MainToolbar mainToolbar;
-    TrackPlayer trackPlayer{};
+    TrackPlayer trackPlayer;
     SideMenu sideMenu{};
 
     juce::FlexBox topLevelFlexBox{};

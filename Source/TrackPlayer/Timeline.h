@@ -7,7 +7,7 @@
 class Timeline final : public juce::Component
 {
 public:
-    explicit Timeline(int numOfBoxes);
+    explicit Timeline(int numOfBoxes, const juce::ValueTree& parentTree);
     ~Timeline() override = default;
 
     void paint(juce::Graphics& g) override;
@@ -18,6 +18,9 @@ public:
     void mouseUp(const juce::MouseEvent& event) override;
 
 private:
+    juce::ValueTree tree;
+    juce::Identifier timeBarTime{"timeBarTime"};
+
     TimeBar timeBar{};
 
     int timeBarXOffset{0};
