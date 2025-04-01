@@ -1,6 +1,6 @@
 #include "MainComponent.h"
 
-MainComponent::MainComponent() : mainToolbar(mainAudio)
+MainComponent::MainComponent() : mainToolbar(mainAudio), trackManager(mainAudio, trackPlayer)
 {
     // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
     setSize(getParentWidth(), getParentHeight());
@@ -53,12 +53,23 @@ void MainComponent::addTestTracks()
     const juce::File invertedMusicAudioFile = dawDir.getChildFile("Assets/Audio/test(-1).wav");
     const juce::File mutedMusicAudioFile = dawDir.getChildFile("Assets/Audio/test.mp3");
 
+    // Dodanie pierwszego tracka wizualnego (jeden już istnieje domyślnie)
+    int firstTrackIndex = 0;
+
+    // Dodanie drugiego tracka wizualnego
+    int secondTrackIndex = trackManager.addVisualTrack();
+
+    // Dodanie trzeciego tracka wizualnego
+    int thirdTrackIndex = trackManager.addVisualTrack();
+
     if(countdownAudioFile.existsAsFile())
     {
-        const auto trackId = mainAudio.addTrack(countdownAudioFile);
-        mainAudio.setPanOfTrack(trackId, 0.5f);
-        mainAudio.setGainOfTrack(trackId, -5.0f);
-        mainAudio.setOffsetOfTrackInSeconds(trackId, 0.0f);
+        // Dodaj track do pierwszego tracka wizualnego
+        auto trackId = trackManager.addAudioTrack(countdownAudioFile);
+        trackManager.assignAudioToTrack(trackId, firstTrackIndex);
+        trackManager.setPanOfTrack(trackId, 0.5f);
+        trackManager.setGainOfTrack(trackId, -5.0f);
+        trackManager.setOffsetOfTrackInSeconds(trackId, 0.0f);
     }
     else
         juce::AlertWindow::showMessageBoxAsync(
@@ -66,10 +77,12 @@ void MainComponent::addTestTracks()
 
     if(musicAudioFile.existsAsFile())
     {
-        const auto trackId = mainAudio.addTrack(musicAudioFile);
-        mainAudio.setPanOfTrack(trackId, 0);
-        mainAudio.setGainOfTrack(trackId, -15.0f);
-        mainAudio.setOffsetOfTrackInSeconds(trackId, 6.0f);
+        // Dodaj track do drugiego tracka wizualnego
+        auto trackId = trackManager.addAudioTrack(musicAudioFile);
+        trackManager.assignAudioToTrack(trackId, secondTrackIndex);
+        trackManager.setPanOfTrack(trackId, 0);
+        trackManager.setGainOfTrack(trackId, -15.0f);
+        trackManager.setOffsetOfTrackInSeconds(trackId, 6.0f);
     }
     else
         juce::AlertWindow::showMessageBoxAsync(
@@ -77,10 +90,12 @@ void MainComponent::addTestTracks()
 
     if(invertedMusicAudioFile.existsAsFile())
     {
-        const auto trackId = mainAudio.addTrack(invertedMusicAudioFile);
-        mainAudio.setPanOfTrack(trackId, 0.6);
-        mainAudio.setGainOfTrack(trackId, -15.0f);
-        mainAudio.setOffsetOfTrackInSeconds(trackId, 6.0f);
+        // Dodaj track do drugiego tracka wizualnego (jako drugi audioclip w tym tracku)
+        auto trackId = trackManager.addAudioTrack(invertedMusicAudioFile);
+        trackManager.assignAudioToTrack(trackId, secondTrackIndex);
+        trackManager.setPanOfTrack(trackId, 0.6);
+        trackManager.setGainOfTrack(trackId, -15.0f);
+        trackManager.setOffsetOfTrackInSeconds(trackId, 6.0f);
     }
     else
         juce::AlertWindow::showMessageBoxAsync(
@@ -88,12 +103,14 @@ void MainComponent::addTestTracks()
 
     if(mutedMusicAudioFile.existsAsFile())
     {
-        const auto trackId = mainAudio.addTrack(mutedMusicAudioFile);
-        mainAudio.setPanOfTrack(trackId, 0);
-        mainAudio.setGainOfTrack(trackId, -15.0f);
-        mainAudio.setOffsetOfTrackInSeconds(trackId, 1.0f);
-        mainAudio.setMuteOfTrack(trackId, true);
-        mainAudio.setSoloOfTrack(trackId, false);
+        // Dodaj track do trzeciego tracka wizualnego
+        auto trackId = trackManager.addAudioTrack(mutedMusicAudioFile);
+        trackManager.assignAudioToTrack(trackId, thirdTrackIndex);
+        trackManager.setPanOfTrack(trackId, 0);
+        trackManager.setGainOfTrack(trackId, -15.0f);
+        trackManager.setOffsetOfTrackInSeconds(trackId, 1.0f);
+        trackManager.setMuteOfTrack(trackId, true);
+        trackManager.setSoloOfTrack(trackId, false);
     }
     else
         juce::AlertWindow::showMessageBoxAsync(

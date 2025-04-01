@@ -55,6 +55,8 @@ private:
     int64_t offsetSamples{0};
     bool mute{false};
     bool solo{false};
+    //
+    // int audioTrackIndex{-1};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Track)
 };

@@ -7,6 +7,7 @@
 #include "SideMenu/SideMenu.h"
 #include "Toolbar/MainToolbar.h"
 #include "TopMenu/Menu.h"
+#include "TrackManager.h"
 #include "TrackPlayer/Timeline.h"
 #include "TrackPlayer/TrackPlayer.h"
 
@@ -26,6 +27,8 @@ private:
     MainToolbar mainToolbar;
     TrackPlayer trackPlayer{};
     SideMenu sideMenu{};
+
+    TrackManager trackManager;
 
     juce::FlexBox topLevelFlexBox{};
     juce::FlexBox mainContentFlexBox{};
