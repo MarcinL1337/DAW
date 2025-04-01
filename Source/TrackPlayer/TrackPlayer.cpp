@@ -125,7 +125,7 @@ void TrackPlayer::drawTrackText(juce::Graphics& g) const
 
 void TrackPlayer::viewportsInit()
 {
-    trackPlayerViewport.setScrollBarsShown(true, true, true, true);
+    trackPlayerViewport.setScrollBarsShown(true, true);
     trackPlayerViewport.setViewedComponent(&clipsBoxesComponent, false);
     // TODO: Temporary. Question: Why stepY = 26 scrolls whole box Height which is 85?
     trackPlayerViewport.setSingleStepSizes(8, 26);
