@@ -21,17 +21,19 @@ void TrackPlayer::paint(juce::Graphics& g)
                                                 trackPlayerViewport.getViewPositionY());
 
     drawBoxes();
-    drawTrackText(g);
 }
 
 void TrackPlayer::resized()
 {
     timeline.setSize(TrackPlayerConstants::startNumOfBoxes * TrackPlayerConstants::startBoxWidth,
                      TrackPlayerConstants::timelineHeightRatio * getHeight());
-    // TODO: set height to be std::max(startScreenHeight, NumOfRows*RowHeight)
-    clipsBoxesComponent.setSize(timeline.getWidth(), getCurrentNumberOfTracks() * TrackPlayerConstants::startBoxHeight);
-    trackPlayerSideMenu.setSize(TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(),
-                                clipsBoxesComponent.getHeight() + timeline.getHeight());
+
+    auto sideMenuHeight{std::max(getCurrentNumberOfTracks() * TrackPlayerConstants::startBoxHeight,
+                                 static_cast<float>(getHeight() - trackPlayerViewport.getScrollBarThickness()))};
+
+    clipsBoxesComponent.setSize(timeline.getWidth(), sideMenuHeight - timeline.getHeight());
+    trackPlayerSideMenu.setBounds(
+        0, timeline.getHeight(), TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(), sideMenuHeight);
 
     trackPlayerViewport.setBounds(getLocalBounds()
                                       .removeFromRight(getWidth() - trackPlayerSideMenu.getWidth())
@@ -44,7 +46,6 @@ void TrackPlayer::resized()
                                           timeline.getHeight(),
                                           trackPlayerSideMenu.getWidth(),
                                           getHeight() - trackPlayerViewport.getScrollBarThickness());
-    drawTrackButtons();
 }
 
 void TrackPlayer::mouseDown(const juce::MouseEvent& event)
@@ -81,50 +82,6 @@ void TrackPlayer::drawBoxes()
     }
 }
 
-void TrackPlayer::drawTrackButtons()
-{
-    trackButtonsVector.clear();
-    const auto startX{trackPlayerSideMenu.getWidth() - 2 * trackButtonsSize};
-    const auto xDifference{trackButtonsSize + 5};
-    for(auto i{0u}; i < getCurrentNumberOfTracks(); i++)
-    {
-        auto recordButton = std::make_unique<juce::TextButton>("R");
-        auto soloButton = std::make_unique<juce::TextButton>("S");
-        auto muteButton = std::make_unique<juce::TextButton>("M");
-
-        auto currentY{i * TrackPlayerConstants::startBoxHeight + 15};
-
-        recordButton->setBounds(startX, currentY, trackButtonsSize, trackButtonsSize);
-        recordButton->onClick = [i]() { std::cout << "Recording[" << i + 1 << "]" << std::endl; };
-
-        soloButton->setBounds(startX - xDifference, currentY, trackButtonsSize, trackButtonsSize);
-        soloButton->onClick = [i]() { std::cout << "Soloing[" << i + 1 << "]" << std::endl; };
-
-        muteButton->setBounds(startX - 2 * xDifference, currentY, trackButtonsSize, trackButtonsSize);
-        muteButton->onClick = [i]() { std::cout << "Muting[" << i + 1 << "]" << std::endl; };
-
-        trackButtonsVector.push_back({std::move(recordButton), std::move(soloButton), std::move(muteButton)});
-        for(auto& button: trackButtonsVector.back()) { trackPlayerSideMenu.addAndMakeVisible(button.get()); }
-    }
-}
-
-void TrackPlayer::drawTrackText(juce::Graphics& g) const
-{
-    for(auto i{0u}; i < getCurrentNumberOfTracks(); i++)
-    {
-        // TODO: to be changed, it's only as a placeholder to differentiate rows + the numbers of tracks don't scroll
-        auto currentY{i * TrackPlayerConstants::startBoxHeight + 15};
-        g.setColour(juce::Colours::white);
-        g.drawText("Track nr " + std::to_string(i + 1),
-                   10,
-                   currentY + timeline.getHeight(),
-                   100,
-                   trackButtonsSize,
-                   juce::Justification::centred,
-                   false);
-    }
-}
-
 void TrackPlayer::viewportsInit()
 {
     trackPlayerViewport.setScrollBarsShown(true, true);
@@ -139,11 +96,11 @@ void TrackPlayer::viewportsInit()
     trackPlayerSideMenuViewport.setViewedComponent(&trackPlayerSideMenu, false);
 }
 
-// TODO: change this so it actually add tracks, not only increments the amount.
 void TrackPlayer::addTrack()
 {
     incrementCurrentNumberOfTracks();
     trackPlayerSideMenu.incrementCurrentNumberOfTracks();
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
     resized();
+    trackPlayerSideMenu.resized();
 }

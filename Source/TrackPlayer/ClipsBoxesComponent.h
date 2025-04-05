@@ -20,4 +20,5 @@ private:
     juce::ValueTree tree;
 
     float timeBarTime{};
+    float timeBarPosition{};
 };

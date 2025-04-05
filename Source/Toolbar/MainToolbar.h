@@ -17,10 +17,15 @@ private:
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
 
-    juce::ValueTree tree;
+    void paintTimeBarValue(juce::Graphics& g);
+    void initTimeBarValueLabel();
 
+    juce::Label timeBarValueLabel;
+    juce::ValueTree tree;
     juce::Toolbar toolbar;
     ToolbarFactory toolbarFactory;
 
-    double timeBarPosition{0.0};
+    std::ostringstream oss;
+    double timeBarValue{0.0};
+    juce::Rectangle<int> timeBarValueArea{};
 };

@@ -23,16 +23,14 @@ public:
     void mouseDown(const juce::MouseEvent& event) override;
     bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
 
-    void drawBoxes();
-    void drawTrackButtons();
-    void drawTrackText(juce::Graphics& g) const;
-    void viewportsInit();
-    void addTrack();
-
     uint16_t getCurrentNumberOfTracks() const { return currentNumberOfTracks; }
     void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }
 
 private:
+    void drawBoxes();
+    void viewportsInit();
+    void addTrack();
+
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
     juce::Viewport trackPlayerSideMenuViewport{};
@@ -43,10 +41,7 @@ private:
     TrackPlayerSideMenu trackPlayerSideMenu{};
     ClipsBoxesComponent clipsBoxesComponent;
 
-    // TODO (maybe): change all vectors to static_vector
-    using trackButtons = std::array<std::unique_ptr<juce::TextButton>, 3>;
     std::vector<std::unique_ptr<ClipsBox>> clipsBoxesVector{};
-    std::vector<trackButtons> trackButtonsVector{};
 
     const int trackButtonsSize{30};
     uint16_t currentNumberOfTracks{1};
