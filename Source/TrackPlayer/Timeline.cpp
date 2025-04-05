@@ -47,9 +47,9 @@ void Timeline::resized()
                       getHeight() - TrackPlayerConstants::timeBarBoxSize,
                       TrackPlayerConstants::timeBarBoxSize,
                       TrackPlayerConstants::timeBarBoxSize);
-    float timeBarTimeInSeconds{(static_cast<float>(timeBarXOffset) + TrackPlayerConstants::timeBarBoxSize / 2.0f) /
-                               getWidth() * TrackPlayerConstants::startNumOfBoxes};
     tree.setProperty(timeBarTime, timeBarTimeInSeconds, nullptr);
+    timeBarTimeInSeconds = (static_cast<float>(timeBarXOffset) + TrackPlayerConstants::timeBarBoxSize / 2.0f) /
+                           getWidth() * TrackPlayerConstants::startNumOfBoxes;
 }
 
 void Timeline::mouseDown(const juce::MouseEvent& event)

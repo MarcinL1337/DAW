@@ -27,4 +27,5 @@ private:
     const int tempNumOfSeconds{};
     juce::Point<int> lastMousePosition{};
     bool isCurrentlyDraggingTimeBar{false};
+    float timeBarTimeInSeconds{0.0f};
 };

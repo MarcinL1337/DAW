@@ -9,8 +9,8 @@ class ToolbarFactory final : public juce::ToolbarItemFactory,
                              public juce::Button::Listener
 {
 public:
-    ToolbarFactory() = default;
-    ToolbarFactory(MainAudio& mainAudioRef);
+    ToolbarFactory() = delete;
+    explicit ToolbarFactory(MainAudio& mainAudioRef);
     ~ToolbarFactory() override = default;
 
 private:
