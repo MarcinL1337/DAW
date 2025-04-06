@@ -26,6 +26,6 @@ private:
     ToolbarFactory toolbarFactory;
 
     std::ostringstream oss;
-    double timeBarValue{0.0};
+    float timeBarValue{0.0f};
     juce::Rectangle<int> timeBarValueArea{};
 };

@@ -40,6 +40,7 @@ void Timeline::resized()
                       getHeight() - TrackPlayerConstants::timeBarBoxSize,
                       TrackPlayerConstants::timeBarBoxSize,
                       TrackPlayerConstants::timeBarBoxSize);
+
     timeBarTimeInSeconds = (static_cast<float>(timeBarXOffset) + TrackPlayerConstants::timeBarBoxSize / 2.0f) /
                            getWidth() * TrackPlayerConstants::startNumOfBoxes;
     tree.setProperty(timeBarTime, timeBarTimeInSeconds, nullptr);
