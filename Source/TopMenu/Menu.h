@@ -35,7 +35,6 @@ private:
         help
     };
 
-    // TODO: Better idea of representation instead of comments like that
     enum LowerLevelMenuOptions
     {
         // File

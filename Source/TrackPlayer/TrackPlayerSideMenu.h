@@ -16,5 +16,12 @@ public:
     void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }
 
 private:
+    void drawTrackText(juce::Graphics& g) const;
+    void drawTrackButtons();
+
+    using trackButtons = std::array<std::unique_ptr<juce::TextButton>, 3>;
+    std::vector<trackButtons> trackButtonsVector{};
+
     uint16_t currentNumberOfTracks{1};
+    const int trackButtonsSize{30};
 };

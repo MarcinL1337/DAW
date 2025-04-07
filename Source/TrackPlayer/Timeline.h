@@ -18,13 +18,16 @@ public:
     void mouseUp(const juce::MouseEvent& event) override;
 
 private:
+    void drawLineOnTimeline(juce::Graphics& g, uint32_t lineNumber) const;
+
     juce::ValueTree tree;
     juce::Identifier timeBarTime{"timeBarTime"};
 
     TimeBar timeBar{};
 
     int timeBarXOffset{0};
-    const int tempNumOfSeconds{};
+    const int numOfSeconds{};
     juce::Point<int> lastMousePosition{};
     bool isCurrentlyDraggingTimeBar{false};
+    float timeBarTimeInSeconds{0.0f};
 };

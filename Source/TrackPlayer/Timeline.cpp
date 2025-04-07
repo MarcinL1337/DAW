@@ -2,19 +2,16 @@
 
 #include "TrackPlayer.h"
 
-Timeline::Timeline(const int numOfBoxes, const juce::ValueTree& parentTree) :
-    tree{parentTree}, tempNumOfSeconds{numOfBoxes}
+Timeline::Timeline(const int numOfBoxes, const juce::ValueTree& parentTree) : tree{parentTree}, numOfSeconds{numOfBoxes}
 {
     addAndMakeVisible(timeBar);
-    tree.setProperty(timeBarTime, 0.0, nullptr);
 }
 
 void Timeline::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightgrey);
 
-    // TODO: make this painting cleaner
-    for(auto i{0u}; i <= tempNumOfSeconds; i++)
+    for(auto i{0u}; i <= numOfSeconds; i++)
     {
         g.drawText(std::to_string(i),
                    i * TrackPlayerConstants::startBoxWidth + 3,
@@ -22,23 +19,19 @@ void Timeline::paint(juce::Graphics& g)
                    TrackPlayerConstants::startBoxWidth,
                    15,
                    juce::Justification::left);
-        if(i % 5 == 0)
-        {
-            g.drawLine(TrackPlayerConstants::startBoxWidth * i,
-                       getHeight(),
-                       TrackPlayerConstants::startBoxWidth * i,
-                       getHeight() * 0.5,
-                       1);
-        }
-        else
-        {
-            g.drawLine(TrackPlayerConstants::startBoxWidth * i,
-                       getHeight(),
-                       TrackPlayerConstants::startBoxWidth * i,
-                       getHeight() * 0.66,
-                       0.75);
-        }
+
+        drawLineOnTimeline(g, i);
     }
+}
+
+void Timeline::drawLineOnTimeline(juce::Graphics& g, const uint32_t lineNumber) const
+{
+    auto heightScale = lineNumber % 5 ? 0.66f : 0.5f;
+    g.drawLine(TrackPlayerConstants::startBoxWidth * lineNumber,
+               getHeight(),
+               TrackPlayerConstants::startBoxWidth * lineNumber,
+               getHeight() * heightScale,
+               0.75);
 }
 
 void Timeline::resized()
@@ -47,8 +40,9 @@ void Timeline::resized()
                       getHeight() - TrackPlayerConstants::timeBarBoxSize,
                       TrackPlayerConstants::timeBarBoxSize,
                       TrackPlayerConstants::timeBarBoxSize);
-    float timeBarTimeInSeconds{(static_cast<float>(timeBarXOffset) + TrackPlayerConstants::timeBarBoxSize / 2.0f) /
-                               getWidth() * TrackPlayerConstants::startNumOfBoxes};
+
+    timeBarTimeInSeconds = (static_cast<float>(timeBarXOffset) + TrackPlayerConstants::timeBarBoxSize / 2.0f) /
+                           getWidth() * TrackPlayerConstants::startNumOfBoxes;
     tree.setProperty(timeBarTime, timeBarTimeInSeconds, nullptr);
 }
 
