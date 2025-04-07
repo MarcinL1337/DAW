@@ -7,7 +7,7 @@ class MainAudio;
 class Track final : public juce::AudioProcessor
 {
 public:
-    Track(MainAudio& mainAudioRef);
+    explicit Track(MainAudio& mainAudioRef);
     ~Track() override = default;
 
     bool loadFile(const juce::File& file);

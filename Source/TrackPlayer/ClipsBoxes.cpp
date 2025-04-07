@@ -1,6 +1,6 @@
 #include "ClipsBoxes.h"
 
-ClipsBox::ClipsBox(const int numOfBoxes) : currentNumOfBoxes{numOfBoxes} {}
+ClipsBox::ClipsBox(const int numOfBoxes, const int id) : currentNumOfBoxes{numOfBoxes}, id{id} {}
 
 void ClipsBox::paint(juce::Graphics& g)
 {

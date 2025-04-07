@@ -6,7 +6,7 @@
 class ClipsBox : public juce::Component
 {
 public:
-    ClipsBox(int numOfBoxes);
+    explicit ClipsBox(int numOfBoxes, int id = -1);
     ClipsBox(const ClipsBox&) = delete;
     ClipsBox& operator=(const ClipsBox&) = delete;
     ~ClipsBox() override = default;
@@ -21,4 +21,5 @@ private:
     const float currentGridBoxWidth{TrackPlayerConstants::startBoxWidth};
     const float currentGridBoxHeight{TrackPlayerConstants::startBoxHeight};
     const int currentNumOfBoxes{};
+    const int id;
 };
