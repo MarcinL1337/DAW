@@ -25,11 +25,13 @@ public:
 
     uint16_t getCurrentNumberOfTracks() const { return currentNumberOfTracks; }
     void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }
+    void decrementCurrentNumberOfTracks() { currentNumberOfTracks--; }
 
 private:
-    void drawBoxes();
+    void makeNewClipsBox();
     void viewportsInit();
     void addTrack();
+    void removeTrack();
 
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
@@ -44,5 +46,5 @@ private:
     std::vector<std::unique_ptr<ClipsBox>> clipsBoxesVector{};
 
     const int trackButtonsSize{30};
-    uint16_t currentNumberOfTracks{1};
+    uint16_t currentNumberOfTracks{0u};
 };

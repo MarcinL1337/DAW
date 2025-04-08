@@ -10,6 +10,7 @@ TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree) :
     addAndMakeVisible(trackPlayerSideMenuViewport);
     viewportsInit();
     juce::Timer::callAfterDelay(100, [&] { grabKeyboardFocus(); });
+    juce::Timer::callAfterDelay(50, [&] { addTrack(); });
 }
 
 void TrackPlayer::paint(juce::Graphics& g)
@@ -19,8 +20,6 @@ void TrackPlayer::paint(juce::Graphics& g)
     timelineViewport.setViewPosition(trackPlayerViewport.getViewPositionX(), timelineViewport.getViewPositionY());
     trackPlayerSideMenuViewport.setViewPosition(trackPlayerSideMenuViewport.getViewPositionX(),
                                                 trackPlayerViewport.getViewPositionY());
-
-    drawBoxes();
 }
 
 void TrackPlayer::resized()
@@ -64,22 +63,23 @@ bool TrackPlayer::keyPressed(const juce::KeyPress& key, Component* originatingCo
         addTrack();
         return true;
     }
+    if(key.getModifiers().isShiftDown() and key.getTextCharacter() == '_')
+    {
+        removeTrack();
+        return true;
+    }
     return false;
 }
 
-void TrackPlayer::drawBoxes()
+void TrackPlayer::makeNewClipsBox()
 {
-    clipsBoxesVector.clear();
-    for(auto i{0u}; i < getCurrentNumberOfTracks(); i++)
-    {
-        auto clipsBox = std::make_unique<ClipsBox>(TrackPlayerConstants::startNumOfBoxes);
-        clipsBox->setBounds(0,
-                            i * TrackPlayerConstants::startBoxHeight,
-                            clipsBoxesComponent.getWidth(),
-                            TrackPlayerConstants::startBoxHeight);
-        clipsBoxesVector.push_back(std::move(clipsBox));
-        clipsBoxesComponent.addAndMakeVisible(clipsBoxesVector.back().get());
-    }
+    auto clipsBox = std::make_unique<ClipsBox>(TrackPlayerConstants::startNumOfBoxes);
+    clipsBox->setBounds(0,
+                        getCurrentNumberOfTracks() * TrackPlayerConstants::startBoxHeight,
+                        clipsBoxesComponent.getWidth(),
+                        TrackPlayerConstants::startBoxHeight);
+    clipsBoxesVector.push_back(std::move(clipsBox));
+    clipsBoxesComponent.addAndMakeVisible(clipsBoxesVector.back().get());
 }
 
 void TrackPlayer::viewportsInit()
@@ -98,9 +98,23 @@ void TrackPlayer::viewportsInit()
 
 void TrackPlayer::addTrack()
 {
+    makeNewClipsBox();
     incrementCurrentNumberOfTracks();
     trackPlayerSideMenu.incrementCurrentNumberOfTracks();
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
     resized();
     trackPlayerSideMenu.resized();
+}
+
+void TrackPlayer::removeTrack()
+{
+    if(getCurrentNumberOfTracks() > 0)
+    {
+        clipsBoxesVector.pop_back();
+        decrementCurrentNumberOfTracks();
+        trackPlayerSideMenu.decrementCurrentNumberOfTracks();
+        assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
+        resized();
+        trackPlayerSideMenu.resized();
+    }
 }
