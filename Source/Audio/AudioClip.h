@@ -4,11 +4,11 @@
 
 class MainAudio;
 
-class Track final : public juce::AudioProcessor
+class AudioClip final : public juce::AudioProcessor
 {
 public:
-    explicit Track(MainAudio& mainAudioRef);
-    ~Track() override = default;
+    explicit AudioClip(MainAudio& mainAudioRef);
+    ~AudioClip() override = default;
 
     bool loadFile(const juce::File& file);
 
@@ -26,7 +26,7 @@ public:
     void releaseResources() override;
     void processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi) override;
 
-    const juce::String getName() const override { return "Track"; }
+    const juce::String getName() const override { return "AudioClip"; }
     bool acceptsMidi() const override { return false; }
     bool producesMidi() const override { return false; }
     double getTailLengthSeconds() const override { return 0; }
@@ -56,5 +56,5 @@ private:
     bool mute{false};
     bool solo{false};
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Track)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioClip)
 };

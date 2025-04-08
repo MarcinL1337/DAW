@@ -23,47 +23,47 @@ MainAudio::~MainAudio()
     graph.clear();
 }
 
-NodeID MainAudio::addTrack(const juce::File& file)
+NodeID MainAudio::addAudioClip(const juce::File& file)
 {
     juce::ScopedLock sl(lock);
-    auto track = std::make_unique<Track>(*this);
-    if(!track->loadFile(file))
+    auto audioClip = std::make_unique<AudioClip>(*this);
+    if(!audioClip->loadFile(file))
         throw std::runtime_error("Failed to load file: " + file.getFullPathName().toStdString());
 
-    track->prepareToPlay(audioDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate(),
-                         audioDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples());
+    audioClip->prepareToPlay(audioDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate(),
+                             audioDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples());
 
-    const auto node = graph.addNode(std::move(track));
+    const auto node = graph.addNode(std::move(audioClip));
     rebuildGraph();
     return node->nodeID;
 }
 
-void MainAudio::removeTrack(const NodeID nodeID)
+void MainAudio::removeAudioClip(const NodeID nodeID)
 {
     juce::ScopedLock sl(lock);
     graph.removeNode(nodeID);
     rebuildGraph();
 }
 
-void MainAudio::setPanOfTrack(const NodeID nodeID, const float pan) const
+void MainAudio::setPanOfAudioClip(const NodeID nodeID, const float pan) const
 {
-    dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setPan(pan);
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setPan(pan);
 }
-void MainAudio::setGainOfTrack(const NodeID nodeID, const float gain) const
+void MainAudio::setGainOfAudioClip(const NodeID nodeID, const float gain) const
 {
-    dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setGain(gain);
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setGain(gain);
 }
-void MainAudio::setOffsetOfTrackInSeconds(const NodeID nodeID, const double offsetSeconds) const
+void MainAudio::setOffsetOfAudioClipInSeconds(const NodeID nodeID, const double offsetSeconds) const
 {
-    dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setOffset(offsetSeconds * getSampleRate());
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setOffset(offsetSeconds * getSampleRate());
 }
-void MainAudio::setSoloOfTrack(const NodeID nodeID, const bool solo) const
+void MainAudio::setSoloOfAudioClip(const NodeID nodeID, const bool solo) const
 {
-    dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setSolo(solo);
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setSolo(solo);
 }
-void MainAudio::setMuteOfTrack(const NodeID nodeID, const bool mute) const
+void MainAudio::setMuteOfAudioClip(const NodeID nodeID, const bool mute) const
 {
-    dynamic_cast<Track*>(graph.getNodeForId(nodeID)->getProcessor())->setMute(mute);
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setMute(mute);
 }
 
 void MainAudio::play()
@@ -136,5 +136,5 @@ bool MainAudio::isAnySoloed() const
     return std::ranges::any_of(
         graph.getNodes(),
         [&](const juce::AudioProcessorGraph::Node* node)
-        { return node->nodeID == outputNodeID ? false : dynamic_cast<Track*>(node->getProcessor())->isSoloed(); });
+        { return node->nodeID == outputNodeID ? false : dynamic_cast<AudioClip*>(node->getProcessor())->isSoloed(); });
 }

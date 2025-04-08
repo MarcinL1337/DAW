@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Track.h"
+#include "AudioClip.h"
 using NodeID = juce::AudioProcessorGraph::NodeID;
 
 class MainAudio final : public juce::AudioPlayHead
@@ -8,13 +8,13 @@ class MainAudio final : public juce::AudioPlayHead
 public:
     MainAudio();
     ~MainAudio() override;
-    NodeID addTrack(const juce::File& file);  // returns index of the track in trackNodes
-    void removeTrack(NodeID nodeID);
-    void setPanOfTrack(NodeID nodeID, float pan) const;
-    void setGainOfTrack(NodeID nodeID, float gain) const;
-    void setOffsetOfTrackInSeconds(NodeID nodeID, double offsetSeconds) const;
-    void setSoloOfTrack(NodeID nodeID, bool solo) const;
-    void setMuteOfTrack(NodeID nodeID, bool mute) const;
+    NodeID addAudioClip(const juce::File& file);
+    void removeAudioClip(NodeID nodeID);
+    void setPanOfAudioClip(NodeID nodeID, float pan) const;
+    void setGainOfAudioClip(NodeID nodeID, float gain) const;
+    void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
+    void setSoloOfAudioClip(NodeID nodeID, bool solo) const;
+    void setMuteOfAudioClip(NodeID nodeID, bool mute) const;
 
     void play();
     void pause();

@@ -61,8 +61,8 @@ set(SourceFiles
 
         Source/Audio/MainAudio.h
         Source/Audio/MainAudio.cpp
-        Source/Audio/Track.h
-        Source/Audio/Track.cpp
+        Source/Audio/AudioClip.h
+        Source/Audio/AudioClip.cpp
 )
 
 juce_add_gui_app(${PROJECT_NAME}
