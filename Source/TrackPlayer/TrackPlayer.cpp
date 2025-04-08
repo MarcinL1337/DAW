@@ -1,7 +1,7 @@
 #include "TrackPlayer.h"
 
 TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree) :
-    tree{parentTree}, timeline{TrackPlayerConstants::startNumOfBoxes, parentTree}, clipsBoxesComponent{parentTree}
+    tree{parentTree}, timeline{TrackPlayerConstants::startNumOfBoxes, parentTree}, trackGuiComponent{parentTree}
 {
     addKeyListener(this);
     setWantsKeyboardFocus(true);
@@ -30,7 +30,7 @@ void TrackPlayer::resized()
     auto sideMenuHeight{std::max(getCurrentNumberOfTracks() * TrackPlayerConstants::startBoxHeight,
                                  static_cast<float>(getHeight() - trackPlayerViewport.getScrollBarThickness()))};
 
-    clipsBoxesComponent.setSize(timeline.getWidth(), sideMenuHeight - timeline.getHeight());
+    trackGuiComponent.setSize(timeline.getWidth(), sideMenuHeight - timeline.getHeight());
     trackPlayerSideMenu.setBounds(
         0, timeline.getHeight(), TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(), sideMenuHeight);
 
@@ -71,21 +71,21 @@ bool TrackPlayer::keyPressed(const juce::KeyPress& key, Component* originatingCo
     return false;
 }
 
-void TrackPlayer::makeNewClipsBox()
+void TrackPlayer::makeNewTrackGui()
 {
-    auto clipsBox = std::make_unique<ClipsBox>(TrackPlayerConstants::startNumOfBoxes);
-    clipsBox->setBounds(0,
+    auto trackGui = std::make_unique<TrackGui>(TrackPlayerConstants::startNumOfBoxes);
+    trackGui->setBounds(0,
                         getCurrentNumberOfTracks() * TrackPlayerConstants::startBoxHeight,
-                        clipsBoxesComponent.getWidth(),
+                        trackGuiComponent.getWidth(),
                         TrackPlayerConstants::startBoxHeight);
-    clipsBoxesVector.push_back(std::move(clipsBox));
-    clipsBoxesComponent.addAndMakeVisible(clipsBoxesVector.back().get());
+    trackGuiVector.push_back(std::move(trackGui));
+    trackGuiComponent.addAndMakeVisible(trackGuiVector.back().get());
 }
 
 void TrackPlayer::viewportsInit()
 {
     trackPlayerViewport.setScrollBarsShown(true, true);
-    trackPlayerViewport.setViewedComponent(&clipsBoxesComponent, false);
+    trackPlayerViewport.setViewedComponent(&trackGuiComponent, false);
     // TODO: Temporary. Question: Why stepY = 26 scrolls whole box Height which is 85?
     trackPlayerViewport.setSingleStepSizes(8, 26);
 
@@ -98,7 +98,7 @@ void TrackPlayer::viewportsInit()
 
 void TrackPlayer::addTrack()
 {
-    makeNewClipsBox();
+    makeNewTrackGui();
     incrementCurrentNumberOfTracks();
     trackPlayerSideMenu.incrementCurrentNumberOfTracks();
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
@@ -110,7 +110,7 @@ void TrackPlayer::removeTrack()
 {
     if(getCurrentNumberOfTracks() > 0)
     {
-        clipsBoxesVector.pop_back();
+        trackGuiVector.pop_back();
         decrementCurrentNumberOfTracks();
         trackPlayerSideMenu.decrementCurrentNumberOfTracks();
         assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
