@@ -1,7 +1,7 @@
-#include "Track.h"
+#include "AudioClip.h"
 #include "MainAudio.h"
 
-Track::Track(MainAudio& mainAudioRef) :
+AudioClip::AudioClip(MainAudio& mainAudioRef) :
     AudioProcessor(BusesProperties()
                        .withInput("Input", juce::AudioChannelSet::stereo(), true)
                        .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
@@ -12,20 +12,20 @@ Track::Track(MainAudio& mainAudioRef) :
     formatManager.registerBasicFormats();
 }
 
-void Track::releaseResources()
+void AudioClip::releaseResources()
 {
     gainProcessor.reset();
     panProcessor.reset();
 }
 
-bool Track::loadFile(const juce::File& file)
+bool AudioClip::loadFile(const juce::File& file)
 {
     std::unique_ptr<juce::AudioFormatReader> temp_reader(formatManager.createReaderFor(file));
     reader = std::move(temp_reader);
     return reader != nullptr;
 }
 
-void Track::prepareToPlay(const double sampleRate, const int samplesPerBlock)
+void AudioClip::prepareToPlay(const double sampleRate, const int samplesPerBlock)
 {
     deviceSampleRate = sampleRate;
     if(reader)
@@ -43,14 +43,14 @@ void Track::prepareToPlay(const double sampleRate, const int samplesPerBlock)
     isPrepared = resampler && reader;
 }
 
-bool Track::processBlockChecker() const
+bool AudioClip::processBlockChecker() const
 {
     const bool muteAndSoloCheck = !mute && (!mainAudio.isAnySoloed() || solo);
     // TODO: what if someone deletes audio file?
     return isPrepared && mainAudio.isPlaying() && muteAndSoloCheck;
 }
 
-void Track::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
+void AudioClip::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     buffer.clear();
     if(!processBlockChecker())

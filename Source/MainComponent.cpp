@@ -55,10 +55,10 @@ void MainComponent::addTestTracks()
 
     if(countdownAudioFile.existsAsFile())
     {
-        const auto trackId = mainAudio.addTrack(countdownAudioFile);
-        mainAudio.setPanOfTrack(trackId, 0.5f);
-        mainAudio.setGainOfTrack(trackId, -5.0f);
-        mainAudio.setOffsetOfTrackInSeconds(trackId, 0.0f);
+        const auto audioClipId = mainAudio.addAudioClip(countdownAudioFile);
+        mainAudio.setPanOfAudioClip(audioClipId, 0.5f);
+        mainAudio.setGainOfAudioClip(audioClipId, -5.0f);
+        mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 0.0f);
     }
     else
         juce::AlertWindow::showMessageBoxAsync(
@@ -66,10 +66,10 @@ void MainComponent::addTestTracks()
 
     if(musicAudioFile.existsAsFile())
     {
-        const auto trackId = mainAudio.addTrack(musicAudioFile);
-        mainAudio.setPanOfTrack(trackId, 0);
-        mainAudio.setGainOfTrack(trackId, -15.0f);
-        mainAudio.setOffsetOfTrackInSeconds(trackId, 6.0f);
+        const auto audioClipId = mainAudio.addAudioClip(musicAudioFile);
+        mainAudio.setPanOfAudioClip(audioClipId, 0);
+        mainAudio.setGainOfAudioClip(audioClipId, -15.0f);
+        mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
     }
     else
         juce::AlertWindow::showMessageBoxAsync(
@@ -77,10 +77,10 @@ void MainComponent::addTestTracks()
 
     if(invertedMusicAudioFile.existsAsFile())
     {
-        const auto trackId = mainAudio.addTrack(invertedMusicAudioFile);
-        mainAudio.setPanOfTrack(trackId, 0.6);
-        mainAudio.setGainOfTrack(trackId, -15.0f);
-        mainAudio.setOffsetOfTrackInSeconds(trackId, 6.0f);
+        const auto audioClipId = mainAudio.addAudioClip(invertedMusicAudioFile);
+        mainAudio.setPanOfAudioClip(audioClipId, 0.6);
+        mainAudio.setGainOfAudioClip(audioClipId, -15.0f);
+        mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
     }
     else
         juce::AlertWindow::showMessageBoxAsync(
@@ -88,12 +88,12 @@ void MainComponent::addTestTracks()
 
     if(mutedMusicAudioFile.existsAsFile())
     {
-        const auto trackId = mainAudio.addTrack(mutedMusicAudioFile);
-        mainAudio.setPanOfTrack(trackId, 0);
-        mainAudio.setGainOfTrack(trackId, -15.0f);
-        mainAudio.setOffsetOfTrackInSeconds(trackId, 1.0f);
-        mainAudio.setMuteOfTrack(trackId, true);
-        mainAudio.setSoloOfTrack(trackId, false);
+        const auto audioClipId = mainAudio.addAudioClip(mutedMusicAudioFile);
+        mainAudio.setPanOfAudioClip(audioClipId, 0);
+        mainAudio.setGainOfAudioClip(audioClipId, -15.0f);
+        mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 1.0f);
+        mainAudio.setMuteOfAudioClip(audioClipId, true);
+        mainAudio.setSoloOfAudioClip(audioClipId, false);
     }
     else
         juce::AlertWindow::showMessageBoxAsync(

@@ -3,9 +3,9 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <cassert>
 #include "../Constants.h"
-#include "ClipsBoxes.h"
-#include "ClipsBoxesComponent.h"
 #include "Timeline.h"
+#include "TrackGui.h"
+#include "TrackGuiComponent.h"
 #include "TrackPlayerSideMenu.h"
 
 class TrackPlayer final : public juce::Component,
@@ -28,7 +28,7 @@ public:
     void decrementCurrentNumberOfTracks() { currentNumberOfTracks--; }
 
 private:
-    void makeNewClipsBox();
+    void makeNewTrackGui();
     void viewportsInit();
     void addTrack();
     void removeTrack();
@@ -41,9 +41,9 @@ private:
 
     Timeline timeline;
     TrackPlayerSideMenu trackPlayerSideMenu{};
-    ClipsBoxesComponent clipsBoxesComponent;
+    TrackGuiComponent trackGuiComponent;
 
-    std::vector<std::unique_ptr<ClipsBox>> clipsBoxesVector{};
+    std::vector<std::unique_ptr<TrackGui>> trackGuiVector{};
 
     const int trackButtonsSize{30};
     uint16_t currentNumberOfTracks{0u};
