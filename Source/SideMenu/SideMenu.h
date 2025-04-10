@@ -2,6 +2,18 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 
+struct SliderSettings
+{
+    juce::Slider& slider;
+    int minValue;
+    int maxValue;
+    float initialValue;
+    int valuesDecimalPoint;
+    std::string textValueSuffix;
+    juce::Label& sliderLabel;
+    std::string labelText;
+};
+
 class SideMenu final : public juce::Component
 {
 public:
@@ -11,7 +23,7 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    void positionSliders();
+    void positionSliders() const;
     void initSliders();
 
 private:
@@ -24,6 +36,8 @@ private:
     juce::Slider bassBoostSlider;
     juce::Label bassBoostLabel;
 
-    const uint8_t sliderPadding{20u};
+    std::vector<SliderSettings> sliderSettings{};
+
+    const uint8_t paddingBetweenSliders{100u};
     const uint8_t sliderHeight{40u};
 };
