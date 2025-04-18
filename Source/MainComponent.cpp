@@ -1,6 +1,7 @@
 #include "MainComponent.h"
 
-MainComponent::MainComponent() : mainToolbar(mainAudio, tree), trackPlayer(tree), trackManager(trackPlayer, mainAudio)
+MainComponent::MainComponent() :
+    mainToolbar(mainAudio, tree), trackPlayer(tree, trackManager), trackManager(trackPlayer, mainAudio)
 {
     // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
     setSize(getParentWidth(), getParentHeight());
@@ -48,24 +49,20 @@ void MainComponent::flexBoxInit()
 // This function is for testing. It can be long. Will be deleted soon
 void MainComponent::addTestTracks()
 {
-    trackManager.addTrack();
-    trackManager.addTrack();
-    trackManager.addTrack();
-    trackManager.addTrack();
-
     const juce::File dawDir =
         juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
     const juce::File countdownAudioFile = dawDir.getChildFile("Assets/Audio/countdown.wav");
     const juce::File musicAudioFile = dawDir.getChildFile("Assets/Audio/test.wav");
     const juce::File invertedMusicAudioFile = dawDir.getChildFile("Assets/Audio/test(-1).wav");
     const juce::File mutedMusicAudioFile = dawDir.getChildFile("Assets/Audio/test.mp3");
+    auto trackId = trackManager.addTrack();
 
     if(countdownAudioFile.existsAsFile())
     {
-        const auto audioClipId = trackManager.addAudioClipToTrack(0, countdownAudioFile);
-        mainAudio.setPanOfAudioClip(audioClipId, 0.5f);
-        mainAudio.setGainOfAudioClip(audioClipId, -5.0f);
-        mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 0.0f);
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackId, countdownAudioFile);
+        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 0.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::PAN, 0.5f);
+        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::GAIN, -5.0f);
     }
     else
         juce::AlertWindow::showMessageBoxAsync(
@@ -73,10 +70,11 @@ void MainComponent::addTestTracks()
 
     if(musicAudioFile.existsAsFile())
     {
-        const auto audioClipId = trackManager.addAudioClipToTrack(1, musicAudioFile);
-        mainAudio.setPanOfAudioClip(audioClipId, 0);
-        mainAudio.setGainOfAudioClip(audioClipId, -15.0f);
-        mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
+        trackId = trackManager.addTrack();
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackId, musicAudioFile);
+        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::PAN, 0.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::GAIN, -15.0f);
     }
     else
         juce::AlertWindow::showMessageBoxAsync(
@@ -84,10 +82,11 @@ void MainComponent::addTestTracks()
 
     if(invertedMusicAudioFile.existsAsFile())
     {
-        const auto audioClipId = trackManager.addAudioClipToTrack(2, invertedMusicAudioFile);
-        mainAudio.setPanOfAudioClip(audioClipId, 0.6);
-        mainAudio.setGainOfAudioClip(audioClipId, -15.0f);
-        mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
+        trackId = trackManager.addTrack();
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackId, invertedMusicAudioFile);
+        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::PAN, 0.6f);
+        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::GAIN, -15.0f);
     }
     else
         juce::AlertWindow::showMessageBoxAsync(
@@ -95,12 +94,13 @@ void MainComponent::addTestTracks()
 
     if(mutedMusicAudioFile.existsAsFile())
     {
-        const auto audioClipId = trackManager.addAudioClipToTrack(3, mutedMusicAudioFile);
-        mainAudio.setPanOfAudioClip(audioClipId, 0);
-        mainAudio.setGainOfAudioClip(audioClipId, -15.0f);
-        mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 1.0f);
-        mainAudio.setMuteOfAudioClip(audioClipId, true);
-        mainAudio.setSoloOfAudioClip(audioClipId, false);
+        trackId = trackManager.addTrack();
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackId, mutedMusicAudioFile);
+        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 1.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::PAN, 0.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::GAIN, -15.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::MUTE, false);
+        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::SOLO, false);
     }
     else
         juce::AlertWindow::showMessageBoxAsync(

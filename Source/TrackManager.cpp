@@ -7,11 +7,11 @@ TrackManager::TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef)
     juce::Timer::callAfterDelay(50, [&] { addTrack(); });
 }
 
-void TrackManager::addTrack()
+int TrackManager::addTrack()
 {
     trackPlayer.addTrack();
     tracks.emplace_back(nextTrackId, std::vector<NodeID>{});
-    nextTrackId++;
+    return nextTrackId++;
 }
 
 bool TrackManager::removeTrack(int trackId)
@@ -54,14 +54,19 @@ NodeID TrackManager::addAudioClipToTrack(int trackId, const juce::File& file)
     return clipId;
 }
 
-bool TrackManager::removeAudioClipFromTrack(int trackId, NodeID clipId)
+void TrackManager::setOffsetOfAudioClipInSeconds(const NodeID nodeID, const double offsetSeconds) const
+{
+    mainAudio.setOffsetOfAudioClipInSeconds(nodeID, offsetSeconds);
+}
+
+bool TrackManager::removeAudioClipFromTrack(const int trackId, const NodeID clipId)
 {
     const int trackIndex = getTrackIndexById(trackId);
     if(trackIndex == -1)
         return false;
 
     auto& clips = tracks[trackIndex].second;
-    auto it = std::find(clips.begin(), clips.end(), clipId);
+    const auto it = std::ranges::find(clips, clipId);
 
     if(it == clips.end())
         return false;
@@ -115,4 +120,44 @@ bool TrackManager::keyPressed(const juce::KeyPress& key)
         return true;
     }
     return false;
+}
+
+void TrackManager::setPropertyForAllClipsInTrack(const int trackId, const AudioClipProperty property,
+                                                 const bool boolValue)
+{
+    int const trackIndex = getTrackIndexById(trackId);
+    if(trackIndex == -1)
+        return;
+
+    for(const auto& clipId: tracks[trackIndex].second) switch(property)
+        {
+            case AudioClipProperty::MUTE:
+                mainAudio.setMuteOfAudioClip(clipId, boolValue);
+                break;
+            case AudioClipProperty::SOLO:
+                mainAudio.setSoloOfAudioClip(clipId, boolValue);
+                break;
+            default:
+                break;
+        }
+}
+
+void TrackManager::setPropertyForAllClipsInTrack(const int trackId, const AudioClipProperty property,
+                                                 const float floatValue)
+{
+    const int trackIndex = getTrackIndexById(trackId);
+    if(trackIndex == -1)
+        return;
+
+    for(const auto& clipId: tracks[trackIndex].second) switch(property)
+        {
+            case AudioClipProperty::GAIN:
+                mainAudio.setGainOfAudioClip(clipId, floatValue);
+                break;
+            case AudioClipProperty::PAN:
+                mainAudio.setPanOfAudioClip(clipId, floatValue);
+                break;
+            default:
+                break;
+        }
 }

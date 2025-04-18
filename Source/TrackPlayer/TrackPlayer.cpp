@@ -1,7 +1,10 @@
 #include "TrackPlayer.h"
 
-TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree) :
-    tree{parentTree}, timeline{TrackPlayerConstants::startNumOfBoxes, parentTree}, trackGuiComponent{parentTree}
+TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree, TrackManager& trackManagerRef) :
+    tree{parentTree},
+    timeline{TrackPlayerConstants::startNumOfBoxes, parentTree},
+    trackPlayerSideMenu(trackManagerRef),
+    trackGuiComponent{parentTree}
 {
     setWantsKeyboardFocus(true);
     addAndMakeVisible(trackPlayerViewport);

@@ -3,10 +3,12 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "../Constants.h"
 
+class TrackManager;
+
 class TrackPlayerSideMenu final : public juce::Component
 {
 public:
-    TrackPlayerSideMenu() = default;
+    explicit TrackPlayerSideMenu(TrackManager& trackManagerRef);
     ~TrackPlayerSideMenu() override = default;
 
     void paint(juce::Graphics& g) override;
@@ -17,6 +19,7 @@ public:
     void decrementCurrentNumberOfTracks() { currentNumberOfTracks--; }
 
 private:
+    TrackManager& trackManager;
     void drawTrackText(juce::Graphics& g) const;
     void drawTrackButtons();
 

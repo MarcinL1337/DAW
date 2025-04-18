@@ -11,7 +11,7 @@
 class TrackPlayer final : public juce::Component
 {
 public:
-    explicit TrackPlayer(const juce::ValueTree& parentTree);
+    explicit TrackPlayer(const juce::ValueTree& parentTree, TrackManager& trackManagerRef);
     TrackPlayer(const TrackPlayer&) = delete;
     TrackPlayer& operator=(const TrackPlayer&) = delete;
     ~TrackPlayer() override = default;
@@ -38,7 +38,7 @@ private:
     juce::ValueTree tree;
 
     Timeline timeline;
-    TrackPlayerSideMenu trackPlayerSideMenu{};
+    TrackPlayerSideMenu trackPlayerSideMenu;
     TrackGuiComponent trackGuiComponent;
 
     std::vector<std::unique_ptr<TrackGui>> trackGuiVector{};
