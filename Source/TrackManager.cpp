@@ -1,8 +1,8 @@
 #include "TrackManager.h"
 #include <algorithm>
 
-TrackManager::TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef)
-    : trackPlayer(trackPlayerRef), mainAudio(mainAudioRef)
+TrackManager::TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef) :
+    trackPlayer(trackPlayerRef), mainAudio(mainAudioRef)
 {
     juce::Timer::callAfterDelay(50, [&] { addTrack(); });
 }
@@ -17,14 +17,11 @@ void TrackManager::addTrack()
 bool TrackManager::removeTrack(int trackId)
 {
     int trackIndex = getTrackIndexById(trackId);
-    if (trackIndex == -1)
+    if(trackIndex == -1)
 
         return false;
 
-    for (const auto& clipId : tracks[trackIndex].second)
-    {
-        mainAudio.removeAudioClip(clipId);
-    }
+    for(const auto& clipId: tracks[trackIndex].second) { mainAudio.removeAudioClip(clipId); }
 
     tracks.erase(tracks.begin() + trackIndex);
     trackPlayer.removeTrack();
@@ -35,7 +32,7 @@ bool TrackManager::removeTrack(int trackId)
 bool TrackManager::changeTrackOrder(int trackId, int newPosition)
 {
     int trackIndex = getTrackIndexById(trackId);
-    if (trackIndex == -1 || newPosition < 0 || newPosition >= static_cast<int>(tracks.size()))
+    if(trackIndex == -1 || newPosition < 0 || newPosition >= static_cast<int>(tracks.size()))
         return false;
 
     auto trackToMove = tracks[trackIndex];
@@ -48,7 +45,7 @@ bool TrackManager::changeTrackOrder(int trackId, int newPosition)
 NodeID TrackManager::addAudioClipToTrack(int trackId, const juce::File& file)
 {
     int trackIndex = getTrackIndexById(trackId);
-    if (trackIndex == -1)
+    if(trackIndex == -1)
         return {};
 
     NodeID clipId = mainAudio.addAudioClip(file);
@@ -60,13 +57,13 @@ NodeID TrackManager::addAudioClipToTrack(int trackId, const juce::File& file)
 bool TrackManager::removeAudioClipFromTrack(int trackId, NodeID clipId)
 {
     const int trackIndex = getTrackIndexById(trackId);
-    if (trackIndex == -1)
+    if(trackIndex == -1)
         return false;
 
     auto& clips = tracks[trackIndex].second;
     auto it = std::find(clips.begin(), clips.end(), clipId);
 
-    if (it == clips.end())
+    if(it == clips.end())
         return false;
 
     mainAudio.removeAudioClip(clipId);
@@ -80,13 +77,13 @@ bool TrackManager::moveAudioClipBetweenTracks(int sourceTrackId, int destTrackId
     const int sourceIndex = getTrackIndexById(sourceTrackId);
     const int destIndex = getTrackIndexById(destTrackId);
 
-    if (sourceIndex == -1 || destIndex == -1)
+    if(sourceIndex == -1 || destIndex == -1)
         return false;
 
     auto& sourceClips = tracks[sourceIndex].second;
     const auto it = std::ranges::find(sourceClips, clipId);
 
-    if (it == sourceClips.end())
+    if(it == sourceClips.end())
         return false;
 
     sourceClips.erase(it);
@@ -97,13 +94,12 @@ bool TrackManager::moveAudioClipBetweenTracks(int sourceTrackId, int destTrackId
 
 int TrackManager::getTrackIndexById(int trackId) const
 {
-    for (size_t i = 0; i < tracks.size(); ++i)
-        if (tracks[i].first == trackId)
+    for(size_t i = 0; i < tracks.size(); ++i)
+        if(tracks[i].first == trackId)
             return static_cast<int>(i);
 
     return -1;
 }
-
 
 bool TrackManager::keyPressed(const juce::KeyPress& key)
 {
@@ -114,7 +110,7 @@ bool TrackManager::keyPressed(const juce::KeyPress& key)
     }
     if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '_')
     {
-        if (!tracks.empty())
+        if(!tracks.empty())
             removeTrack(tracks.back().first);
         return true;
     }

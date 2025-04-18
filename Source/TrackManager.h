@@ -1,9 +1,9 @@
 #pragma once
 
-#include "TrackPlayer/TrackPlayer.h"
-#include "Audio/MainAudio.h"
-#include <vector>
 #include <utility>
+#include <vector>
+#include "Audio/MainAudio.h"
+#include "TrackPlayer/TrackPlayer.h"
 
 class TrackManager
 {
@@ -27,7 +27,7 @@ private:
     TrackPlayer& trackPlayer;
     MainAudio& mainAudio;
 
-    std::vector<std::pair<int, std::vector<NodeID>>> tracks; // (trackId, vector<NodeID>)
+    std::vector<std::pair<int, std::vector<NodeID>>> tracks;  // (trackId, vector<NodeID>)
 
     int nextTrackId = 0;
 };
