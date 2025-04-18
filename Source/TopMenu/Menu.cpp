@@ -1,6 +1,6 @@
 #include "Menu.h"
 
-Menu::Menu()
+Menu::Menu(const juce::ValueTree& parentTree) : tree{parentTree}
 {
     menuBarComponent = std::make_unique<juce::MenuBarComponent>(this);
     addAndMakeVisible(menuBarComponent.get());
@@ -105,9 +105,9 @@ bool Menu::perform(const InvocationInfo& info)
     switch(info.commandID)
     {
         case newFile:
-            // what should clicking NewFile do? etc.
             break;
         case openFile:
+            openFileButtonClicked();
             break;
         case saveFile:
             break;
@@ -125,4 +125,20 @@ bool Menu::perform(const InvocationInfo& info)
             return false;
     }
     return true;
+}
+
+void Menu::openFileButtonClicked()
+{
+    const auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles |
+                                    juce::FileBrowserComponent::canSelectDirectories;
+
+    fileChooser.launchAsync(folderChooserFlags,
+                            [this](const juce::FileChooser& chooser)
+                            {
+                                auto selectedFileFullPath{chooser.getResult().getFullPathName()};
+                                if(selectedFileFullPath.isNotEmpty())
+                                {
+                                    tree.setProperty(newAudioFile, selectedFileFullPath, nullptr);
+                                }
+                            });
 }

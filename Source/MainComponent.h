@@ -24,7 +24,7 @@ private:
     juce::ValueTree tree{treeType};
 
     MainAudio mainAudio{};
-    Menu topLevelMenu{};
+    Menu topLevelMenu;
     MainToolbar mainToolbar;
     TrackPlayer trackPlayer;
     SideMenu sideMenu{};

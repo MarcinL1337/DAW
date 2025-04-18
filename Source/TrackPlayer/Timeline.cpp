@@ -2,7 +2,8 @@
 
 #include "TrackPlayer.h"
 
-Timeline::Timeline(const int numOfBoxes, const juce::ValueTree& parentTree) : tree{parentTree}, numOfSeconds{numOfBoxes}
+Timeline::Timeline(const int numOfSeconds, const juce::ValueTree& parentTree) :
+    tree{parentTree}, currentNumOfSeconds{numOfSeconds}
 {
     addAndMakeVisible(timeBar);
 }
@@ -10,13 +11,12 @@ Timeline::Timeline(const int numOfBoxes, const juce::ValueTree& parentTree) : tr
 void Timeline::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightgrey);
-
-    for(auto i{0u}; i <= numOfSeconds; i++)
+    for(auto i{0}; i <= currentNumOfSeconds; i++)
     {
         g.drawText(std::to_string(i),
-                   i * TrackPlayerConstants::startBoxWidth + 3,
+                   i * currentTrackGuiBoxWidth + 3,
                    getHeight() - 20,
-                   TrackPlayerConstants::startBoxWidth,
+                   currentTrackGuiBoxWidth,
                    15,
                    juce::Justification::left);
 
@@ -27,9 +27,9 @@ void Timeline::paint(juce::Graphics& g)
 void Timeline::drawLineOnTimeline(juce::Graphics& g, const uint32_t lineNumber) const
 {
     auto heightScale = lineNumber % 5 ? 0.66f : 0.5f;
-    g.drawLine(TrackPlayerConstants::startBoxWidth * lineNumber,
+    g.drawLine(currentTrackGuiBoxWidth * lineNumber,
                getHeight(),
-               TrackPlayerConstants::startBoxWidth * lineNumber,
+               currentTrackGuiBoxWidth * lineNumber,
                getHeight() * heightScale,
                0.75);
 }
@@ -42,7 +42,7 @@ void Timeline::resized()
                       TrackPlayerConstants::timeBarBoxSize);
 
     timeBarTimeInSeconds = (static_cast<float>(timeBarXOffset) + TrackPlayerConstants::timeBarBoxSize / 2.0f) /
-                           getWidth() * TrackPlayerConstants::startNumOfBoxes;
+                           getWidth() * currentNumOfSeconds;
     tree.setProperty(timeBarTime, timeBarTimeInSeconds, nullptr);
 }
 
