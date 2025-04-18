@@ -7,10 +7,12 @@
 #include "SideMenu/SideMenu.h"
 #include "Toolbar/MainToolbar.h"
 #include "TopMenu/Menu.h"
+#include "TrackManager.h"
 #include "TrackPlayer/Timeline.h"
 #include "TrackPlayer/TrackPlayer.h"
 
-class MainComponent final : public juce::Component
+class MainComponent final : public juce::Component,
+                            public juce::KeyListener
 {
 public:
     MainComponent();
@@ -18,6 +20,8 @@ public:
     void resized() override;
     void flexBoxInit();
     void addTestTracks();
+
+    bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
 
 private:
     juce::Identifier treeType{"mainComponentValueTree"};
@@ -27,6 +31,7 @@ private:
     Menu topLevelMenu{};
     MainToolbar mainToolbar;
     TrackPlayer trackPlayer;
+    TrackManager trackManager;
     SideMenu sideMenu{};
 
     juce::FlexBox topLevelFlexBox{};

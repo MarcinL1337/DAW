@@ -3,14 +3,12 @@
 TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree) :
     tree{parentTree}, timeline{TrackPlayerConstants::startNumOfBoxes, parentTree}, trackGuiComponent{parentTree}
 {
-    addKeyListener(this);
     setWantsKeyboardFocus(true);
     addAndMakeVisible(trackPlayerViewport);
     addAndMakeVisible(timelineViewport);
     addAndMakeVisible(trackPlayerSideMenuViewport);
     viewportsInit();
     juce::Timer::callAfterDelay(100, [&] { grabKeyboardFocus(); });
-    juce::Timer::callAfterDelay(50, [&] { addTrack(); });
 }
 
 void TrackPlayer::paint(juce::Graphics& g)
@@ -45,30 +43,6 @@ void TrackPlayer::resized()
                                           timeline.getHeight(),
                                           trackPlayerSideMenu.getWidth(),
                                           getHeight() - trackPlayerViewport.getScrollBarThickness());
-}
-
-void TrackPlayer::mouseDown(const juce::MouseEvent& event)
-{
-    juce::Point mouseClickPosition{event.getMouseDownPosition()};
-    if(reallyContains(mouseClickPosition, true) and event.mods.isRightButtonDown())
-    {
-        addTrack();
-    }
-}
-
-bool TrackPlayer::keyPressed(const juce::KeyPress& key, Component* originatingComponent)
-{
-    if(key.getModifiers().isShiftDown() and key.getTextCharacter() == '+')
-    {
-        addTrack();
-        return true;
-    }
-    if(key.getModifiers().isShiftDown() and key.getTextCharacter() == '_')
-    {
-        removeTrack();
-        return true;
-    }
-    return false;
 }
 
 void TrackPlayer::makeNewTrackGui()

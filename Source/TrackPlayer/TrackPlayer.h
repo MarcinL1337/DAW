@@ -8,8 +8,7 @@
 #include "TrackGuiComponent.h"
 #include "TrackPlayerSideMenu.h"
 
-class TrackPlayer final : public juce::Component,
-                          public juce::KeyListener
+class TrackPlayer final : public juce::Component
 {
 public:
     explicit TrackPlayer(const juce::ValueTree& parentTree);
@@ -20,18 +19,17 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    void mouseDown(const juce::MouseEvent& event) override;
-    bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
-
     uint16_t getCurrentNumberOfTracks() const { return currentNumberOfTracks; }
     void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }
     void decrementCurrentNumberOfTracks() { currentNumberOfTracks--; }
 
 private:
-    void makeNewTrackGui();
-    void viewportsInit();
+    friend class TrackManager;
     void addTrack();
     void removeTrack();
+
+    void makeNewTrackGui();
+    void viewportsInit();
 
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};

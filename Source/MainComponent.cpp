@@ -1,6 +1,6 @@
 #include "MainComponent.h"
 
-MainComponent::MainComponent() : mainToolbar(mainAudio, tree), trackPlayer(tree)
+MainComponent::MainComponent() : mainToolbar(mainAudio, tree), trackPlayer(tree), trackManager(trackPlayer, mainAudio)
 {
     // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
     setSize(getParentWidth(), getParentHeight());
@@ -10,7 +10,9 @@ MainComponent::MainComponent() : mainToolbar(mainAudio, tree), trackPlayer(tree)
 
     addAndMakeVisible(sideMenu);
     flexBoxInit();
-    addTestTracks();
+
+    addKeyListener(this);
+    juce::Timer::callAfterDelay(50, [&] { addTestTracks(); });
 }
 
 void MainComponent::paint(juce::Graphics& g)
@@ -46,6 +48,11 @@ void MainComponent::flexBoxInit()
 // This function is for testing. It can be long. Will be deleted soon
 void MainComponent::addTestTracks()
 {
+    trackManager.addTrack();
+    trackManager.addTrack();
+    trackManager.addTrack();
+    trackManager.addTrack();
+
     const juce::File dawDir =
         juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
     const juce::File countdownAudioFile = dawDir.getChildFile("Assets/Audio/countdown.wav");
@@ -55,7 +62,7 @@ void MainComponent::addTestTracks()
 
     if(countdownAudioFile.existsAsFile())
     {
-        const auto audioClipId = mainAudio.addAudioClip(countdownAudioFile);
+        const auto audioClipId = trackManager.addAudioClipToTrack(0, countdownAudioFile);
         mainAudio.setPanOfAudioClip(audioClipId, 0.5f);
         mainAudio.setGainOfAudioClip(audioClipId, -5.0f);
         mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 0.0f);
@@ -66,7 +73,7 @@ void MainComponent::addTestTracks()
 
     if(musicAudioFile.existsAsFile())
     {
-        const auto audioClipId = mainAudio.addAudioClip(musicAudioFile);
+        const auto audioClipId = trackManager.addAudioClipToTrack(1, musicAudioFile);
         mainAudio.setPanOfAudioClip(audioClipId, 0);
         mainAudio.setGainOfAudioClip(audioClipId, -15.0f);
         mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
@@ -77,7 +84,7 @@ void MainComponent::addTestTracks()
 
     if(invertedMusicAudioFile.existsAsFile())
     {
-        const auto audioClipId = mainAudio.addAudioClip(invertedMusicAudioFile);
+        const auto audioClipId = trackManager.addAudioClipToTrack(2, invertedMusicAudioFile);
         mainAudio.setPanOfAudioClip(audioClipId, 0.6);
         mainAudio.setGainOfAudioClip(audioClipId, -15.0f);
         mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
@@ -88,7 +95,7 @@ void MainComponent::addTestTracks()
 
     if(mutedMusicAudioFile.existsAsFile())
     {
-        const auto audioClipId = mainAudio.addAudioClip(mutedMusicAudioFile);
+        const auto audioClipId = trackManager.addAudioClipToTrack(3, mutedMusicAudioFile);
         mainAudio.setPanOfAudioClip(audioClipId, 0);
         mainAudio.setGainOfAudioClip(audioClipId, -15.0f);
         mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 1.0f);
@@ -99,3 +106,9 @@ void MainComponent::addTestTracks()
         juce::AlertWindow::showMessageBoxAsync(
             juce::AlertWindow::WarningIcon, "Error", mutedMusicAudioFile.getFullPathName() + " not found :c");
 }
+
+bool MainComponent::keyPressed(const juce::KeyPress& key, Component* originatingComponent)
+{
+    return trackManager.keyPressed(key);
+}
+
