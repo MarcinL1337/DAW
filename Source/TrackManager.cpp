@@ -18,10 +18,9 @@ bool TrackManager::removeTrack(const int trackId)
 {
     const int trackIndex = getTrackIndexById(trackId);
     if(trackIndex == -1)
-
         return false;
 
-    for(const auto& clipId: tracks[trackIndex].second) { mainAudio.removeAudioClip(clipId); }
+    for(const auto& clipId: tracks[trackIndex].audioClips) { mainAudio.removeAudioClip(clipId); }
 
     tracks.erase(tracks.begin() + trackIndex);
     trackPlayer.removeTrack();
@@ -29,27 +28,33 @@ bool TrackManager::removeTrack(const int trackId)
     return true;
 }
 
-bool TrackManager::changeTrackOrder(int trackId, int newPosition)
+bool TrackManager::changeTrackOrder(const int trackId, const int newPosition)
 {
-    int trackIndex = getTrackIndexById(trackId);
+    const int trackIndex = getTrackIndexById(trackId);
     if(trackIndex == -1 || newPosition < 0 || newPosition >= static_cast<int>(tracks.size()))
         return false;
 
-    auto trackToMove = tracks[trackIndex];
+    const auto trackToMove = tracks[trackIndex];
     tracks.erase(tracks.begin() + trackIndex);
     tracks.insert(tracks.begin() + newPosition, trackToMove);
 
     return true;
 }
 
-NodeID TrackManager::addAudioClipToTrack(int trackId, const juce::File& file)
+NodeID TrackManager::addAudioClipToTrack(const int trackId, const juce::File& file)
 {
-    int trackIndex = getTrackIndexById(trackId);
+    const int trackIndex = getTrackIndexById(trackId);
     if(trackIndex == -1)
         return {};
 
-    NodeID clipId = mainAudio.addAudioClip(file);
-    tracks[trackIndex].second.push_back(clipId);
+    const NodeID clipId = mainAudio.addAudioClip(file);
+    tracks[trackIndex].audioClips.push_back(clipId);
+
+    const auto& [gain, pan, mute, solo] = tracks[trackIndex].settings;
+    mainAudio.setGainOfAudioClip(clipId, gain);
+    mainAudio.setPanOfAudioClip(clipId, pan);
+    mainAudio.setMuteOfAudioClip(clipId, mute);
+    mainAudio.setSoloOfAudioClip(clipId, solo);
 
     return clipId;
 }
@@ -65,7 +70,7 @@ bool TrackManager::removeAudioClipFromTrack(const int trackId, const NodeID clip
     if(trackIndex == -1)
         return false;
 
-    auto& clips = tracks[trackIndex].second;
+    auto& clips = tracks[trackIndex].audioClips;
     const auto it = std::ranges::find(clips, clipId);
 
     if(it == clips.end())
@@ -77,7 +82,7 @@ bool TrackManager::removeAudioClipFromTrack(const int trackId, const NodeID clip
     return true;
 }
 
-bool TrackManager::moveAudioClipBetweenTracks(int sourceTrackId, int destTrackId, NodeID clipId)
+bool TrackManager::moveAudioClipBetweenTracks(const int sourceTrackId, const int destTrackId, const NodeID clipId)
 {
     const int sourceIndex = getTrackIndexById(sourceTrackId);
     const int destIndex = getTrackIndexById(destTrackId);
@@ -85,22 +90,22 @@ bool TrackManager::moveAudioClipBetweenTracks(int sourceTrackId, int destTrackId
     if(sourceIndex == -1 || destIndex == -1)
         return false;
 
-    auto& sourceClips = tracks[sourceIndex].second;
+    auto& sourceClips = tracks[sourceIndex].audioClips;
     const auto it = std::ranges::find(sourceClips, clipId);
 
     if(it == sourceClips.end())
         return false;
 
     sourceClips.erase(it);
-    tracks[destIndex].second.push_back(clipId);
+    tracks[destIndex].audioClips.push_back(clipId);
 
     return true;
 }
 
-int TrackManager::getTrackIndexById(int trackId) const
+int TrackManager::getTrackIndexById(const int trackId) const
 {
     for(size_t i = 0; i < tracks.size(); ++i)
-        if(tracks[i].first == trackId)
+        if(tracks[i].id == trackId)
             return static_cast<int>(i);
 
     return -1;
@@ -116,7 +121,7 @@ bool TrackManager::keyPressed(const juce::KeyPress& key)
     if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '_')
     {
         if(!tracks.empty())
-            removeTrack(tracks.back().first);
+            removeTrack(tracks.back().id);
         return true;
     }
     return false;
@@ -129,7 +134,20 @@ void TrackManager::setPropertyForAllClipsInTrack(const int trackId, const AudioC
     if(trackIndex == -1)
         return;
 
-    for(const auto& clipId: tracks[trackIndex].second) switch(property)
+    auto& settings = tracks[trackIndex].settings;
+    switch(property)
+    {
+        case AudioClipProperty::MUTE:
+            settings.mute = boolValue;
+            break;
+        case AudioClipProperty::SOLO:
+            settings.solo = boolValue;
+            break;
+        default:
+            break;
+    }
+
+    for(const auto& clipId: tracks[trackIndex].audioClips) switch(property)
         {
             case AudioClipProperty::MUTE:
                 mainAudio.setMuteOfAudioClip(clipId, boolValue);
@@ -149,7 +167,20 @@ void TrackManager::setPropertyForAllClipsInTrack(const int trackId, const AudioC
     if(trackIndex == -1)
         return;
 
-    for(const auto& clipId: tracks[trackIndex].second) switch(property)
+    auto& settings = tracks[trackIndex].settings;
+    switch(property)
+    {
+        case AudioClipProperty::GAIN:
+            settings.gain = floatValue;
+            break;
+        case AudioClipProperty::PAN:
+            settings.pan = floatValue;
+            break;
+        default:
+            break;
+    }
+
+    for(const auto& clipId: tracks[trackIndex].audioClips) switch(property)
         {
             case AudioClipProperty::GAIN:
                 mainAudio.setGainOfAudioClip(clipId, floatValue);

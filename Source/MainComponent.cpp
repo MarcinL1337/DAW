@@ -55,30 +55,29 @@ void MainComponent::addTestTracks()
     const juce::File musicAudioFile = dawDir.getChildFile("Assets/Audio/test.wav");
     const juce::File invertedMusicAudioFile = dawDir.getChildFile("Assets/Audio/test(-1).wav");
     const juce::File mutedMusicAudioFile = dawDir.getChildFile("Assets/Audio/test.mp3");
+
+    auto errorMsg = [](const juce::String& msg)
+    { juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon, "Error", msg + " not found :c"); };
+
     auto trackId = trackManager.addTrack();
 
     if(countdownAudioFile.existsAsFile())
     {
         const auto audioClipId = trackManager.addAudioClipToTrack(trackId, countdownAudioFile);
         trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 0.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::PAN, 0.5f);
-        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::GAIN, -5.0f);
-    }
-    else
-        juce::AlertWindow::showMessageBoxAsync(
-            juce::AlertWindow::WarningIcon, "Error", countdownAudioFile.getFullPathName() + " not found :c");
-
-    if(musicAudioFile.existsAsFile())
-    {
-        trackId = trackManager.addTrack();
-        const auto audioClipId = trackManager.addAudioClipToTrack(trackId, musicAudioFile);
-        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
         trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::PAN, 0.0f);
         trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::GAIN, -15.0f);
     }
     else
-        juce::AlertWindow::showMessageBoxAsync(
-            juce::AlertWindow::WarningIcon, "Error", musicAudioFile.getFullPathName() + " not found :c");
+        errorMsg(countdownAudioFile.getFullPathName());
+
+    if(musicAudioFile.existsAsFile())
+    {
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackId, musicAudioFile);
+        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
+    }
+    else
+        errorMsg(musicAudioFile.getFullPathName());
 
     if(invertedMusicAudioFile.existsAsFile())
     {
@@ -89,8 +88,7 @@ void MainComponent::addTestTracks()
         trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::GAIN, -15.0f);
     }
     else
-        juce::AlertWindow::showMessageBoxAsync(
-            juce::AlertWindow::WarningIcon, "Error", invertedMusicAudioFile.getFullPathName() + " not found :c");
+        errorMsg(invertedMusicAudioFile.getFullPathName());
 
     if(mutedMusicAudioFile.existsAsFile())
     {
@@ -103,8 +101,7 @@ void MainComponent::addTestTracks()
         trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::SOLO, false);
     }
     else
-        juce::AlertWindow::showMessageBoxAsync(
-            juce::AlertWindow::WarningIcon, "Error", mutedMusicAudioFile.getFullPathName() + " not found :c");
+        errorMsg(mutedMusicAudioFile.getFullPathName());
 }
 
 bool MainComponent::keyPressed(const juce::KeyPress& key, Component* originatingComponent)
