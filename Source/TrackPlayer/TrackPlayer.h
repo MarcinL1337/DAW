@@ -8,11 +8,10 @@
 #include "TrackGuiComponent.h"
 #include "TrackPlayerSideMenu.h"
 
-class TrackPlayer final : public juce::Component,
-                          public juce::KeyListener
+class TrackPlayer final : public juce::Component
 {
 public:
-    explicit TrackPlayer(const juce::ValueTree& parentTree);
+    explicit TrackPlayer(const juce::ValueTree& parentTree, TrackManager& trackManagerRef);
     TrackPlayer(const TrackPlayer&) = delete;
     TrackPlayer& operator=(const TrackPlayer&) = delete;
     ~TrackPlayer() override = default;
@@ -20,18 +19,17 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    void mouseDown(const juce::MouseEvent& event) override;
-    bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
-
     uint16_t getCurrentNumberOfTracks() const { return currentNumberOfTracks; }
     void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }
     void decrementCurrentNumberOfTracks() { currentNumberOfTracks--; }
 
 private:
-    void makeNewTrackGui();
-    void viewportsInit();
+    friend class TrackManager;
     void addTrack();
     void removeTrack();
+
+    void makeNewTrackGui();
+    void viewportsInit();
 
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
@@ -40,7 +38,7 @@ private:
     juce::ValueTree tree;
 
     Timeline timeline;
-    TrackPlayerSideMenu trackPlayerSideMenu{};
+    TrackPlayerSideMenu trackPlayerSideMenu;
     TrackGuiComponent trackGuiComponent;
 
     std::vector<std::unique_ptr<TrackGui>> trackGuiVector{};

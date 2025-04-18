@@ -63,6 +63,9 @@ set(SourceFiles
         Source/Audio/MainAudio.cpp
         Source/Audio/AudioClip.h
         Source/Audio/AudioClip.cpp
+
+        Source/TrackManager.h
+        Source/TrackManager.cpp
 )
 
 juce_add_gui_app(${PROJECT_NAME}

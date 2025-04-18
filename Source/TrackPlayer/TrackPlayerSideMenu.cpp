@@ -1,4 +1,7 @@
 #include "TrackPlayerSideMenu.h"
+#include "../TrackManager.h"
+
+TrackPlayerSideMenu::TrackPlayerSideMenu(TrackManager& trackManagerRef) : trackManager(trackManagerRef) {}
 
 void TrackPlayerSideMenu::paint(juce::Graphics& g)
 {
@@ -47,10 +50,21 @@ void TrackPlayerSideMenu::drawTrackButtons()
         recordButton->onClick = [i]() { std::cout << "Recording[" << i + 1 << "]" << std::endl; };
 
         soloButton->setBounds(startX - xDifference, currentY, trackButtonsSize, trackButtonsSize);
-        soloButton->onClick = [i]() { std::cout << "Soloing[" << i + 1 << "]" << std::endl; };
-
+        soloButton->onClick = [this, i, soloButtonPtr = soloButton.get()]()
+        {
+            const bool currentState = soloButtonPtr->getToggleState();
+            soloButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
+            trackManager.setPropertyForAllClipsInTrack(i, AudioClipProperty::SOLO, !currentState);
+            std::cout << "Soloing[" << i + 1 << "] - " << (!currentState ? "ON" : "OFF") << std::endl;
+        };
         muteButton->setBounds(startX - 2 * xDifference, currentY, trackButtonsSize, trackButtonsSize);
-        muteButton->onClick = [i]() { std::cout << "Muting[" << i + 1 << "]" << std::endl; };
+        muteButton->onClick = [this, i, muteButtonPtr = muteButton.get()]()
+        {
+            const bool currentState = muteButtonPtr->getToggleState();
+            muteButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
+            trackManager.setPropertyForAllClipsInTrack(i, AudioClipProperty::MUTE, !currentState);
+            std::cout << "Muting[" << i + 1 << "] - " << (!currentState ? "ON" : "OFF") << std::endl;
+        };
 
         trackButtonsVector.push_back({std::move(recordButton), std::move(soloButton), std::move(muteButton)});
         for(auto& button: trackButtonsVector.back()) { addAndMakeVisible(button.get()); }
