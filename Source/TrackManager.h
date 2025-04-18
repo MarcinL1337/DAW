@@ -14,6 +14,14 @@ enum class AudioClipProperty
     PAN
 };
 
+struct TrackSettings
+{
+    float gain{0.0f};
+    float pan{0.0f};
+    bool mute{false};
+    bool solo{false};
+};
+
 class TrackManager
 {
 public:
@@ -40,9 +48,14 @@ private:
     TrackPlayer& trackPlayer;
     MainAudio& mainAudio;
 
-    // TODO: Add a struct with track state, because when adding a new AudioClip to a track, appropriate attributes need
-    // to be assigned (e.g., mute, gain, pan)
-    std::vector<std::pair<int, std::vector<NodeID>>> tracks;  // (trackId, vector<NodeID>)
+    struct Track
+    {
+        int id;
+        std::vector<NodeID> audioClips;
+        TrackSettings settings;
+    };
+
+    std::vector<Track> tracks;
 
     int nextTrackId{0};
 };

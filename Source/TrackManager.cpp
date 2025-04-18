@@ -10,13 +10,13 @@ TrackManager::TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef)
 int TrackManager::addTrack()
 {
     trackPlayer.addTrack();
-    tracks.emplace_back(nextTrackId, std::vector<NodeID>{});
+    tracks.push_back({nextTrackId, std::vector<NodeID>{}, TrackSettings{}});
     return nextTrackId++;
 }
 
-bool TrackManager::removeTrack(int trackId)
+bool TrackManager::removeTrack(const int trackId)
 {
-    int trackIndex = getTrackIndexById(trackId);
+    const int trackIndex = getTrackIndexById(trackId);
     if(trackIndex == -1)
 
         return false;
