@@ -10,7 +10,7 @@ TrackManager::TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef)
 int TrackManager::addTrack()
 {
     trackPlayer.addTrack();
-    tracks.push_back({nextTrackId, std::vector<NodeID>{}, TrackSettings{}});
+    tracks.push_back({nextTrackId, std::vector<NodeID>{}, TrackProperties{}});
     return nextTrackId++;
 }
 
@@ -50,7 +50,7 @@ NodeID TrackManager::addAudioClipToTrack(const int trackId, const juce::File& fi
     const NodeID clipId = mainAudio.addAudioClip(file);
     tracks[trackIndex].audioClips.push_back(clipId);
 
-    const auto& [gain, pan, mute, solo] = tracks[trackIndex].settings;
+    const auto& [gain, pan, mute, solo] = tracks[trackIndex].properties;
     mainAudio.setGainOfAudioClip(clipId, gain);
     mainAudio.setPanOfAudioClip(clipId, pan);
     mainAudio.setMuteOfAudioClip(clipId, mute);
@@ -134,14 +134,14 @@ void TrackManager::setPropertyForAllClipsInTrack(const int trackId, const AudioC
     if(trackIndex == -1)
         return;
 
-    auto& settings = tracks[trackIndex].settings;
+    auto& properties = tracks[trackIndex].properties;
     switch(property)
     {
         case AudioClipProperty::MUTE:
-            settings.mute = boolValue;
+            properties.mute = boolValue;
             break;
         case AudioClipProperty::SOLO:
-            settings.solo = boolValue;
+            properties.solo = boolValue;
             break;
         default:
             break;
@@ -167,14 +167,14 @@ void TrackManager::setPropertyForAllClipsInTrack(const int trackId, const AudioC
     if(trackIndex == -1)
         return;
 
-    auto& settings = tracks[trackIndex].settings;
+    auto& properties = tracks[trackIndex].properties;
     switch(property)
     {
         case AudioClipProperty::GAIN:
-            settings.gain = floatValue;
+            properties.gain = floatValue;
             break;
         case AudioClipProperty::PAN:
-            settings.pan = floatValue;
+            properties.pan = floatValue;
             break;
         default:
             break;

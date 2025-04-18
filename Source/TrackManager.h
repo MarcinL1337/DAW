@@ -14,7 +14,7 @@ enum class AudioClipProperty
     PAN
 };
 
-struct TrackSettings
+struct TrackProperties
 {
     float gain{0.0f};
     float pan{0.0f};
@@ -52,7 +52,7 @@ private:
     {
         int id;
         std::vector<NodeID> audioClips;
-        TrackSettings settings;
+        TrackProperties properties;
     };
 
     std::vector<Track> tracks;
