@@ -12,7 +12,6 @@ MainComponent::MainComponent() :
     addAndMakeVisible(sideMenu);
     flexBoxInit();
 
-    addKeyListener(this);
     juce::Timer::callAfterDelay(50, [&] { addTestTracks(); });
 }
 
@@ -103,9 +102,3 @@ void MainComponent::addTestTracks()
     else
         errorMsg(mutedMusicAudioFile.getFullPathName());
 }
-
-bool MainComponent::keyPressed(const juce::KeyPress& key, Component* originatingComponent)
-{
-    return trackManager.keyPressed(key);
-}
-

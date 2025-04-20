@@ -11,8 +11,7 @@
 #include "TrackPlayer/Timeline.h"
 #include "TrackPlayer/TrackPlayer.h"
 
-class MainComponent final : public juce::Component,
-                            public juce::KeyListener
+class MainComponent final : public juce::Component
 {
 public:
     MainComponent();
@@ -20,8 +19,6 @@ public:
     void resized() override;
     void flexBoxInit();
     void addTestTracks();
-
-    bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
 
 private:
     juce::Identifier treeType{"mainComponentValueTree"};

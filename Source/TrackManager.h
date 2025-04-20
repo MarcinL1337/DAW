@@ -22,7 +22,8 @@ struct TrackProperties
     bool solo{false};
 };
 
-class TrackManager
+class TrackManager : public juce::Component,
+                     public juce::KeyListener
 {
 public:
     TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef);
@@ -30,16 +31,16 @@ public:
 
     int addTrack();
     bool removeTrack(int trackId);
-    bool changeTrackOrder(int trackId, int newPosition);
+    bool changeTrackOrder(int trackId, uint32_t newPosition);
 
     NodeID addAudioClipToTrack(int trackId, const juce::File& file);
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
     bool removeAudioClipFromTrack(int trackId, NodeID clipId);
     bool moveAudioClipBetweenTracks(int sourceTrackId, int destTrackId, NodeID clipId);
 
-    int getTrackIndexById(int trackId) const;
+    uint32_t getTrackPositionInVectorById(int trackId) const;
 
-    bool keyPressed(const juce::KeyPress& key);
+    bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
 
     void setPropertyForAllClipsInTrack(int trackId, AudioClipProperty property, bool boolValue);
     void setPropertyForAllClipsInTrack(int trackId, AudioClipProperty property, float floatValue);
@@ -57,5 +58,6 @@ private:
 
     std::vector<Track> tracks;
 
+    // TODO: possible overflow :c
     int nextTrackId{0};
 };

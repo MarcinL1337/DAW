@@ -1,4 +1,5 @@
 #pragma once
+#include <juce_audio_processors/juce_audio_processors.h>
 
 namespace TopLevelMenuConstants
 {
@@ -24,6 +25,12 @@ constexpr float trackPlayerHeightRatio{1.0f - timelineHeightRatio};
 constexpr float trackPlayerSideMenuWidthRatio{0.12f};
 
 }  // namespace TrackPlayerConstants
+
+namespace TrackManagerConstants
+{
+constexpr uint32_t InvalidTrackPositionInVector{0xFFFFFFFF};
+const juce::AudioProcessorGraph::NodeID InvalidNodeID{0xFFFFFFFF};
+}  // namespace TrackManagerConstants
 
 namespace SideMenuConstants
 {
