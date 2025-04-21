@@ -1,7 +1,9 @@
 #include "TrackPlayer.h"
 
+#include <random>
+
 TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree) :
-    tree{parentTree}, timeline{TrackPlayerConstants::startNumOfBoxes, parentTree}, trackGuiComponent{parentTree}
+    tree{parentTree}, timeline{currentNumOfSeconds, parentTree}, trackGuiComponent{parentTree}
 {
     addKeyListener(this);
     setWantsKeyboardFocus(true);
@@ -9,6 +11,7 @@ TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree) :
     addAndMakeVisible(timelineViewport);
     addAndMakeVisible(trackPlayerSideMenuViewport);
     viewportsInit();
+    tree.addListener(this);
     juce::Timer::callAfterDelay(100, [&] { grabKeyboardFocus(); });
     juce::Timer::callAfterDelay(50, [&] { addTrack(); });
 }
@@ -24,13 +27,14 @@ void TrackPlayer::paint(juce::Graphics& g)
 
 void TrackPlayer::resized()
 {
-    timeline.setSize(TrackPlayerConstants::startNumOfBoxes * TrackPlayerConstants::startBoxWidth,
+    timeline.setSize(currentNumOfSeconds * currentTrackGuiBoxWidth,
                      TrackPlayerConstants::timelineHeightRatio * getHeight());
 
-    auto sideMenuHeight{std::max(getCurrentNumberOfTracks() * TrackPlayerConstants::startBoxHeight,
-                                 static_cast<float>(getHeight() - trackPlayerViewport.getScrollBarThickness()))};
+    auto sideMenuHeight{std::max(getCurrentNumberOfTracks() * currentTrackGuiBoxHeight,
+                                 getHeight() - trackPlayerViewport.getScrollBarThickness())};  // getScrollBarThickness?
 
     trackGuiComponent.setSize(timeline.getWidth(), sideMenuHeight - timeline.getHeight());
+
     trackPlayerSideMenu.setBounds(
         0, timeline.getHeight(), TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(), sideMenuHeight);
 
@@ -68,18 +72,15 @@ bool TrackPlayer::keyPressed(const juce::KeyPress& key, Component* originatingCo
         removeTrack();
         return true;
     }
+    // Only for testing, will be deleted soon
+    if(key.getModifiers().isShiftDown() and key.getTextCharacter() == '(')
+    {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distrib(50, 200);
+        changeTrackGuiBoxWidthAndPropagate(distrib(gen));
+    }
     return false;
-}
-
-void TrackPlayer::makeNewTrackGui()
-{
-    auto trackGui = std::make_unique<TrackGui>(TrackPlayerConstants::startNumOfBoxes);
-    trackGui->setBounds(0,
-                        getCurrentNumberOfTracks() * TrackPlayerConstants::startBoxHeight,
-                        trackGuiComponent.getWidth(),
-                        TrackPlayerConstants::startBoxHeight);
-    trackGuiVector.push_back(std::move(trackGui));
-    trackGuiComponent.addAndMakeVisible(trackGuiVector.back().get());
 }
 
 void TrackPlayer::viewportsInit()
@@ -96,9 +97,25 @@ void TrackPlayer::viewportsInit()
     trackPlayerSideMenuViewport.setViewedComponent(&trackPlayerSideMenu, false);
 }
 
-void TrackPlayer::addTrack()
+void TrackPlayer::makeNewTrackGui(const juce::String& newAudioFilePath)
 {
-    makeNewTrackGui();
+    auto trackGui =
+        newAudioFilePath.isEmpty()
+            ? std::make_unique<TrackGui>(currentTrackGuiBoxWidth, currentNumOfSeconds, tree)
+            : std::make_unique<TrackGui>(currentTrackGuiBoxWidth, currentNumOfSeconds, tree, newAudioFilePath);
+
+    trackGui->setBounds(0,
+                        getCurrentNumberOfTracks() * currentTrackGuiBoxHeight,
+                        trackGuiComponent.getWidth(),
+                        currentTrackGuiBoxHeight);
+    trackGuiVector.push_back(std::move(trackGui));
+    trackGuiComponent.addAndMakeVisible(trackGuiVector.back().get());
+}
+
+void TrackPlayer::addTrack(const juce::String& newAudioFilePath)
+{
+    newAudioFilePath.isEmpty() ? makeNewTrackGui() : makeNewTrackGui(newAudioFilePath);
+
     incrementCurrentNumberOfTracks();
     trackPlayerSideMenu.incrementCurrentNumberOfTracks();
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
@@ -116,5 +133,63 @@ void TrackPlayer::removeTrack()
         assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
         resized();
         trackPlayerSideMenu.resized();
+    }
+}
+
+void TrackPlayer::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
+{
+    if(property.toString() == "newAudioFile")
+    {
+        const juce::var newAudioFilePath = tree["newAudioFile"];
+        handleNewAudioFileOpened(newAudioFilePath.toString());
+    }
+    else if(property.toString() == "numOfSecondsChanged")
+    {
+        currentNumOfSeconds = tree["numOfSecondsChanged"];
+        timeline.changeNumOfSeconds(currentNumOfSeconds);
+        resized();
+        for(const auto& trackGui: trackGuiVector)
+        {
+            trackGui->changeNumOfSeconds(currentNumOfSeconds);
+            trackGui->setSize(trackGuiComponent.getWidth(), currentTrackGuiBoxHeight);
+            trackGui->repaint();
+        }
+    }
+}
+
+TrackGui* TrackPlayer::findFirstEmptyTrackGui() const
+{
+    for(auto& trackGui: trackGuiVector)
+    {
+        if(trackGui->hasNoAudioClips())
+        {
+            return trackGui.get();
+        }
+    }
+    return nullptr;
+}
+
+void TrackPlayer::handleNewAudioFileOpened(const juce::String& newAudioFilePath)
+{
+    if(const auto maybeFreeTrackGui = findFirstEmptyTrackGui(); maybeFreeTrackGui != nullptr)
+    {
+        maybeFreeTrackGui->addNewAudioFile(newAudioFilePath);
+    }
+    else
+    {
+        addTrack(newAudioFilePath);
+    }
+}
+
+void TrackPlayer::changeTrackGuiBoxWidthAndPropagate(const uint16_t newBoxWidth)
+{
+    currentTrackGuiBoxWidth = newBoxWidth;
+    resized();
+    timeline.changeBoxWidth(newBoxWidth);
+    trackGuiComponent.changeBoxWidth(newBoxWidth);
+    for(const auto& trackGui: trackGuiVector)
+    {
+        trackGui->setSize(trackGuiComponent.getWidth(), currentTrackGuiBoxHeight);
+        trackGui->changeBoxWidth(newBoxWidth);
     }
 }

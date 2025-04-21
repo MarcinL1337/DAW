@@ -25,4 +25,5 @@ private:
 
     uint16_t currentNumberOfTracks{0u};
     const int trackButtonsSize{30};
+    uint16_t currentTrackGuiBoxHeight{TrackPlayerConstants::startBoxHeight};
 };

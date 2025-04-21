@@ -1,22 +1,19 @@
 #include "TrackGuiComponent.h"
 
-TrackGuiComponent::TrackGuiComponent(const juce::ValueTree& parentTree) : tree{parentTree}
-{
-    tree.addListener(this);
-}
+TrackGuiComponent::TrackGuiComponent(const juce::ValueTree& parentTree) : tree{parentTree} { tree.addListener(this); }
 
 void TrackGuiComponent::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::forestgreen);
     timeBarPosition =
-        timeBarTime == 0 ? TrackPlayerConstants::timeBarBoxSize / 2 : timeBarTime * TrackPlayerConstants::startBoxWidth;
+        timeBarTime == 0 ? TrackPlayerConstants::timeBarBoxSize / 2 : timeBarTime * currentTrackGuiBoxWidth;
     g.drawLine(timeBarPosition, 0, timeBarPosition, getHeight());
 }
 
 void TrackGuiComponent::resized() {}
 
 void TrackGuiComponent::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
-                                                   const juce::Identifier& property)
+                                                 const juce::Identifier& property)
 {
     if(property.toString() == "timeBarTime")
     {
@@ -24,3 +21,5 @@ void TrackGuiComponent::valueTreePropertyChanged(juce::ValueTree& treeWhosePrope
         repaint();
     }
 }
+
+void TrackGuiComponent::changeBoxWidth(const uint16_t newBoxWidth) { currentTrackGuiBoxWidth = newBoxWidth; }

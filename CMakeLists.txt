@@ -55,6 +55,8 @@ set(SourceFiles
         Source/TrackPlayer/TimeBar.cpp
         Source/TrackPlayer/TrackGuiComponent.h
         Source/TrackPlayer/TrackGuiComponent.cpp
+        Source/TrackPlayer/Waveform.h
+        Source/TrackPlayer/Waveform.cpp
 
         Source/SideMenu/SideMenu.h
         Source/SideMenu/SideMenu.cpp

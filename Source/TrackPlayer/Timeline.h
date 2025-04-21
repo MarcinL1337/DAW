@@ -7,7 +7,7 @@
 class Timeline final : public juce::Component
 {
 public:
-    explicit Timeline(int numOfBoxes, const juce::ValueTree& parentTree);
+    explicit Timeline(int numOfSeconds, const juce::ValueTree& parentTree);
     ~Timeline() override = default;
 
     void paint(juce::Graphics& g) override;
@@ -16,6 +16,9 @@ public:
     void mouseDown(const juce::MouseEvent& event) override;
     void mouseDrag(const juce::MouseEvent& event) override;
     void mouseUp(const juce::MouseEvent& event) override;
+
+    void changeBoxWidth(const uint16_t newBoxWidth) { currentTrackGuiBoxWidth = newBoxWidth; }
+    void changeNumOfSeconds(const int newNumOfSeconds) { currentNumOfSeconds = newNumOfSeconds; }
 
 private:
     void drawLineOnTimeline(juce::Graphics& g, uint32_t lineNumber) const;
@@ -26,8 +29,9 @@ private:
     TimeBar timeBar{};
 
     int timeBarXOffset{0};
-    const int numOfSeconds{};
+    int currentNumOfSeconds;
     juce::Point<int> lastMousePosition{};
     bool isCurrentlyDraggingTimeBar{false};
     float timeBarTimeInSeconds{0.0f};
+    uint16_t currentTrackGuiBoxWidth{TrackPlayerConstants::startBoxWidth};
 };
