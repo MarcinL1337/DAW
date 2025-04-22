@@ -39,6 +39,9 @@ NodeID TrackManager::addAudioClipToTrack(const int trackId, const juce::File& fi
     if(trackPositionInVector == TrackManagerConstants::InvalidTrackPositionInVector)
         return TrackManagerConstants::InvalidNodeID;
 
+    // TODO: handle file opening in trackManager?
+    trackPlayer.handleNewAudioFileOpened(file.getFullPathName());
+
     return tracks[trackPositionInVector]->addAudioClip(file);
 }
 

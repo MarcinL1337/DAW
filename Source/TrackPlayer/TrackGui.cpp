@@ -1,4 +1,4 @@
-#include "trackGui.h"
+#include "TrackGui.h"
 
 TrackGui::TrackGui(const uint16_t boxWidth, const int numOfSeconds, const juce::ValueTree& parentTree, const int id) :
     tree{parentTree}, currentNumOfSeconds{numOfSeconds}, id{id}, currentBoxWidth{boxWidth}
