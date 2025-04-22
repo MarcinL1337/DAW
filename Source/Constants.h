@@ -19,8 +19,6 @@ constexpr int startNumOfBoxes{51};
 constexpr float timelineHeightRatio{0.08f};
 constexpr uint8_t timeBarBoxSize{15u};
 
-constexpr float trackPlayerHeightRatio{1.0f - timelineHeightRatio};
-
 constexpr float trackPlayerSideMenuWidthRatio{0.12f};
 
 }  // namespace TrackPlayerConstants
