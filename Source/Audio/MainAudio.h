@@ -21,7 +21,8 @@ private:
     void audioProcessorGraphInit();
     void rebuildGraph();
 
-    friend class TrackManager;
+    friend class AudioTrack;
+
     NodeID addAudioClip(const juce::File& file);
     void removeAudioClip(NodeID nodeID);
     void setPanOfAudioClip(NodeID nodeID, float pan) const;

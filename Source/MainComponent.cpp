@@ -8,6 +8,7 @@ MainComponent::MainComponent() :
     addAndMakeVisible(topLevelMenu);
     addAndMakeVisible(mainToolbar);
     addAndMakeVisible(trackPlayer);
+    addAndMakeVisible(trackManager);
 
     addAndMakeVisible(sideMenu);
     flexBoxInit();

@@ -6,12 +6,10 @@ TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree, TrackManager& trackM
     trackPlayerSideMenu(trackManagerRef),
     trackGuiComponent{parentTree}
 {
-    setWantsKeyboardFocus(true);
     addAndMakeVisible(trackPlayerViewport);
     addAndMakeVisible(timelineViewport);
     addAndMakeVisible(trackPlayerSideMenuViewport);
     viewportsInit();
-    juce::Timer::callAfterDelay(100, [&] { grabKeyboardFocus(); });
 }
 
 void TrackPlayer::paint(juce::Graphics& g)

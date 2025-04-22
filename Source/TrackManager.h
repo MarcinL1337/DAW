@@ -3,37 +3,22 @@
 #include <utility>
 #include <vector>
 
+#include "Audio/AudioTrack.h"
 #include "Audio/MainAudio.h"
 #include "TrackPlayer/TrackPlayer.h"
-
-enum class AudioClipProperty
-{
-    MUTE,
-    SOLO,
-    GAIN,
-    PAN
-};
-
-struct TrackProperties
-{
-    float gain{0.0f};
-    float pan{0.0f};
-    bool mute{false};
-    bool solo{false};
-};
 
 class TrackManager : public juce::Component,
                      public juce::KeyListener
 {
 public:
     TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef);
-    ~TrackManager() = default;
+    ~TrackManager() override = default;
 
     int addTrack();
     bool removeTrack(int trackId);
     bool changeTrackOrder(int trackId, uint32_t newPosition);
 
-    NodeID addAudioClipToTrack(int trackId, const juce::File& file);
+    NodeID addAudioClipToTrack(int trackId, const juce::File& file) const;
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
     bool removeAudioClipFromTrack(int trackId, NodeID clipId);
     bool moveAudioClipBetweenTracks(int sourceTrackId, int destTrackId, NodeID clipId);
@@ -48,15 +33,7 @@ public:
 private:
     TrackPlayer& trackPlayer;
     MainAudio& mainAudio;
-
-    struct Track
-    {
-        int id;
-        std::vector<NodeID> audioClips;
-        TrackProperties properties;
-    };
-
-    std::vector<Track> tracks;
+    std::vector<std::unique_ptr<AudioTrack>> tracks;
 
     // TODO: possible overflow :c
     int nextTrackId{0};
