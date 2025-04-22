@@ -15,7 +15,6 @@ TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree, TrackManager& trackM
     viewportsInit();
     tree.addListener(this);
     juce::Timer::callAfterDelay(100, [&] { grabKeyboardFocus(); });
-    juce::Timer::callAfterDelay(50, [&] { addTrack(); });
 }
 
 void TrackPlayer::paint(juce::Graphics& g)
