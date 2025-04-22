@@ -13,9 +13,9 @@ constexpr float mainToolbarHeightRatio{0.035f};
 
 namespace TrackPlayerConstants
 {
-constexpr float startBoxWidth{70.0f};
-constexpr float startBoxHeight{85.0f};
-constexpr uint8_t startNumOfBoxes{51u};
+constexpr uint16_t startBoxWidth{70u};
+constexpr uint16_t startBoxHeight{85u};
+constexpr int startNumOfBoxes{51};
 
 constexpr float timelineHeightRatio{0.08f};
 constexpr uint8_t timeBarBoxSize{15u};

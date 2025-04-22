@@ -7,7 +7,7 @@ class Menu final : public juce::Component,
                    public juce::MenuBarModel
 {
 public:
-    Menu();
+    Menu(const juce::ValueTree& parentTree);
     ~Menu() override;
 
 private:
@@ -22,8 +22,17 @@ private:
     void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
     bool perform(const InvocationInfo& info) override;
 
+    void openFileButtonClicked();
+
     std::unique_ptr<juce::MenuBarComponent> menuBarComponent;
     juce::ApplicationCommandManager commandManager;
+    juce::ValueTree tree;
+    juce::Identifier newAudioFile{"newAudioFile"};
+
+    std::string fileChooserDialogText{"Choose an audio file to open"};
+    juce::File fileChooserStartDirectory{juce::File::getSpecialLocation(juce::File::userMusicDirectory)};
+    std::string fileChooserValidFileExtensions{"*.wav;*.mp3"};
+    juce::FileChooser fileChooser{fileChooserDialogText, fileChooserStartDirectory, fileChooserValidFileExtensions};
 
     juce::StringArray menuBarNames{"File", "Edit", "View", "Help"};
 

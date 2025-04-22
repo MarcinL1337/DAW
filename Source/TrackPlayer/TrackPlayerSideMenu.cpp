@@ -9,8 +9,7 @@ void TrackPlayerSideMenu::paint(juce::Graphics& g)
 
     for(auto i{0u}; i < getCurrentNumberOfTracks() + 1; ++i)
     {
-        g.drawLine(
-            0, i * TrackPlayerConstants::startBoxHeight, getWidth(), i * TrackPlayerConstants::startBoxHeight, 0.75);
+        g.drawLine(0, i * currentTrackGuiBoxHeight, getWidth(), i * currentTrackGuiBoxHeight, 0.75);
     }
     drawTrackText(g);
 }
@@ -21,7 +20,7 @@ void TrackPlayerSideMenu::drawTrackText(juce::Graphics& g) const
 {
     for(auto i{0u}; i < getCurrentNumberOfTracks(); i++)
     {
-        auto currentY{i * TrackPlayerConstants::startBoxHeight + 15};
+        auto currentY{i * currentTrackGuiBoxHeight + 15};
         g.setColour(juce::Colours::white);
         g.drawText("Track nr " + std::to_string(i + 1),
                    10,
@@ -44,7 +43,7 @@ void TrackPlayerSideMenu::drawTrackButtons()
         auto soloButton = std::make_unique<juce::TextButton>("S");
         auto muteButton = std::make_unique<juce::TextButton>("M");
 
-        auto currentY{i * TrackPlayerConstants::startBoxHeight + 15};
+        auto currentY{i * currentTrackGuiBoxHeight + 15};
 
         recordButton->setBounds(startX, currentY, trackButtonsSize, trackButtonsSize);
         recordButton->onClick = [i]() { std::cout << "Recording[" << i + 1 << "]" << std::endl; };
