@@ -21,6 +21,7 @@ public:
     uint16_t getCurrentNumberOfTracks() const { return currentNumberOfTracks; }
 
 private:
+    friend class TrackManager;
     void paint(juce::Graphics& g) override;
     void resized() override;
 
@@ -37,7 +38,6 @@ private:
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
 
-    void mouseDown(const juce::MouseEvent& event) override;
     bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
 
     void changeTrackGuiBoxWidthAndPropagate(uint16_t newBoxWidth);

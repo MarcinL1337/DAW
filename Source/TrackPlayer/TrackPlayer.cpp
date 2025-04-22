@@ -2,7 +2,7 @@
 
 #include <random>
 
-TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree) :
+TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree, TrackManager& trackManagerRef) :
     tree{parentTree}, timeline{currentNumOfSeconds, parentTree},
     trackPlayerSideMenu(trackManagerRef),
     trackGuiComponent{parentTree}
