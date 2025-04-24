@@ -39,6 +39,7 @@ void AudioTrack::setOffsetOfAudioClipInSeconds(const NodeID nodeID, const double
     mainAudio.setOffsetOfAudioClipInSeconds(nodeID, offsetSeconds);
 }
 
+// TODO: use template from pull request #23 https://github.com/MarcinL1337/DAW/pull/23#discussion_r2058940747
 void AudioTrack::setProperty(const AudioClipProperty property, const bool boolValue)
 {
     switch(property)
