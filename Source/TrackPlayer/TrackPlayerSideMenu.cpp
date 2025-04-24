@@ -1,4 +1,9 @@
 #include "TrackPlayerSideMenu.h"
+#include "../TrackManager.h"
+
+TrackPlayerSideMenu::TrackPlayerSideMenu(const juce::ValueTree& parentTree) : tree(parentTree) {}
+
+// TODO: Styling for track text and buttons is still not great -> fix with free time
 
 void TrackPlayerSideMenu::paint(juce::Graphics& g)
 {
@@ -15,41 +20,59 @@ void TrackPlayerSideMenu::resized() { drawTrackButtons(); }
 
 void TrackPlayerSideMenu::drawTrackText(juce::Graphics& g) const
 {
-    for(auto i{0u}; i < getCurrentNumberOfTracks(); i++)
+    for(auto i{0}; i < getCurrentNumberOfTracks(); i++)
     {
-        auto currentY{i * currentTrackGuiBoxHeight + 15};
-        g.setColour(juce::Colours::white);
-        g.drawText("Track nr " + std::to_string(i + 1),
-                   10,
-                   currentY,
-                   100,
-                   trackButtonsSize,
-                   juce::Justification::centred,
-                   false);
+        juce::Rectangle<int> currentTrackTextArea{
+            0, i * currentTrackGuiBoxHeight, getWidth() / 2, currentTrackGuiBoxHeight};
+        g.drawFittedText("Track nr " + std::to_string(i + 1),
+                         currentTrackTextArea.removeFromRight(0.9 * currentTrackTextArea.getWidth()),
+                         juce::Justification::centredLeft,
+                         2);
     }
 }
 
 void TrackPlayerSideMenu::drawTrackButtons()
 {
     trackButtonsVector.clear();
-    const auto startX{getWidth() - 2 * trackButtonsSize};
-    const auto xDifference{trackButtonsSize + 5};
-    for(auto i{0u}; i < getCurrentNumberOfTracks(); i++)
+    for(auto i{0}; i < getCurrentNumberOfTracks(); i++)
     {
+        juce::Rectangle<int> currentTrackButtonsArea{
+            getWidth() / 2, i * currentTrackGuiBoxHeight, getWidth() / 2, currentTrackGuiBoxHeight};
+
         auto recordButton = std::make_unique<juce::TextButton>("R");
         auto soloButton = std::make_unique<juce::TextButton>("S");
         auto muteButton = std::make_unique<juce::TextButton>("M");
 
-        auto currentY{i * currentTrackGuiBoxHeight + 15};
-
-        recordButton->setBounds(startX, currentY, trackButtonsSize, trackButtonsSize);
+        recordButton->setBounds(currentTrackButtonsArea.removeFromRight(trackButtonsSize)
+                                    .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
+                                    .reduced(buttonMargin));
         recordButton->onClick = [i]() { std::cout << "Recording[" << i + 1 << "]" << std::endl; };
 
-        soloButton->setBounds(startX - xDifference, currentY, trackButtonsSize, trackButtonsSize);
-        soloButton->onClick = [i]() { std::cout << "Soloing[" << i + 1 << "]" << std::endl; };
-
-        muteButton->setBounds(startX - 2 * xDifference, currentY, trackButtonsSize, trackButtonsSize);
-        muteButton->onClick = [i]() { std::cout << "Muting[" << i + 1 << "]" << std::endl; };
+        soloButton->setBounds(currentTrackButtonsArea.removeFromRight(trackButtonsSize)
+                                          .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
+                                          .reduced(buttonMargin));
+        soloButton->onClick = [this, i, soloButtonPtr = soloButton.get()]()
+        {
+            const bool currentState = soloButtonPtr->getToggleState();
+            soloButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
+            tree.setProperty("trackAction", "SOLO", nullptr);
+            tree.setProperty("trackActionIndex", i, nullptr);
+            tree.setProperty("trackActionValue", !currentState, nullptr);
+            std::cout << "Soloing[" << i + 1 << "] - " << (!currentState ? "ON" : "OFF") << std::endl;
+        };
+        muteButton->setBounds(currentTrackButtonsArea.removeFromRight(trackButtonsSize)
+                                          .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
+                                          .reduced(buttonMargin));
+        muteButton->onClick = [this, i, muteButtonPtr = muteButton.get()]()
+        {
+            const bool currentState = muteButtonPtr->getToggleState();
+            muteButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
+            tree.setProperty("trackAction", "MUTE", nullptr);
+            tree.setProperty("trackActionIndex", i, nullptr);
+            // TODO: trackActionValue should be deleted
+            tree.setProperty("trackActionValue", !currentState, nullptr);
+            std::cout << "Muting[" << i + 1 << "] - " << (!currentState ? "ON" : "OFF") << std::endl;
+        };
 
         trackButtonsVector.push_back({std::move(recordButton), std::move(soloButton), std::move(muteButton)});
         for(auto& button: trackButtonsVector.back()) { addAndMakeVisible(button.get()); }

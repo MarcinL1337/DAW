@@ -3,7 +3,9 @@
 #include <random>
 
 TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree) :
-    tree{parentTree}, timeline{currentNumOfSeconds, parentTree}, trackGuiComponent{parentTree}
+    tree{parentTree}, timeline{currentNumOfSeconds, parentTree},
+    trackPlayerSideMenu(parentTree),
+    trackGuiComponent{parentTree}
 {
     addKeyListener(this);
     setWantsKeyboardFocus(true);
@@ -13,7 +15,6 @@ TrackPlayer::TrackPlayer(const juce::ValueTree& parentTree) :
     viewportsInit();
     tree.addListener(this);
     juce::Timer::callAfterDelay(100, [&] { grabKeyboardFocus(); });
-    juce::Timer::callAfterDelay(50, [&] { addTrack(); });
 }
 
 void TrackPlayer::paint(juce::Graphics& g)
@@ -51,27 +52,8 @@ void TrackPlayer::resized()
                                           getHeight() - trackPlayerViewport.getScrollBarThickness());
 }
 
-void TrackPlayer::mouseDown(const juce::MouseEvent& event)
-{
-    juce::Point mouseClickPosition{event.getMouseDownPosition()};
-    if(reallyContains(mouseClickPosition, true) and event.mods.isRightButtonDown())
-    {
-        addTrack();
-    }
-}
-
 bool TrackPlayer::keyPressed(const juce::KeyPress& key, Component* originatingComponent)
 {
-    if(key.getModifiers().isShiftDown() and key.getTextCharacter() == '+')
-    {
-        addTrack();
-        return true;
-    }
-    if(key.getModifiers().isShiftDown() and key.getTextCharacter() == '_')
-    {
-        removeTrack();
-        return true;
-    }
     // Only for testing, will be deleted soon
     if(key.getModifiers().isShiftDown() and key.getTextCharacter() == '(')
     {
@@ -116,34 +98,30 @@ void TrackPlayer::addTrack(const juce::String& newAudioFilePath)
 {
     newAudioFilePath.isEmpty() ? makeNewTrackGui() : makeNewTrackGui(newAudioFilePath);
 
-    incrementCurrentNumberOfTracks();
     trackPlayerSideMenu.incrementCurrentNumberOfTracks();
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
     resized();
     trackPlayerSideMenu.resized();
 }
 
-void TrackPlayer::removeTrack()
+void TrackPlayer::removeTrack(const int trackIndex)
 {
-    if(getCurrentNumberOfTracks() > 0)
-    {
-        trackGuiVector.pop_back();
-        decrementCurrentNumberOfTracks();
-        trackPlayerSideMenu.decrementCurrentNumberOfTracks();
-        assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
-        resized();
-        trackPlayerSideMenu.resized();
-    }
+    assert(trackIndex >= 0 && trackIndex < static_cast<int>(trackGuiVector.size()));
+    trackGuiVector.erase(trackGuiVector.begin() + trackIndex);
+
+    for(size_t i = trackIndex; i < trackGuiVector.size(); ++i)
+        trackGuiVector[i]->setBounds(
+            0, i * currentTrackGuiBoxHeight, trackGuiComponent.getWidth(), currentTrackGuiBoxHeight);
+
+    trackPlayerSideMenu.decrementCurrentNumberOfTracks();
+    assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
+    resized();
+    trackPlayerSideMenu.resized();
 }
 
 void TrackPlayer::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
 {
-    if(property.toString() == "newAudioFile")
-    {
-        const juce::var newAudioFilePath = tree["newAudioFile"];
-        handleNewAudioFileOpened(newAudioFilePath.toString());
-    }
-    else if(property.toString() == "numOfSecondsChanged")
+    if(property.toString() == "numOfSecondsChanged")
     {
         currentNumOfSeconds = tree["numOfSecondsChanged"];
         timeline.changeNumOfSeconds(currentNumOfSeconds);
@@ -160,24 +138,23 @@ void TrackPlayer::valueTreePropertyChanged(juce::ValueTree&, const juce::Identif
 TrackGui* TrackPlayer::findFirstEmptyTrackGui() const
 {
     for(auto& trackGui: trackGuiVector)
-    {
         if(trackGui->hasNoAudioClips())
-        {
             return trackGui.get();
-        }
-    }
     return nullptr;
 }
 
-void TrackPlayer::handleNewAudioFileOpened(const juce::String& newAudioFilePath)
+void TrackPlayer::addWaveformToTrackGui(const juce::String& newAudioFilePath, const int trackIndex)
 {
-    if(const auto maybeFreeTrackGui = findFirstEmptyTrackGui(); maybeFreeTrackGui != nullptr)
+    if(trackIndex >= 0 && trackIndex < static_cast<int>(trackGuiVector.size()))
     {
-        maybeFreeTrackGui->addNewAudioFile(newAudioFilePath);
+        trackGuiVector[trackIndex]->addNewAudioFile(newAudioFilePath);
     }
-    else
+    else if(trackIndex == -1)
     {
-        addTrack(newAudioFilePath);
+        if(const auto maybeFreeTrackGui = findFirstEmptyTrackGui(); maybeFreeTrackGui != nullptr)
+            maybeFreeTrackGui->addNewAudioFile(newAudioFilePath);
+        else
+            addTrack(newAudioFilePath);
     }
 }
 

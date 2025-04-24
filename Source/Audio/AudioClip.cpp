@@ -50,6 +50,7 @@ bool AudioClip::processBlockChecker() const
     return isPrepared && mainAudio.isPlaying() && muteAndSoloCheck;
 }
 
+// TODO: Sometimes audio clips get out of sync, e.g., when muting and unmuting tracks. Fix audio clip synchronization.
 void AudioClip::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     buffer.clear();

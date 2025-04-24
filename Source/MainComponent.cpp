@@ -1,16 +1,19 @@
 #include "MainComponent.h"
 
-MainComponent::MainComponent() : topLevelMenu(tree), mainToolbar(mainAudio, tree), trackPlayer(tree)
+MainComponent::MainComponent() :
+    topLevelMenu(tree), mainToolbar(mainAudio, tree), trackPlayer(tree), trackManager(trackPlayer, mainAudio)
 {
     // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
     setSize(getParentWidth(), getParentHeight());
     addAndMakeVisible(topLevelMenu);
     addAndMakeVisible(mainToolbar);
     addAndMakeVisible(trackPlayer);
+    addAndMakeVisible(trackManager);
 
     addAndMakeVisible(sideMenu);
     flexBoxInit();
-    addTestTracks();
+
+    juce::Timer::callAfterDelay(50, [&] { addTestTracks(); });
 }
 
 void MainComponent::paint(juce::Graphics& g)
@@ -53,49 +56,50 @@ void MainComponent::addTestTracks()
     const juce::File invertedMusicAudioFile = dawDir.getChildFile("Assets/Audio/test(-1).wav");
     const juce::File mutedMusicAudioFile = dawDir.getChildFile("Assets/Audio/test.mp3");
 
+    auto errorMsg = [](const juce::String& msg)
+    { juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon, "Error", msg + " not found :c"); };
+
+    auto trackIndex = trackManager.addTrack();
+
     if(countdownAudioFile.existsAsFile())
     {
-        const auto audioClipId = mainAudio.addAudioClip(countdownAudioFile);
-        mainAudio.setPanOfAudioClip(audioClipId, 0.5f);
-        mainAudio.setGainOfAudioClip(audioClipId, -5.0f);
-        mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 0.0f);
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, countdownAudioFile);
+        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 0.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::PAN, 0.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::GAIN, -15.0f);
     }
     else
-        juce::AlertWindow::showMessageBoxAsync(
-            juce::AlertWindow::WarningIcon, "Error", countdownAudioFile.getFullPathName() + " not found :c");
+        errorMsg(countdownAudioFile.getFullPathName());
 
     if(musicAudioFile.existsAsFile())
     {
-        const auto audioClipId = mainAudio.addAudioClip(musicAudioFile);
-        mainAudio.setPanOfAudioClip(audioClipId, 0);
-        mainAudio.setGainOfAudioClip(audioClipId, -15.0f);
-        mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, musicAudioFile);
+        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
     }
     else
-        juce::AlertWindow::showMessageBoxAsync(
-            juce::AlertWindow::WarningIcon, "Error", musicAudioFile.getFullPathName() + " not found :c");
+        errorMsg(musicAudioFile.getFullPathName());
 
     if(invertedMusicAudioFile.existsAsFile())
     {
-        const auto audioClipId = mainAudio.addAudioClip(invertedMusicAudioFile);
-        mainAudio.setPanOfAudioClip(audioClipId, 0.6);
-        mainAudio.setGainOfAudioClip(audioClipId, -15.0f);
-        mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
+        trackIndex = trackManager.addTrack();
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, invertedMusicAudioFile);
+        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::PAN, 0.6f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::GAIN, -15.0f);
     }
     else
-        juce::AlertWindow::showMessageBoxAsync(
-            juce::AlertWindow::WarningIcon, "Error", invertedMusicAudioFile.getFullPathName() + " not found :c");
+        errorMsg(invertedMusicAudioFile.getFullPathName());
 
     if(mutedMusicAudioFile.existsAsFile())
     {
-        const auto audioClipId = mainAudio.addAudioClip(mutedMusicAudioFile);
-        mainAudio.setPanOfAudioClip(audioClipId, 0);
-        mainAudio.setGainOfAudioClip(audioClipId, -15.0f);
-        mainAudio.setOffsetOfAudioClipInSeconds(audioClipId, 1.0f);
-        mainAudio.setMuteOfAudioClip(audioClipId, true);
-        mainAudio.setSoloOfAudioClip(audioClipId, false);
+        trackIndex = trackManager.addTrack();
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, mutedMusicAudioFile);
+        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 1.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::PAN, 0.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::GAIN, -15.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::MUTE, false);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::SOLO, false);
     }
     else
-        juce::AlertWindow::showMessageBoxAsync(
-            juce::AlertWindow::WarningIcon, "Error", mutedMusicAudioFile.getFullPathName() + " not found :c");
+        errorMsg(mutedMusicAudioFile.getFullPathName());
 }

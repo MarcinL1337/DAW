@@ -131,7 +131,8 @@ void Menu::openFileButtonClicked()
 {
     const auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles |
                                     juce::FileBrowserComponent::canSelectDirectories;
-
+    // TODO: when choosing to open the same file twice, the value in the ValueTree stays the same, meaning no update is
+    // propagated which results in not adding the file for the second time. Fix it.
     fileChooser.launchAsync(folderChooserFlags,
                             [this](const juce::FileChooser& chooser)
                             {

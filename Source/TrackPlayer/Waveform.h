@@ -20,8 +20,9 @@ private:
     void resized() override;
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
+    // TODO: when TrackManager will be ready, think if this is necessary here
     juce::AudioBuffer<float> samplesBuffer{};
-    juce::AudioFormatReader* formatReader{nullptr};  // change to unique_ptr
+    juce::AudioFormatReader* formatReader{nullptr};  // change to unique_ptr -> for now it stays as is
     juce::AudioFormatManager formatManager;
     juce::AudioThumbnailCache audioThumbnailCache;
     juce::AudioThumbnail audioThumbnail;
@@ -30,5 +31,5 @@ private:
     juce::Identifier numOfSecondsChanged{"numOfSecondsChanged"};
 
     uint16_t currentTrackGuiBoxWidth;
-    uint16_t currentTrackGuiBoxHeight;
+    uint16_t currentTrackGuiBoxHeight{};
 };

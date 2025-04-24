@@ -6,7 +6,7 @@
 class TrackPlayerSideMenu final : public juce::Component
 {
 public:
-    TrackPlayerSideMenu() = default;
+    explicit TrackPlayerSideMenu(const juce::ValueTree& parentTree);
     ~TrackPlayerSideMenu() override = default;
 
     void paint(juce::Graphics& g) override;
@@ -17,6 +17,7 @@ public:
     void decrementCurrentNumberOfTracks() { currentNumberOfTracks--; }
 
 private:
+    juce::ValueTree tree;
     void drawTrackText(juce::Graphics& g) const;
     void drawTrackButtons();
 
@@ -24,6 +25,7 @@ private:
     std::vector<trackButtons> trackButtonsVector{};
 
     uint16_t currentNumberOfTracks{0u};
-    const int trackButtonsSize{30};
+    const uint16_t trackButtonsSize{36u};
+    const uint16_t buttonMargin{3u};
     uint16_t currentTrackGuiBoxHeight{TrackPlayerConstants::startBoxHeight};
 };

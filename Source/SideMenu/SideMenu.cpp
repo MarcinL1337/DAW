@@ -15,8 +15,7 @@ void SideMenu::initSliders()
     sliderSettings.push_back(SliderSettings{faderSlider, -15, 15, 0.0f, 1, " dB", faderLabel, "Fader"});
     sliderSettings.push_back(SliderSettings{delaySlider, -5000, 5000, 0.0f, 0, " Samples", delayLabel, "Delay"});
     sliderSettings.push_back(SliderSettings{reverbSlider, 0, 100, 0.0f, 2, " %", reverbLabel, "Reverb"});
-    sliderSettings.push_back(
-        SliderSettings{bassBoostSlider, 0, 50, 0.0f, 0, " wpierdolu", bassBoostLabel, "Bass Boost"});
+    sliderSettings.push_back(SliderSettings{bassBoostSlider, 0, 50, 0.0f, 0, " %", bassBoostLabel, "Bass Boost"});
 
     for(auto& sliderSetting: sliderSettings)
     {
