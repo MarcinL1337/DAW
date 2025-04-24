@@ -1,6 +1,7 @@
 #include "MainComponent.h"
 
-MainComponent::MainComponent() : topLevelMenu(tree), mainToolbar(mainAudio, tree), trackPlayer(tree, trackManager), trackManager(trackPlayer, mainAudio)
+MainComponent::MainComponent() :
+    topLevelMenu(tree), mainToolbar(mainAudio, tree), trackPlayer(tree), trackManager(trackPlayer, mainAudio)
 {
     // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
     setSize(getParentWidth(), getParentHeight());
@@ -58,21 +59,21 @@ void MainComponent::addTestTracks()
     auto errorMsg = [](const juce::String& msg)
     { juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon, "Error", msg + " not found :c"); };
 
-    auto trackId = trackManager.addTrack();
+    auto trackIndex = trackManager.addTrack();
 
     if(countdownAudioFile.existsAsFile())
     {
-        const auto audioClipId = trackManager.addAudioClipToTrack(trackId, countdownAudioFile);
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, countdownAudioFile);
         trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 0.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::PAN, 0.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::GAIN, -15.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::PAN, 0.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::GAIN, -15.0f);
     }
     else
         errorMsg(countdownAudioFile.getFullPathName());
 
     if(musicAudioFile.existsAsFile())
     {
-        const auto audioClipId = trackManager.addAudioClipToTrack(trackId, musicAudioFile);
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, musicAudioFile);
         trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
     }
     else
@@ -80,24 +81,24 @@ void MainComponent::addTestTracks()
 
     if(invertedMusicAudioFile.existsAsFile())
     {
-        trackId = trackManager.addTrack();
-        const auto audioClipId = trackManager.addAudioClipToTrack(trackId, invertedMusicAudioFile);
+        trackIndex = trackManager.addTrack();
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, invertedMusicAudioFile);
         trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::PAN, 0.6f);
-        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::GAIN, -15.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::PAN, 0.6f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::GAIN, -15.0f);
     }
     else
         errorMsg(invertedMusicAudioFile.getFullPathName());
 
     if(mutedMusicAudioFile.existsAsFile())
     {
-        trackId = trackManager.addTrack();
-        const auto audioClipId = trackManager.addAudioClipToTrack(trackId, mutedMusicAudioFile);
+        trackIndex = trackManager.addTrack();
+        const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, mutedMusicAudioFile);
         trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 1.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::PAN, 0.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::GAIN, -15.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::MUTE, false);
-        trackManager.setPropertyForAllClipsInTrack(trackId, AudioClipProperty::SOLO, false);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::PAN, 0.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::GAIN, -15.0f);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::MUTE, false);
+        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::SOLO, false);
     }
     else
         errorMsg(mutedMusicAudioFile.getFullPathName());

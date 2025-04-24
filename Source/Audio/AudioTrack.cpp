@@ -1,7 +1,7 @@
 #include "AudioTrack.h"
 #include <algorithm>
 
-AudioTrack::AudioTrack(const int id, MainAudio& mainAudioRef) : id(id), mainAudio(mainAudioRef) {}
+AudioTrack::AudioTrack(MainAudio& mainAudioRef) : mainAudio(mainAudioRef) {}
 
 AudioTrack::~AudioTrack()
 {

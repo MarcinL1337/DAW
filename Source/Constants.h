@@ -24,12 +24,6 @@ constexpr float trackPlayerSideMenuWidthRatio{0.12f};
 
 }  // namespace TrackPlayerConstants
 
-namespace TrackManagerConstants
-{
-constexpr uint32_t InvalidTrackPositionInVector{0xFFFFFFFF};
-const juce::AudioProcessorGraph::NodeID InvalidNodeID{0xFFFFFFFF};
-}  // namespace TrackManagerConstants
-
 namespace SideMenuConstants
 {
 constexpr float sideMenuWidthRatio{0.15f};

@@ -7,34 +7,34 @@
 #include "Audio/MainAudio.h"
 #include "TrackPlayer/TrackPlayer.h"
 
-class TrackManager : public juce::Component,
-                     public juce::KeyListener
+class TrackManager final : public juce::Component,
+                           public juce::KeyListener,
+                           public juce::ValueTree::Listener
 {
 public:
     TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef);
     ~TrackManager() override = default;
 
     int addTrack();
-    bool removeTrack(int trackId);
-    bool changeTrackOrder(int trackId, uint32_t newPosition);
+    void removeTrack(int trackIndex);
+    bool changeTrackOrder(int trackIndex, int newPosition);
 
-    NodeID addAudioClipToTrack(int trackId, const juce::File& file) const;
+    NodeID addAudioClipToTrack(int trackIndex, const juce::File& file) const;
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
-    bool removeAudioClipFromTrack(int trackId, NodeID clipId);
-    bool moveAudioClipBetweenTracks(int sourceTrackId, int destTrackId, NodeID clipId);
-
-    uint32_t getTrackPositionInVectorById(int trackId) const;
+    bool removeAudioClipFromTrack(int trackIndex, NodeID clipId);
+    bool moveAudioClipBetweenTracks(int sourceTrackIndex, int destTrackIndex, NodeID clipId);
 
     bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
 
-    void setPropertyForAllClipsInTrack(int trackId, AudioClipProperty property, bool boolValue);
-    void setPropertyForAllClipsInTrack(int trackId, AudioClipProperty property, float floatValue);
+    void setPropertyForAllClipsInTrack(int trackIndex, AudioClipProperty property, bool boolValue);
+    void setPropertyForAllClipsInTrack(int trackIndex, AudioClipProperty property, float floatValue);
+
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
 
 private:
     TrackPlayer& trackPlayer;
     MainAudio& mainAudio;
+    juce::ValueTree& tree;
     std::vector<std::unique_ptr<AudioTrack>> tracks;
-
-    // TODO: possible overflow :c
-    int nextTrackId{0};
 };

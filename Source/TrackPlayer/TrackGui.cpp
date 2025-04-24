@@ -1,12 +1,12 @@
 #include "TrackGui.h"
 
-TrackGui::TrackGui(const uint16_t boxWidth, const int numOfSeconds, const juce::ValueTree& parentTree, const int id) :
-    tree{parentTree}, currentNumOfSeconds{numOfSeconds}, id{id}, currentBoxWidth{boxWidth}
+TrackGui::TrackGui(const uint16_t boxWidth, const int numOfSeconds, const juce::ValueTree& parentTree) :
+    tree{parentTree}, currentNumOfSeconds{numOfSeconds}, currentBoxWidth{boxWidth}
 {}
 
 TrackGui::TrackGui(const uint16_t boxWidth, const int numOfBoxes, const juce::ValueTree& parentTree,
-                   const juce::String& newAudioFilePath, const int id) :
-    TrackGui(boxWidth, numOfBoxes, parentTree, id)
+                   const juce::String& newAudioFilePath) :
+    TrackGui(boxWidth, numOfBoxes, parentTree)
 {
     makeNewWaveformFromAudioFilePath(newAudioFilePath);
 }

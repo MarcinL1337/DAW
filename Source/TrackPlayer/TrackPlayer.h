@@ -13,26 +13,23 @@ class TrackPlayer final : public juce::Component,
                           public juce::ValueTree::Listener
 {
 public:
-    explicit TrackPlayer(const juce::ValueTree& parentTree, TrackManager& trackManagerRef);
+    explicit TrackPlayer(const juce::ValueTree& parentTree);
     TrackPlayer(const TrackPlayer&) = delete;
     TrackPlayer& operator=(const TrackPlayer&) = delete;
     ~TrackPlayer() override = default;
 
-    uint16_t getCurrentNumberOfTracks() const { return currentNumberOfTracks; }
+    uint16_t getCurrentNumberOfTracks() const { return trackGuiVector.size(); }
 
 private:
     friend class TrackManager;
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }
-    void decrementCurrentNumberOfTracks() { currentNumberOfTracks--; }
-
     void makeNewTrackGui(const juce::String& newAudioFilePath = "");
     void viewportsInit();
     void addTrack(const juce::String& newAudioFilePath = "");
-    void removeTrack();
-    void handleNewAudioFileOpened(const juce::String& newAudioFilePath);
+    void removeTrack(int trackIndex);
+    void addWaveformToTrackGui(const juce::String& newAudioFilePath, int trackIndex = -1);
     TrackGui* findFirstEmptyTrackGui() const;
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
@@ -56,7 +53,6 @@ private:
     std::vector<std::unique_ptr<TrackGui>> trackGuiVector{};
 
     const int trackButtonsSize{30};
-    uint16_t currentNumberOfTracks{0u};
     uint16_t currentTrackGuiBoxHeight{TrackPlayerConstants::startBoxHeight};
     uint16_t currentTrackGuiBoxWidth{TrackPlayerConstants::startBoxWidth};
 };

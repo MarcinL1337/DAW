@@ -23,10 +23,8 @@ struct TrackProperties
 class AudioTrack
 {
 public:
-    AudioTrack(int id, MainAudio& mainAudioRef);
+    explicit AudioTrack(MainAudio& mainAudioRef);
     ~AudioTrack();
-
-    int getId() const { return id; }
 
     NodeID addAudioClip(const juce::File& file);
     bool removeAudioClip(NodeID clipId);
@@ -39,7 +37,6 @@ public:
     const std::vector<NodeID>& getAudioClips() const { return audioClips; }
 
 private:
-    int id;
     std::vector<NodeID> audioClips;
     TrackProperties properties;
     MainAudio& mainAudio;

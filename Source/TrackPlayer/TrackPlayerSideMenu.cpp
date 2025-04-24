@@ -1,7 +1,7 @@
 #include "TrackPlayerSideMenu.h"
 #include "../TrackManager.h"
 
-TrackPlayerSideMenu::TrackPlayerSideMenu(TrackManager& trackManagerRef) : trackManager(trackManagerRef) {}
+TrackPlayerSideMenu::TrackPlayerSideMenu(const juce::ValueTree& parentTree) : tree(parentTree) {}
 
 // TODO: Styling for track text and buttons is still not great -> fix with free time
 
@@ -55,7 +55,9 @@ void TrackPlayerSideMenu::drawTrackButtons()
         {
             const bool currentState = soloButtonPtr->getToggleState();
             soloButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
-            trackManager.setPropertyForAllClipsInTrack(i, AudioClipProperty::SOLO, !currentState);
+            tree.setProperty("trackAction", "SOLO", nullptr);
+            tree.setProperty("trackActionIndex", i, nullptr);
+            tree.setProperty("trackActionValue", !currentState, nullptr);
             std::cout << "Soloing[" << i + 1 << "] - " << (!currentState ? "ON" : "OFF") << std::endl;
         };
         muteButton->setBounds(currentTrackButtonsArea.removeFromRight(trackButtonsSize)
@@ -65,7 +67,9 @@ void TrackPlayerSideMenu::drawTrackButtons()
         {
             const bool currentState = muteButtonPtr->getToggleState();
             muteButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
-            trackManager.setPropertyForAllClipsInTrack(i, AudioClipProperty::MUTE, !currentState);
+            tree.setProperty("trackAction", "MUTE", nullptr);
+            tree.setProperty("trackActionIndex", i, nullptr);
+            tree.setProperty("trackActionValue", !currentState, nullptr);
             std::cout << "Muting[" << i + 1 << "] - " << (!currentState ? "ON" : "OFF") << std::endl;
         };
 
