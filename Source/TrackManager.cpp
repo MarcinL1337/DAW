@@ -6,6 +6,7 @@ TrackManager::TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef)
 {
     juce::Timer::callAfterDelay(50, [&] { addTrack(); });
 
+    // TODO: "W chuj mi się to nie podoba"~LilMarcin
     juce::Timer::callAfterDelay(200,
                                 [this]
                                 {

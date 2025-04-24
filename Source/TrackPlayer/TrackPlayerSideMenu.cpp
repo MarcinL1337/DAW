@@ -69,6 +69,7 @@ void TrackPlayerSideMenu::drawTrackButtons()
             muteButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
             tree.setProperty("trackAction", "MUTE", nullptr);
             tree.setProperty("trackActionIndex", i, nullptr);
+            // TODO: trackActionValue should be deleted
             tree.setProperty("trackActionValue", !currentState, nullptr);
             std::cout << "Muting[" << i + 1 << "] - " << (!currentState ? "ON" : "OFF") << std::endl;
         };
