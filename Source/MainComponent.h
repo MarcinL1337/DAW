@@ -24,7 +24,7 @@ private:
     juce::Identifier treeType{"mainComponentValueTree"};
     juce::ValueTree tree{treeType};
 
-    MainAudio mainAudio{};
+    MainAudio mainAudio;
     Menu topLevelMenu;
     MainToolbar mainToolbar;
     TrackPlayer trackPlayer;

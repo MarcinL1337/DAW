@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 namespace TopLevelMenuConstants
 {
@@ -27,3 +28,8 @@ namespace SideMenuConstants
 {
 constexpr float sideMenuWidthRatio{0.15f};
 }  // namespace SideMenuConstants
+
+namespace ValueTreeConstants
+{
+constexpr int doNothing{0x42abcdef};
+}  // namespace ValueTreeConstants

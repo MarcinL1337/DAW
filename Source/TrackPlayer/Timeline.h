@@ -4,7 +4,8 @@
 #include "../Constants.h"
 #include "TimeBar.h"
 
-class Timeline final : public juce::Component
+class Timeline final : public juce::Component,
+                       public juce::ValueTree::Listener
 {
 public:
     explicit Timeline(int numOfSeconds, const juce::ValueTree& parentTree);
@@ -15,6 +16,7 @@ public:
 
     void mouseDown(const juce::MouseEvent& event) override;
     void mouseDrag(const juce::MouseEvent& event) override;
+    void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property) override;
     void mouseUp(const juce::MouseEvent& event) override;
 
     void changeBoxWidth(const uint16_t newBoxWidth) { currentTrackGuiBoxWidth = newBoxWidth; }

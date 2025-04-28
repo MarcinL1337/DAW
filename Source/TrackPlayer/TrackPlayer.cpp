@@ -121,6 +121,8 @@ void TrackPlayer::removeTrack(const int trackIndex)
 
 void TrackPlayer::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
 {
+    if(static_cast<int>(tree[property.toString()]) == ValueTreeConstants::doNothing)
+        return;
     if(property.toString() == "numOfSecondsChanged")
     {
         currentNumOfSeconds = tree["numOfSecondsChanged"];

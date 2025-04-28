@@ -1,6 +1,6 @@
 #include "ToolbarFactory.h"
 
-ToolbarFactory::ToolbarFactory(MainAudio& mainAudioRef) : mainAudio(mainAudioRef) {};
+ToolbarFactory::ToolbarFactory(juce::ValueTree& valueTree) : tree(valueTree) {};
 
 void ToolbarFactory::getAllToolbarItemIds(juce::Array<int>& ids)
 {
@@ -146,29 +146,21 @@ void ToolbarFactory::buttonClicked(juce::Button* button)
     }
     if(button == stopRecordingButton)
     {
-        stopRecordingButtonClicked();
+        stopButtonClicked();
     }
 }
 
 void ToolbarFactory::previousButtonClicked() { temporaryButtonsFunction("previousButton"); }
 void ToolbarFactory::nextButtonClicked() { temporaryButtonsFunction("nextButton"); }
 void ToolbarFactory::replayButtonClicked() { temporaryButtonsFunction("replayButton"); }
-void ToolbarFactory::playPauseButtonClicked()
+void ToolbarFactory::playPauseButtonClicked() const
 {
-    if(getCurrentTrackState() == TrackPlayingState::playing)
-    {
-        setCurrentTrackState(TrackPlayingState::stopped);
-        mainAudio.pause();
-    }
-    else
-    {
-        setCurrentTrackState(TrackPlayingState::playing);
-        mainAudio.play();
-    }
+    tree.setProperty("playPauseButtonClicked", true, nullptr);
+    tree.setProperty("playPauseButtonClicked", ValueTreeConstants::doNothing, nullptr);
 }
 void ToolbarFactory::startRecordingButtonClicked() { temporaryButtonsFunction("startRecordingButton"); }
-void ToolbarFactory::stopRecordingButtonClicked()
+void ToolbarFactory::stopButtonClicked() const
 {
-    setCurrentTrackState(TrackPlayingState::stopped);
-    mainAudio.stop();
+    tree.setProperty("stopButtonClicked", true, nullptr);
+    tree.setProperty("stopButtonClicked", ValueTreeConstants::doNothing, nullptr);
 }

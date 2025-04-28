@@ -53,25 +53,20 @@ void TrackPlayerSideMenu::drawTrackButtons()
                                           .reduced(buttonMargin));
         soloButton->onClick = [this, i, soloButtonPtr = soloButton.get()]()
         {
+            tree.setProperty("soloButtonClicked", ValueTreeConstants::doNothing, nullptr);
+            tree.setProperty("soloButtonClicked", i, nullptr);
             const bool currentState = soloButtonPtr->getToggleState();
             soloButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
-            tree.setProperty("trackAction", "SOLO", nullptr);
-            tree.setProperty("trackActionIndex", i, nullptr);
-            tree.setProperty("trackActionValue", !currentState, nullptr);
-            std::cout << "Soloing[" << i + 1 << "] - " << (!currentState ? "ON" : "OFF") << std::endl;
         };
         muteButton->setBounds(currentTrackButtonsArea.removeFromRight(trackButtonsSize)
                                           .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
                                           .reduced(buttonMargin));
         muteButton->onClick = [this, i, muteButtonPtr = muteButton.get()]()
         {
+            tree.setProperty("muteButtonClicked", ValueTreeConstants::doNothing, nullptr);
+            tree.setProperty("muteButtonClicked", i, nullptr);
             const bool currentState = muteButtonPtr->getToggleState();
             muteButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
-            tree.setProperty("trackAction", "MUTE", nullptr);
-            tree.setProperty("trackActionIndex", i, nullptr);
-            // TODO: trackActionValue should be deleted
-            tree.setProperty("trackActionValue", !currentState, nullptr);
-            std::cout << "Muting[" << i + 1 << "] - " << (!currentState ? "ON" : "OFF") << std::endl;
         };
 
         trackButtonsVector.push_back({std::move(recordButton), std::move(soloButton), std::move(muteButton)});

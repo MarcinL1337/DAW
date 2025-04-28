@@ -1,7 +1,7 @@
 #include "MainComponent.h"
 
 MainComponent::MainComponent() :
-    topLevelMenu(tree), mainToolbar(mainAudio, tree), trackPlayer(tree), trackManager(trackPlayer, mainAudio)
+    mainAudio(tree), topLevelMenu(tree), mainToolbar(tree), trackPlayer(tree), trackManager(trackPlayer, mainAudio)
 {
     // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
     setSize(getParentWidth(), getParentHeight());
@@ -65,8 +65,8 @@ void MainComponent::addTestTracks()
     {
         const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, countdownAudioFile);
         trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 0.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::PAN, 0.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::GAIN, -15.0f);
+        trackManager.setTrackProperty(trackIndex, AudioClipProperty::PAN, 0.0f);
+        trackManager.setTrackProperty(trackIndex, AudioClipProperty::GAIN, -15.0f);
     }
     else
         errorMsg(countdownAudioFile.getFullPathName());
@@ -84,8 +84,8 @@ void MainComponent::addTestTracks()
         trackIndex = trackManager.addTrack();
         const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, invertedMusicAudioFile);
         trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::PAN, 0.6f);
-        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::GAIN, -15.0f);
+        trackManager.setTrackProperty(trackIndex, AudioClipProperty::PAN, 0.6f);
+        trackManager.setTrackProperty(trackIndex, AudioClipProperty::GAIN, -15.0f);
     }
     else
         errorMsg(invertedMusicAudioFile.getFullPathName());
@@ -95,10 +95,10 @@ void MainComponent::addTestTracks()
         trackIndex = trackManager.addTrack();
         const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, mutedMusicAudioFile);
         trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 1.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::PAN, 0.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::GAIN, -15.0f);
-        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::MUTE, false);
-        trackManager.setPropertyForAllClipsInTrack(trackIndex, AudioClipProperty::SOLO, false);
+        trackManager.setTrackProperty(trackIndex, AudioClipProperty::PAN, 0.0f);
+        trackManager.setTrackProperty(trackIndex, AudioClipProperty::GAIN, -15.0f);
+        trackManager.setTrackProperty(trackIndex, AudioClipProperty::MUTE, false);
+        trackManager.setTrackProperty(trackIndex, AudioClipProperty::SOLO, false);
     }
     else
         errorMsg(mutedMusicAudioFile.getFullPathName());

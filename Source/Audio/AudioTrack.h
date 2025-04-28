@@ -33,6 +33,8 @@ public:
     void setProperty(AudioClipProperty property, bool boolValue);
     void setProperty(AudioClipProperty property, float floatValue);
 
+    TrackProperties getProperties() const;
+
     std::vector<NodeID>& getAudioClips() { return audioClips; }
     const std::vector<NodeID>& getAudioClips() const { return audioClips; }
 
