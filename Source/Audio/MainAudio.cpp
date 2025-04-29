@@ -1,6 +1,6 @@
 #include "MainAudio.h"
 
-MainAudio::MainAudio(juce::ValueTree& valueTree) : tree(valueTree)
+MainAudio::MainAudio(juce::ValueTree& valueTree) : tree{valueTree}
 {
     audioProcessorGraphInit();
     processorPlayer.setProcessor(&graph);
@@ -87,10 +87,10 @@ void MainAudio::stop()
 {
     juce::ScopedLock sl(lock);
     transportIsPlaying = false;
-    seek(0);
+    setPlayheadPosition(0);
 }
 
-void MainAudio::seek(const int64_t positionSamples)
+void MainAudio::setPlayheadPosition(const int64_t positionSamples)
 {
     juce::ScopedLock sl(lock);
     if(transportIsPlaying)
@@ -159,11 +159,11 @@ void MainAudio::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifie
     }
     else if(property.toString() == "stopButtonClicked")
         stop();
-    else if(property.toString() == "seekAudio")
+    else if(property.toString() == "setPlayheadPosition")
     {
-        const double positionSeconds = tree["seekAudio"];
+        const double positionSeconds = tree["setPlayheadPosition"];
         const auto positionSamples = static_cast<int64_t>(positionSeconds * getSampleRate());
-        seek(positionSamples);
+        setPlayheadPosition(positionSamples);
     }
 }
 

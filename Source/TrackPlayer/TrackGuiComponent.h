@@ -13,7 +13,7 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    void valueTreePropertyChanged(juce::ValueTree&,
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
 
     void changeBoxWidth(uint16_t newBoxWidth);

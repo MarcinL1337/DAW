@@ -15,7 +15,7 @@ public:
     void play();
     void pause();
     void stop();
-    void seek(int64_t positionSamples);
+    void setPlayheadPosition(int64_t positionSamples);
     bool isPlaying() const { return transportIsPlaying; }
     juce::Optional<PositionInfo> getPosition() const override;
     bool isAnySoloed() const;
@@ -27,7 +27,8 @@ private:
     void audioProcessorGraphInit();
     void rebuildGraph();
 
-    void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property) override;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
 
     friend class AudioTrack;
 

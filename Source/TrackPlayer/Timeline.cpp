@@ -58,7 +58,8 @@ void Timeline::mouseUp(const juce::MouseEvent& event)
     if(isCurrentlyDraggingTimeBar)
     {
         isCurrentlyDraggingTimeBar = false;
-        tree.setProperty("seekAudio", timeBarTimeInSeconds, nullptr);
+        tree.setProperty("setPlayheadPosition", ValueTreeConstants::doNothing, nullptr);
+        tree.setProperty("setPlayheadPosition", timeBarTimeInSeconds, nullptr);
     }
 }
 

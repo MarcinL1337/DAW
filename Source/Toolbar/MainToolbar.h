@@ -14,7 +14,7 @@ private:
     void resized() override;
     void paint(juce::Graphics& g) override;
 
-    void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property) override;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
 
     void paintTimeBarValue(juce::Graphics& g);
     void initTimeBarValueLabel();

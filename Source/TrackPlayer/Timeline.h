@@ -16,7 +16,7 @@ public:
 
     void mouseDown(const juce::MouseEvent& event) override;
     void mouseDrag(const juce::MouseEvent& event) override;
-    void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property) override;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
     void mouseUp(const juce::MouseEvent& event) override;
 
     void changeBoxWidth(const uint16_t newBoxWidth) { currentTrackGuiBoxWidth = newBoxWidth; }

@@ -5,7 +5,7 @@ ToolbarFactory::ToolbarFactory(juce::ValueTree& valueTree) : tree(valueTree) {};
 void ToolbarFactory::getAllToolbarItemIds(juce::Array<int>& ids)
 {
     const juce::Array<int> toolbarButtons{
-        separatorBarId, spacerId, flexibleSpacerId, previous, next, replay, playPause, stopRecording, startRecording};
+        separatorBarId, spacerId, flexibleSpacerId, previous, next, replay, playPause, stop, startRecording};
     ids.addArray(toolbarButtons);
 }
 
@@ -21,7 +21,7 @@ void ToolbarFactory::getDefaultItemSet(juce::Array<int>& ids)
                                                  separatorBarId,
                                                  startRecording,
                                                  separatorBarId,
-                                                 stopRecording};
+                                                 stop};
     ids.addArray(toolbarDefaultButtons);
 }
 
@@ -49,10 +49,10 @@ juce::ToolbarItemComponent* ToolbarFactory::createItem(int itemId)
             startRecordingButton = createButtonFromImage(startRecording, "Start recording");
             startRecordingButton->addListener(this);
             return startRecordingButton;
-        case stopRecording:
-            stopRecordingButton = createButtonFromImage(stopRecording, "Stop recording");
-            stopRecordingButton->addListener(this);
-            return stopRecordingButton;
+        case stop:
+            stopButton = createButtonFromImage(stop, "Stop recording");
+            stopButton->addListener(this);
+            return stopButton;
         default:
             std::unreachable();
     }
@@ -86,7 +86,7 @@ juce::ToolbarButton* ToolbarFactory::createButtonFromImage(int itemId,
             png = BinaryData::recordButton_png;
             pngSize.emplace(BinaryData::recordButton_pngSize);
             break;
-        case stopRecording:
+        case stop:
             png = BinaryData::stopButton_png;
             pngSize.emplace(BinaryData::stopButton_pngSize);
             break;
@@ -144,7 +144,7 @@ void ToolbarFactory::buttonClicked(juce::Button* button)
     {
         startRecordingButtonClicked();
     }
-    if(button == stopRecordingButton)
+    if(button == stopButton)
     {
         stopButtonClicked();
     }

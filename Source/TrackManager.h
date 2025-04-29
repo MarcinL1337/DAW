@@ -31,7 +31,7 @@ public:
     void setTrackProperty(int trackIndex, AudioClipProperty property, float floatValue) const;
     TrackProperties getTrackProperties(int trackIndex) const;
 
-    void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property) override;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
 
 private:
     TrackPlayer& trackPlayer;

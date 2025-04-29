@@ -45,7 +45,7 @@ private:
         replay,
         playPause,
         startRecording,
-        stopRecording
+        stop
     };
 
     juce::ToolbarButton* previousButton{nullptr};
@@ -53,7 +53,7 @@ private:
     juce::ToolbarButton* playPauseButton{nullptr};
     juce::ToolbarButton* replayButton{nullptr};
     juce::ToolbarButton* startRecordingButton{nullptr};
-    juce::ToolbarButton* stopRecordingButton{nullptr};
+    juce::ToolbarButton* stopButton{nullptr};
 
     juce::ValueTree& tree;
 };
