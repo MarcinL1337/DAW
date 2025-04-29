@@ -99,3 +99,5 @@ void AudioTrack::setProperty(const AudioClipProperty property, const float float
         }
     }
 }
+
+TrackProperties AudioTrack::getProperties() const { return properties; }

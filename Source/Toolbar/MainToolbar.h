@@ -7,15 +7,14 @@ class MainToolbar final : public juce::Component,
                           public juce::ValueTree::Listener
 {
 public:
-    explicit MainToolbar(MainAudio& mainAudioRef, const juce::ValueTree& parentTree);
+    explicit MainToolbar(const juce::ValueTree& parentTree);
     ~MainToolbar() override = default;
 
 private:
     void resized() override;
     void paint(juce::Graphics& g) override;
 
-    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
-                                  const juce::Identifier& property) override;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
 
     void paintTimeBarValue(juce::Graphics& g);
     void initTimeBarValueLabel();

@@ -5,16 +5,16 @@ TrackGuiComponent::TrackGuiComponent(const juce::ValueTree& parentTree) : tree{p
 void TrackGuiComponent::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::forestgreen);
-    timeBarPosition =
-        timeBarTime == 0 ? TrackPlayerConstants::timeBarBoxSize / 2 : timeBarTime * currentTrackGuiBoxWidth;
+    timeBarPosition = timeBarTime * currentTrackGuiBoxWidth;
     g.drawLine(timeBarPosition, 0, timeBarPosition, getHeight());
 }
 
 void TrackGuiComponent::resized() {}
 
-void TrackGuiComponent::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
-                                                 const juce::Identifier& property)
+void TrackGuiComponent::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
 {
+    if(static_cast<int>(tree[property.toString()]) == ValueTreeConstants::doNothing)
+        return;
     if(property.toString() == "timeBarTime")
     {
         timeBarTime = tree["timeBarTime"];

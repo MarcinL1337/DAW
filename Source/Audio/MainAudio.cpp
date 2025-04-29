@@ -1,12 +1,14 @@
 #include "MainAudio.h"
 
-MainAudio::MainAudio()
+MainAudio::MainAudio(juce::ValueTree& valueTree) : tree{valueTree}
 {
     audioProcessorGraphInit();
     processorPlayer.setProcessor(&graph);
     audioDeviceManager.initialiseWithDefaultDevices(0, 2);
     audioDeviceManager.addAudioCallback(&processorPlayer);
     graph.setPlayHead(this);
+    tree.addListener(this);
+    startTimer(30);
 }
 
 void MainAudio::audioProcessorGraphInit()
@@ -21,6 +23,7 @@ MainAudio::~MainAudio()
 {
     audioDeviceManager.removeAudioCallback(&processorPlayer);
     graph.clear();
+    stopTimer();
 }
 
 NodeID MainAudio::addAudioClip(const juce::File& file)
@@ -84,13 +87,17 @@ void MainAudio::stop()
 {
     juce::ScopedLock sl(lock);
     transportIsPlaying = false;
-    currentPositionSamples = 0;
+    setPlayheadPosition(0);
 }
 
-void MainAudio::seek(const int64_t positionSamples)
+void MainAudio::setPlayheadPosition(const int64_t positionSamples)
 {
     juce::ScopedLock sl(lock);
+    if(transportIsPlaying)
+        return;
     currentPositionSamples = positionSamples;
+    const double positionInSeconds = static_cast<double>(currentPositionSamples) / getSampleRate();
+    tree.setProperty("timeBarTime", positionInSeconds, nullptr);
 }
 
 void MainAudio::rebuildGraph()
@@ -137,4 +144,34 @@ bool MainAudio::isAnySoloed() const
         graph.getNodes(),
         [&](const juce::AudioProcessorGraph::Node* node)
         { return node->nodeID == outputNodeID ? false : dynamic_cast<AudioClip*>(node->getProcessor())->isSoloed(); });
+}
+
+void MainAudio::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
+{
+    if(static_cast<int>(tree[property.toString()]) == ValueTreeConstants::doNothing)
+        return;
+    if(property.toString() == "playPauseButtonClicked")
+    {
+        if(transportIsPlaying)
+            pause();
+        else
+            play();
+    }
+    else if(property.toString() == "stopButtonClicked")
+        stop();
+    else if(property.toString() == "setPlayheadPosition")
+    {
+        const double positionSeconds = tree["setPlayheadPosition"];
+        const auto positionSamples = static_cast<int64_t>(positionSeconds * getSampleRate());
+        setPlayheadPosition(positionSamples);
+    }
+}
+
+void MainAudio::timerCallback()
+{
+    if(transportIsPlaying)
+    {
+        const double positionInSeconds = static_cast<double>(currentPositionSamples) / getSampleRate();
+        tree.setProperty("timeBarTime", positionInSeconds, nullptr);
+    }
 }

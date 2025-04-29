@@ -1,5 +1,7 @@
 #include "Menu.h"
 
+#include "../Constants.h"
+
 Menu::Menu(const juce::ValueTree& parentTree) : tree{parentTree}
 {
     menuBarComponent = std::make_unique<juce::MenuBarComponent>(this);
@@ -139,6 +141,7 @@ void Menu::openFileButtonClicked()
                                 auto selectedFileFullPath{chooser.getResult().getFullPathName()};
                                 if(selectedFileFullPath.isNotEmpty())
                                 {
+                                    tree.setProperty(newAudioFile, ValueTreeConstants::doNothing, nullptr);
                                     tree.setProperty(newAudioFile, selectedFileFullPath, nullptr);
                                 }
                             });

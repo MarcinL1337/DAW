@@ -13,7 +13,7 @@ class TrackPlayer final : public juce::Component,
                           public juce::ValueTree::Listener
 {
 public:
-    explicit TrackPlayer(const juce::ValueTree& parentTree);
+    explicit TrackPlayer(juce::ValueTree& parentTree);
     TrackPlayer(const TrackPlayer&) = delete;
     TrackPlayer& operator=(const TrackPlayer&) = delete;
     ~TrackPlayer() override = default;
@@ -43,7 +43,7 @@ private:
     juce::Viewport timelineViewport{};
     juce::Viewport trackPlayerSideMenuViewport{};
 
-    juce::ValueTree tree;
+    juce::ValueTree& tree;
 
     int currentNumOfSeconds{TrackPlayerConstants::startNumOfBoxes};
     Timeline timeline;

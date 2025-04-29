@@ -1,7 +1,6 @@
 #include "MainToolbar.h"
 
-MainToolbar::MainToolbar(MainAudio& mainAudioRef, const juce::ValueTree& parentTree) :
-    tree{parentTree}, toolbarFactory(mainAudioRef)
+MainToolbar::MainToolbar(const juce::ValueTree& parentTree) : tree{parentTree}, toolbarFactory(tree)
 {
     addAndMakeVisible(toolbar);
     initTimeBarValueLabel();
@@ -27,7 +26,6 @@ void MainToolbar::paint(juce::Graphics& g)
 
 void MainToolbar::paintTimeBarValue(juce::Graphics& g)
 {
-    // TODO: at the application start the timeBarValueLabel shows 0.11s, change it so it shows 0.00s (how?)
     g.setColour(juce::Colours::whitesmoke);
     g.drawRect(timeBarValueArea, 2);
     oss.str("");
@@ -44,9 +42,10 @@ void MainToolbar::initTimeBarValueLabel()
     timeBarValueLabel.setJustificationType(juce::Justification::centred);
 }
 
-void MainToolbar::valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
-                                           const juce::Identifier& property)
+void MainToolbar::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
 {
+    if(static_cast<int>(tree[property.toString()]) == ValueTreeConstants::doNothing)
+        return;
     if(property.toString() == "timeBarTime")
     {
         timeBarValue = tree["timeBarTime"];

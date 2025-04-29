@@ -10,7 +10,7 @@ class ToolbarFactory final : public juce::ToolbarItemFactory,
 {
 public:
     ToolbarFactory() = delete;
-    explicit ToolbarFactory(MainAudio& mainAudioRef);
+    explicit ToolbarFactory(juce::ValueTree& valueTree);
     ~ToolbarFactory() override = default;
 
 private:
@@ -20,15 +20,13 @@ private:
     void buttonClicked(juce::Button* button) override;
 
     juce::ToolbarButton* createButtonFromImage(int itemId, const juce::String& shortDescription);
-    auto getCurrentTrackState() const { return currentTrackState; }
-    void setCurrentTrackState(auto newTrackState) { currentTrackState = newTrackState; }
     void temporaryButtonsFunction(juce::String buttonName);
     void previousButtonClicked();
     void nextButtonClicked();
     void replayButtonClicked();
-    void playPauseButtonClicked();
+    void playPauseButtonClicked() const;
     void startRecordingButtonClicked();
-    void stopRecordingButtonClicked();
+    void stopButtonClicked() const;
 
     enum SpecialItemIds
     {
@@ -47,24 +45,16 @@ private:
         replay,
         playPause,
         startRecording,
-        stopRecording
+        stop
     };
-
-    enum class TrackPlayingState
-    {
-        stopped = 0,
-        playing
-    };
-
-    TrackPlayingState currentTrackState{TrackPlayingState::stopped};
 
     juce::ToolbarButton* previousButton{nullptr};
     juce::ToolbarButton* nextButton{nullptr};
     juce::ToolbarButton* playPauseButton{nullptr};
     juce::ToolbarButton* replayButton{nullptr};
     juce::ToolbarButton* startRecordingButton{nullptr};
-    juce::ToolbarButton* stopRecordingButton{nullptr};
+    juce::ToolbarButton* stopButton{nullptr};
 
-    MainAudio& mainAudio;
+    juce::ValueTree& tree;
 };
 
