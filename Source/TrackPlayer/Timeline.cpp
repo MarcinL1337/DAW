@@ -50,6 +50,7 @@ void Timeline::mouseDown(const juce::MouseEvent& event)
     if(timeBar.getBounds().contains(lastMousePosition) and event.mods.isLeftButtonDown())
     {
         isCurrentlyDraggingTimeBar = true;
+        tree.setProperty("isCurrentlyDraggingTimeBar", true, nullptr);
     }
 }
 
@@ -57,9 +58,10 @@ void Timeline::mouseUp(const juce::MouseEvent& event)
 {
     if(isCurrentlyDraggingTimeBar)
     {
-        isCurrentlyDraggingTimeBar = false;
         tree.setProperty("setPlayheadPosition", ValueTreeConstants::doNothing, nullptr);
         tree.setProperty("setPlayheadPosition", timeBarTimeInSeconds, nullptr);
+        isCurrentlyDraggingTimeBar = false;
+        tree.setProperty("isCurrentlyDraggingTimeBar", false, nullptr);
     }
 }
 

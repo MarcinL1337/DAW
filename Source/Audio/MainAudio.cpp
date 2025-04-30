@@ -165,6 +165,20 @@ void MainAudio::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifie
         const auto positionSamples = static_cast<int64_t>(positionSeconds * getSampleRate());
         setPlayheadPosition(positionSamples);
     }
+    else if(property.toString() == "isCurrentlyDraggingTimeBar")
+    {
+        static bool wasPlaying = false;
+        if(isPlaying())
+        {
+            wasPlaying = true;
+            pause();
+        }
+        else if(wasPlaying)
+        {
+            wasPlaying = false;
+            play();
+        }
+    }
 }
 
 void MainAudio::timerCallback()
