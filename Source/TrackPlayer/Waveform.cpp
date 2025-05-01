@@ -51,6 +51,6 @@ void Waveform::changeBoxHeight(const uint16_t newBoxHeight) { currentTrackGuiBox
 void Waveform::setOffsetSeconds(const double newOffsetSeconds)
 {
     offsetSeconds = newOffsetSeconds;
-    // repaint();
+    repaint();
 }
 
