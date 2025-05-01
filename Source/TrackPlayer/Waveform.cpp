@@ -1,6 +1,6 @@
 #include "Waveform.h"
 
-Waveform::Waveform(const uint16_t boxWidth, const juce::ValueTree& parentTree) :
+Waveform::Waveform(const uint16_t boxWidth, juce::ValueTree& parentTree) :
     audioThumbnailCache(5),
     audioThumbnail(512, formatManager, audioThumbnailCache),
     tree{parentTree},
@@ -9,7 +9,7 @@ Waveform::Waveform(const uint16_t boxWidth, const juce::ValueTree& parentTree) :
     audioThumbnail.addChangeListener(this);
 }
 
-Waveform::Waveform(const juce::String& newAudioFilePath, const uint16_t boxWidth, const juce::ValueTree& parentTree) :
+Waveform::Waveform(const juce::String& newAudioFilePath, const uint16_t boxWidth, juce::ValueTree& parentTree) :
     Waveform(boxWidth, parentTree)
 {
     const juce::File newAudioFile(newAudioFilePath);

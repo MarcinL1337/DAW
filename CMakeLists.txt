@@ -60,6 +60,8 @@ set(SourceFiles
 
         Source/SideMenu/SideMenu.h
         Source/SideMenu/SideMenu.cpp
+        Source/SideMenu/ZoomSlider.h
+        Source/SideMenu/ZoomSlider.cpp
 
         Source/Audio/MainAudio.h
         Source/Audio/MainAudio.cpp

@@ -8,8 +8,8 @@ class Waveform final : public juce::Component,
                        public juce::ChangeListener
 {
 public:
-    explicit Waveform(uint16_t boxWidth, const juce::ValueTree& parentTree);
-    explicit Waveform(const juce::String& newAudioFilePath, uint16_t boxWidth, const juce::ValueTree& parentTree);
+    explicit Waveform(uint16_t boxWidth, juce::ValueTree& parentTree);
+    explicit Waveform(const juce::String& newAudioFilePath, uint16_t boxWidth, juce::ValueTree& parentTree);
     ~Waveform() override = default;
 
     void changeBoxWidth(uint16_t newBoxWidth);
@@ -20,14 +20,14 @@ private:
     void resized() override;
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
-    // TODO: when TrackManager will be ready, think if this is necessary here
+    // TODO: when TrackManager will be ready, think if formatReader and formatManager are necessary here
     juce::AudioBuffer<float> samplesBuffer{};
     juce::AudioFormatReader* formatReader{nullptr};  // change to unique_ptr -> for now it stays as is
     juce::AudioFormatManager formatManager;
     juce::AudioThumbnailCache audioThumbnailCache;
     juce::AudioThumbnail audioThumbnail;
 
-    juce::ValueTree tree;
+    juce::ValueTree& tree;
     juce::Identifier numOfSecondsChanged{"numOfSecondsChanged"};
 
     uint16_t currentTrackGuiBoxWidth;

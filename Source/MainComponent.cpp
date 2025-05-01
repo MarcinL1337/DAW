@@ -1,7 +1,7 @@
 #include "MainComponent.h"
 
 MainComponent::MainComponent() :
-    mainAudio(tree), topLevelMenu(tree), mainToolbar(tree), trackPlayer(tree), trackManager(trackPlayer, mainAudio)
+    mainAudio(tree), topLevelMenu(tree), mainToolbar(tree), trackPlayer(tree), trackManager(trackPlayer, mainAudio), sideMenu(tree)
 {
     // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
     setSize(getParentWidth(), getParentHeight());

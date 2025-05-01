@@ -1,6 +1,11 @@
 #include "SideMenu.h"
 
-SideMenu::SideMenu() { initSliders(); }
+SideMenu::SideMenu(const juce::ValueTree& parentTree) : tree{parentTree}
+{
+    initTrackPropertiesSliders();
+    addAndMakeVisible(zoomSlider);
+    zoomSlider.addListener(this);
+}
 
 void SideMenu::paint(juce::Graphics& g)
 {
@@ -8,9 +13,13 @@ void SideMenu::paint(juce::Graphics& g)
     g.drawRect(getLocalBounds());
 }
 
-void SideMenu::resized() { positionSliders(); }
+void SideMenu::resized()
+{
+    positionTrackPropertiesSliders();
+    positionZoomSlider();
+}
 
-void SideMenu::initSliders()
+void SideMenu::initTrackPropertiesSliders()
 {
     sliderSettings.push_back(SliderSettings{faderSlider, -15, 15, 0.0f, 1, " dB", faderLabel, "Fader"});
     sliderSettings.push_back(SliderSettings{delaySlider, -5000, 5000, 0.0f, 0, " Samples", delayLabel, "Delay"});
@@ -32,7 +41,7 @@ void SideMenu::initSliders()
     }
 }
 
-void SideMenu::positionSliders() const
+void SideMenu::positionTrackPropertiesSliders() const
 {
     auto currentY{50u};
     for(auto& sliderSetting: sliderSettings)
@@ -40,5 +49,18 @@ void SideMenu::positionSliders() const
         sliderSetting.slider.setSize(getWidth() * 0.95, sliderHeight);
         sliderSetting.slider.setCentrePosition(getWidth() * 0.5, currentY);
         currentY += paddingBetweenSliders;
+    }
+}
+
+void SideMenu::positionZoomSlider()
+{
+    zoomSlider.setBounds(0.05 * getWidth(), getHeight() - 1.5 * zoomSliderHeight, 0.9 * getWidth(), zoomSliderHeight);
+}
+
+void SideMenu::sliderValueChanged(juce::Slider* changedSlider)
+{
+    if(changedSlider == &zoomSlider)
+    {
+        tree.setProperty(trackPlayerZoomPercentage, changedSlider->getValue(), nullptr);
     }
 }
