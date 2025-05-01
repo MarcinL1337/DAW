@@ -10,7 +10,6 @@
 #include "TrackPlayerSideMenu.h"
 
 class TrackPlayer final : public juce::Component,
-                          public juce::KeyListener,
                           public juce::ValueTree::Listener
 {
 public:
@@ -38,9 +37,7 @@ private:
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
 
-    bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
-
-    void changeTrackGuiBoxWidthAndPropagate(uint16_t newBoxWidth);
+    void changeTrackGuiBoxWidthAndPropagate(const int newBoxWidthPercentage);
 
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
@@ -56,6 +53,7 @@ private:
     std::vector<std::unique_ptr<TrackGui>> trackGuiVector{};
 
     const int trackButtonsSize{30};
+    uint16_t baseTrackGuiBoxWidth{TrackPlayerConstants::startBoxWidth};
+    uint16_t currentTrackGuiBoxWidth{baseTrackGuiBoxWidth};
     uint16_t currentTrackGuiBoxHeight{TrackPlayerConstants::startBoxHeight};
-    uint16_t currentTrackGuiBoxWidth{TrackPlayerConstants::startBoxWidth};
 };

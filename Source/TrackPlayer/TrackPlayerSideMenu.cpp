@@ -49,8 +49,8 @@ void TrackPlayerSideMenu::drawTrackButtons()
         recordButton->onClick = [i]() { std::cout << "Recording[" << i + 1 << "]" << std::endl; };
 
         soloButton->setBounds(currentTrackButtonsArea.removeFromRight(trackButtonsSize)
-                                          .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
-                                          .reduced(buttonMargin));
+                                  .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
+                                  .reduced(buttonMargin));
         soloButton->onClick = [this, i, soloButtonPtr = soloButton.get()]()
         {
             tree.setProperty("soloButtonClicked", ValueTreeConstants::doNothing, nullptr);
@@ -59,8 +59,8 @@ void TrackPlayerSideMenu::drawTrackButtons()
             soloButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
         };
         muteButton->setBounds(currentTrackButtonsArea.removeFromRight(trackButtonsSize)
-                                          .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
-                                          .reduced(buttonMargin));
+                                  .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
+                                  .reduced(buttonMargin));
         muteButton->onClick = [this, i, muteButtonPtr = muteButton.get()]()
         {
             tree.setProperty("muteButtonClicked", ValueTreeConstants::doNothing, nullptr);

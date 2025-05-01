@@ -7,7 +7,6 @@ TrackPlayer::TrackPlayer(juce::ValueTree& parentTree) :
     trackPlayerSideMenu{parentTree},
     trackGuiComponent{parentTree}
 {
-    addKeyListener(this);
     setWantsKeyboardFocus(true);
     addAndMakeVisible(trackPlayerViewport);
     addAndMakeVisible(timelineViewport);
@@ -31,8 +30,10 @@ void TrackPlayer::resized()
     timeline.setSize(currentNumOfSeconds * currentTrackGuiBoxWidth,
                      TrackPlayerConstants::timelineHeightRatio * getHeight());
 
-    auto sideMenuHeight{std::max(getCurrentNumberOfTracks() * currentTrackGuiBoxHeight,
-                                 getHeight() - trackPlayerViewport.getScrollBarThickness())};  // getScrollBarThickness?
+    // TODO: magic constant -> to be changed
+    const auto sideMenuHeight{std::max(getCurrentNumberOfTracks() * currentTrackGuiBoxHeight,
+                                       getHeight() - trackPlayerViewport.getScrollBarThickness()) +
+                              105};
 
     trackGuiComponent.setSize(timeline.getWidth(), sideMenuHeight - timeline.getHeight());
 
@@ -50,19 +51,6 @@ void TrackPlayer::resized()
                                           timeline.getHeight(),
                                           trackPlayerSideMenu.getWidth(),
                                           getHeight() - trackPlayerViewport.getScrollBarThickness());
-}
-
-bool TrackPlayer::keyPressed(const juce::KeyPress& key, Component* originatingComponent)
-{
-    // Only for testing, will be deleted soon
-    if(key.getModifiers().isShiftDown() and key.getTextCharacter() == '(')
-    {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::uniform_int_distribution<> distrib(50, 200);
-        changeTrackGuiBoxWidthAndPropagate(distrib(gen));
-    }
-    return false;
 }
 
 void TrackPlayer::viewportsInit()
@@ -135,6 +123,11 @@ void TrackPlayer::valueTreePropertyChanged(juce::ValueTree&, const juce::Identif
             trackGui->repaint();
         }
     }
+    else if(property.toString() == "trackPlayerZoomPercentage")
+    {
+        int newZoomPercentage{tree["trackPlayerZoomPercentage"]};
+        changeTrackGuiBoxWidthAndPropagate(newZoomPercentage);
+    }
 }
 
 TrackGui* TrackPlayer::findFirstEmptyTrackGui() const
@@ -161,22 +154,23 @@ void TrackPlayer::addWaveformToTrackGui(const juce::String& newAudioFilePath, co
     }
 }
 
-void TrackPlayer::setOffsetOfWaveformInSeconds(const int trackIndex, NodeID audioClipID, double offsetSeconds)
+void TrackPlayer::setOffsetOfWaveformInSeconds(const int trackIndex, const NodeID audioClipID,
+                                               const double offsetSeconds)
 {
     assert(trackIndex >= 0 && trackIndex < getCurrentNumberOfTracks());
 
     trackGuiVector[trackIndex]->setOffsetOfWaveformInSeconds(audioClipID, offsetSeconds);
 }
 
-void TrackPlayer::changeTrackGuiBoxWidthAndPropagate(const uint16_t newBoxWidth)
+void TrackPlayer::changeTrackGuiBoxWidthAndPropagate(const int newBoxWidthPercentage)
 {
-    currentTrackGuiBoxWidth = newBoxWidth;
+    currentTrackGuiBoxWidth = baseTrackGuiBoxWidth * newBoxWidthPercentage / 100;
     resized();
-    timeline.changeBoxWidth(newBoxWidth);
-    trackGuiComponent.changeBoxWidth(newBoxWidth);
+    timeline.changeBoxWidth(currentTrackGuiBoxWidth);
+    trackGuiComponent.changeBoxWidth(currentTrackGuiBoxWidth);
     for(const auto& trackGui: trackGuiVector)
     {
         trackGui->setSize(trackGuiComponent.getWidth(), currentTrackGuiBoxHeight);
-        trackGui->changeBoxWidth(newBoxWidth);
+        trackGui->changeBoxWidth(currentTrackGuiBoxWidth);
     }
 }
