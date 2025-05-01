@@ -38,10 +38,11 @@ void Timeline::drawLineOnTimeline(juce::Graphics& g, const uint32_t lineNumber) 
 
 void Timeline::resized()
 {
-    timeBar.setBounds(timeBarXOffset,
-                      getHeight() - TrackPlayerConstants::timeBarBoxSize,
-                      TrackPlayerConstants::timeBarBoxSize,
-                      TrackPlayerConstants::timeBarBoxSize);
+    timeBar.setBounds(
+        (timeBarTimeInSeconds * getWidth() / currentNumOfSeconds) - (TrackPlayerConstants::timeBarBoxSize / 2.0f),
+        getHeight() - TrackPlayerConstants::timeBarBoxSize,
+        TrackPlayerConstants::timeBarBoxSize,
+        TrackPlayerConstants::timeBarBoxSize);
 }
 
 void Timeline::mouseDown(const juce::MouseEvent& event)
