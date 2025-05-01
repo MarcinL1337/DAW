@@ -89,8 +89,6 @@ void Timeline::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier
     if(property == timeBarTime && !isCurrentlyDraggingTimeBar)
     {
         timeBarTimeInSeconds = tree[timeBarTime];
-        timeBarXOffset =
-            (timeBarTimeInSeconds * getWidth() / currentNumOfSeconds) - (TrackPlayerConstants::timeBarBoxSize / 2.0f);
         resized();
     }
 }
