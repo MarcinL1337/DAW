@@ -29,7 +29,7 @@ private:
     MainToolbar mainToolbar;
     TrackPlayer trackPlayer;
     TrackManager trackManager;
-    SideMenu sideMenu{};
+    SideMenu sideMenu;
 
     juce::FlexBox topLevelFlexBox{};
     juce::FlexBox mainContentFlexBox{};

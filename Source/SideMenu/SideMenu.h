@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include "ZoomSlider.h"
 
 struct SliderSettings
 {
@@ -14,17 +15,21 @@ struct SliderSettings
     std::string labelText;
 };
 
-class SideMenu final : public juce::Component
+class SideMenu final : public juce::Component,
+                       public juce::Slider::Listener
 {
 public:
-    SideMenu();
+    explicit SideMenu(const juce::ValueTree& parentTree);
     ~SideMenu() override = default;
 
     void paint(juce::Graphics& g) override;
     void resized() override;
+    void sliderValueChanged(juce::Slider*) override;
 
-    void positionSliders() const;
-    void initSliders();
+    void positionTrackPropertiesSliders() const;
+    void initTrackPropertiesSliders();
+
+    void positionZoomSlider();
 
 private:
     juce::Slider faderSlider;
@@ -40,4 +45,10 @@ private:
 
     const uint8_t paddingBetweenSliders{100u};
     const uint8_t sliderHeight{40u};
+
+    ZoomSlider zoomSlider{};
+    const int zoomSliderHeight{60};
+
+    juce::ValueTree tree;
+    juce::Identifier trackPlayerZoomPercentage{"trackPlayerZoomPercentage"};
 };
