@@ -49,7 +49,8 @@ bool TrackManager::keyPressed(const juce::KeyPress& key, Component* originatingC
 {
     if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '+')
     {
-        addTrack();
+        std::cerr << "keyPressed trackIndex = " << addTrack() << std::endl;
+        // addTrack();
         return true;
     }
     if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '_')
@@ -89,6 +90,7 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const juce::var newAudioFilePath = tree["newAudioFile"];
 
         const auto index = addTrack();
+        std::cerr << "valueTreePropertyChanged trackIndex = " << index << std::endl;
         addAudioClipToTrack(index, juce::File(newAudioFilePath));
     }
     if(property.toString() == "soloButtonClicked")
