@@ -4,8 +4,6 @@
 TrackManager::TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef) :
     trackPlayer(trackPlayerRef), mainAudio(mainAudioRef), tree(trackPlayerRef.tree)
 {
-    juce::Timer::callAfterDelay(50, [&] { addTrack(); });
-
     // TODO: "W chuj mi się to nie podoba"~LilMarcin
     juce::Timer::callAfterDelay(200,
                                 [this]
@@ -51,7 +49,8 @@ bool TrackManager::keyPressed(const juce::KeyPress& key, Component* originatingC
 {
     if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '+')
     {
-        addTrack();
+        std::cerr << "keyPressed trackIndex = " << addTrack() << std::endl;
+        // addTrack();
         return true;
     }
     if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '_')
@@ -91,6 +90,7 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const juce::var newAudioFilePath = tree["newAudioFile"];
 
         const auto index = addTrack();
+        std::cerr << "valueTreePropertyChanged trackIndex = " << index << std::endl;
         addAudioClipToTrack(index, juce::File(newAudioFilePath));
     }
     if(property.toString() == "soloButtonClicked")
