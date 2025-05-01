@@ -1,13 +1,13 @@
 #include "AudioClip.h"
 #include "MainAudio.h"
 
-AudioClip::AudioClip(MainAudio& mainAudioRef) :
+AudioClip::AudioClip(MainAudio& mainAudioRef):
     AudioProcessor(BusesProperties()
                        .withInput("Input", juce::AudioChannelSet::stereo(), true)
                        .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
-    mainAudio(mainAudioRef),
-    resampler(nullptr),
-    readerSource(nullptr)
+    mainAudio{mainAudioRef},
+    resampler{nullptr},
+    readerSource{nullptr}
 {
     formatManager.registerBasicFormats();
 }
@@ -45,8 +45,11 @@ void AudioClip::prepareToPlay(const double sampleRate, const int samplesPerBlock
 
 bool AudioClip::processBlockChecker() const
 {
+    // TODO: isAnySoloed value should be in value tree, mainAudio ref should be out
     const bool muteAndSoloCheck = !mute && (!mainAudio.isAnySoloed() || solo);
     // TODO: what if someone deletes audio file?
+    // TODO: isPlaying value should be in value tree, mainAudio ref should be out
+    // alternative: isPlaying from audioPlayHead in processBlock?
     return isPrepared && mainAudio.isPlaying() && muteAndSoloCheck;
 }
 

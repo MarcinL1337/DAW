@@ -2,6 +2,7 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <cassert>
+#include "../Audio/MainAudio.h"
 #include "../Constants.h"
 #include "Timeline.h"
 #include "TrackGui.h"
@@ -25,11 +26,13 @@ private:
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    void makeNewTrackGui(const juce::String& newAudioFilePath = "");
+    void makeNewTrackGui(const juce::String& newAudioFilePath = "", const NodeID newAudioClipID = NodeID());
     void viewportsInit();
     void addTrack(const juce::String& newAudioFilePath = "");
     void removeTrack(int trackIndex);
-    void addWaveformToTrackGui(const juce::String& newAudioFilePath, int trackIndex = -1);
+    void addWaveformToTrackGui(const juce::String& newAudioFilePath, int trackIndex = -1,
+                               NodeID newAudioClipID = NodeID(1));
+    void setOffsetOfWaveformInSeconds(int trackIndex, NodeID audioClipID, double offsetSeconds);
     TrackGui* findFirstEmptyTrackGui() const;
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,

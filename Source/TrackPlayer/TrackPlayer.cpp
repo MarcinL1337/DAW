@@ -4,7 +4,7 @@
 
 TrackPlayer::TrackPlayer(juce::ValueTree& parentTree) :
     tree{parentTree}, timeline{currentNumOfSeconds, parentTree},
-    trackPlayerSideMenu(parentTree),
+    trackPlayerSideMenu{parentTree},
     trackGuiComponent{parentTree}
 {
     addKeyListener(this);
@@ -79,13 +79,13 @@ void TrackPlayer::viewportsInit()
     trackPlayerSideMenuViewport.setViewedComponent(&trackPlayerSideMenu, false);
 }
 
-void TrackPlayer::makeNewTrackGui(const juce::String& newAudioFilePath)
+void TrackPlayer::makeNewTrackGui(const juce::String& newAudioFilePath, NodeID newAudioClipID)
 {
     auto trackGui =
         newAudioFilePath.isEmpty()
             ? std::make_unique<TrackGui>(currentTrackGuiBoxWidth, currentNumOfSeconds, tree)
-            : std::make_unique<TrackGui>(currentTrackGuiBoxWidth, currentNumOfSeconds, tree, newAudioFilePath);
-
+                        : std::make_unique<TrackGui>(
+                              currentTrackGuiBoxWidth, currentNumOfSeconds, tree, newAudioFilePath, newAudioClipID);
     trackGui->setBounds(0,
                         getCurrentNumberOfTracks() * currentTrackGuiBoxHeight,
                         trackGuiComponent.getWidth(),
@@ -145,19 +145,27 @@ TrackGui* TrackPlayer::findFirstEmptyTrackGui() const
     return nullptr;
 }
 
-void TrackPlayer::addWaveformToTrackGui(const juce::String& newAudioFilePath, const int trackIndex)
+void TrackPlayer::addWaveformToTrackGui(const juce::String& newAudioFilePath, const int trackIndex,
+                                        const NodeID newAudioClipID)
 {
     if(trackIndex >= 0 && trackIndex < static_cast<int>(trackGuiVector.size()))
     {
-        trackGuiVector[trackIndex]->addNewAudioFile(newAudioFilePath);
+        trackGuiVector[trackIndex]->addNewAudioFile(newAudioFilePath, newAudioClipID);
     }
     else if(trackIndex == -1)
     {
         if(const auto maybeFreeTrackGui = findFirstEmptyTrackGui(); maybeFreeTrackGui != nullptr)
-            maybeFreeTrackGui->addNewAudioFile(newAudioFilePath);
+            maybeFreeTrackGui->addNewAudioFile(newAudioFilePath, newAudioClipID);
         else
             addTrack(newAudioFilePath);
     }
+}
+
+void TrackPlayer::setOffsetOfWaveformInSeconds(const int trackIndex, NodeID audioClipID, double offsetSeconds)
+{
+    assert(trackIndex >= 0 && trackIndex < getCurrentNumberOfTracks());
+
+    trackGuiVector[trackIndex]->setOffsetOfWaveformInSeconds(audioClipID, offsetSeconds);
 }
 
 void TrackPlayer::changeTrackGuiBoxWidthAndPropagate(const uint16_t newBoxWidth)
