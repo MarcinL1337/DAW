@@ -25,7 +25,7 @@ private:
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    void makeNewTrackGui(const juce::String& newAudioFilePath = "", const NodeID newAudioClipID = NodeID());
+    void makeNewTrackGui(const juce::String& newAudioFilePath = "", NodeID newAudioClipID = NodeID());
     void viewportsInit();
     void addTrack(const juce::String& newAudioFilePath = "");
     void removeTrack(int trackIndex);
