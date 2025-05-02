@@ -11,7 +11,6 @@ void TrackPlayerSideMenu::paint(juce::Graphics& g)
     {
         g.drawLine(0, i * currentTrackGuiBoxHeight, getWidth(), i * currentTrackGuiBoxHeight, 0.75);
     }
-    drawTrackText(g);
 }
 
 void TrackPlayerSideMenu::resized()
@@ -20,25 +19,12 @@ void TrackPlayerSideMenu::resized()
     buttonMargin = static_cast<uint16_t>(0.01 * getWidth());
 }
 
-void TrackPlayerSideMenu::drawTrackText(juce::Graphics& g) const
-{
-    for(auto i{0}; i < getCurrentNumberOfTracks(); i++)
-    {
-        juce::Rectangle<int> currentTrackTextArea{
-            0, i * currentTrackGuiBoxHeight, getWidth() / 2, currentTrackGuiBoxHeight};
-        g.drawFittedText("Track nr " + std::to_string(i + 1),
-                         currentTrackTextArea.removeFromRight(0.9 * currentTrackTextArea.getWidth()),
-                         juce::Justification::centredLeft,
-                         2);
-    }
-}
-
-void TrackPlayerSideMenu::changeCurrentTrackGuiBoxHeight(const int newBoxHeight)
+void TrackPlayerSideMenu::resizeAllTrackButtons(const int newBoxHeight)
 {
     currentTrackGuiBoxHeight = newBoxHeight;
 
     int currentRow{0};
-    for(auto& [recordButton, soloButton, muteButton]: trackButtonsVector)
+    for(auto& [recordButton, soloButton, muteButton, _]: trackControlsVector)
     {
         juce::Rectangle<int> currentTrackButtonsArea{
             getWidth() / 2, currentRow * currentTrackGuiBoxHeight, getWidth() / 2, currentTrackGuiBoxHeight};
@@ -61,26 +47,33 @@ void TrackPlayerSideMenu::changeCurrentTrackGuiBoxHeight(const int newBoxHeight)
 
 void TrackPlayerSideMenu::addTrackControls()
 {
+    const int currentRow{getCurrentNumberOfTracks()};
+    auto currentTrackButtonsArea = getCurrentTrackButtonsArea(currentRow);
+    auto currentTrackNameArea = getCurrentTrackNameArea(currentRow);
+
     auto recordButton = std::make_unique<juce::TextButton>("R");
     auto soloButton = std::make_unique<juce::TextButton>("S");
     auto muteButton = std::make_unique<juce::TextButton>("M");
+    auto trackNameLabel = std::make_unique<juce::Label>("", "Track nr " + std::to_string(currentRow + 1));
 
-    const int currentRow{getCurrentNumberOfTracks()};
-    juce::Rectangle<int> currentTrackButtonsArea{
-        getWidth() / 2, currentRow * currentTrackGuiBoxHeight, getWidth() / 2, currentTrackGuiBoxHeight};
+    setupRecordButton(recordButton, currentTrackButtonsArea, currentRow);
+    setupSoloButton(soloButton, currentTrackButtonsArea, currentRow);
+    setupMuteButton(muteButton, currentTrackButtonsArea, currentRow);
+    setupTrackNameLabel(trackNameLabel, currentTrackNameArea, currentRow);
 
-    initRecordButton(recordButton, currentTrackButtonsArea, currentRow);
-    initSoloButton(soloButton, currentTrackButtonsArea, currentRow);
-    initMuteButton(muteButton, currentTrackButtonsArea, currentRow);
+    trackControlsVector.push_back(
+        {std::move(recordButton), std::move(soloButton), std::move(muteButton), std::move(trackNameLabel)});
 
-    trackButtonsVector.push_back({std::move(recordButton), std::move(soloButton), std::move(muteButton)});
-    for(auto& button: trackButtonsVector.back()) { addAndMakeVisible(button.get()); }
+    addAndMakeVisible(trackControlsVector.back().recordButton.get());
+    addAndMakeVisible(trackControlsVector.back().soloButton.get());
+    addAndMakeVisible(trackControlsVector.back().muteButton.get());
+    addAndMakeVisible(trackControlsVector.back().trackNameLabel.get());
 
     incrementCurrentNumberOfTracks();
 }
 
-void TrackPlayerSideMenu::initRecordButton(const std::unique_ptr<juce::TextButton>& recordButton,
-                                           juce::Rectangle<int>& buttonArea, const uint16_t currentRow)
+void TrackPlayerSideMenu::setupRecordButton(const std::unique_ptr<juce::TextButton>& recordButton,
+                                            juce::Rectangle<int>& buttonArea, const uint16_t currentRow)
 {
     recordButton->setBounds(buttonArea.removeFromRight(trackButtonsSize)
                                 .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
@@ -88,8 +81,8 @@ void TrackPlayerSideMenu::initRecordButton(const std::unique_ptr<juce::TextButto
     recordButton->onClick = [this, currentRow]() { std::cout << "Recording[" << currentRow + 1 << "]" << std::endl; };
 }
 
-void TrackPlayerSideMenu::initSoloButton(const std::unique_ptr<juce::TextButton>& soloButton,
-                                         juce::Rectangle<int>& buttonArea, const uint16_t currentRow)
+void TrackPlayerSideMenu::setupSoloButton(const std::unique_ptr<juce::TextButton>& soloButton,
+                                          juce::Rectangle<int>& buttonArea, const uint16_t currentRow)
 {
     soloButton->setBounds(buttonArea.removeFromRight(trackButtonsSize)
                               .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
@@ -103,8 +96,8 @@ void TrackPlayerSideMenu::initSoloButton(const std::unique_ptr<juce::TextButton>
     };
 }
 
-void TrackPlayerSideMenu::initMuteButton(const std::unique_ptr<juce::TextButton>& muteButton,
-                                         juce::Rectangle<int>& buttonArea, const uint16_t currentRow)
+void TrackPlayerSideMenu::setupMuteButton(const std::unique_ptr<juce::TextButton>& muteButton,
+                                          juce::Rectangle<int>& buttonArea, const uint16_t currentRow)
 {
     muteButton->setBounds(buttonArea.removeFromRight(trackButtonsSize)
                               .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
@@ -118,9 +111,38 @@ void TrackPlayerSideMenu::initMuteButton(const std::unique_ptr<juce::TextButton>
     };
 }
 
-void TrackPlayerSideMenu::removeTrackControls(const int trackIndex)
+void TrackPlayerSideMenu::setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel,
+                                              juce::Rectangle<int>& trackNameArea, const uint16_t currentRow)
 {
-    trackButtonsVector.erase(trackButtonsVector.begin() + trackIndex);
+    trackNameLabel->setBounds(trackNameArea.removeFromRight(0.9 * trackNameArea.getWidth()));
+    trackNameLabel->setEditable(false, true, false);
+}
+
+juce::Rectangle<int> TrackPlayerSideMenu::getCurrentTrackButtonsArea(const uint16_t currentRow) const
+{
+    return juce::Rectangle<int>{
+        getWidth() / 2, currentRow * currentTrackGuiBoxHeight, getWidth() / 2, currentTrackGuiBoxHeight};
+}
+
+juce::Rectangle<int> TrackPlayerSideMenu::getCurrentTrackNameArea(const uint16_t currentRow) const
+{
+    return juce::Rectangle<int>{0, currentRow * currentTrackGuiBoxHeight, getWidth() / 2, currentTrackGuiBoxHeight};
+}
+
+void TrackPlayerSideMenu::removeTrackControls(int trackIndex)
+{
+    trackControlsVector.erase(trackControlsVector.begin() + trackIndex);
+    resizeAllTrackButtons(currentTrackGuiBoxHeight);
+    for(; trackIndex < trackControlsVector.size(); trackIndex++)
+    {
+        auto& [recordButton, soloButton, muteButton, trackNameLabel] = trackControlsVector[trackIndex];
+        auto currentTrackButtonsArea = getCurrentTrackButtonsArea(trackIndex);
+        auto currentTrackNameArea = getCurrentTrackNameArea(trackIndex);
+        setupRecordButton(recordButton, currentTrackButtonsArea, trackIndex);
+        setupSoloButton(soloButton, currentTrackButtonsArea, trackIndex);
+        setupMuteButton(muteButton, currentTrackButtonsArea, trackIndex);
+        setupTrackNameLabel(trackNameLabel, currentTrackNameArea, trackIndex);
+    }
     decrementCurrentNumberOfTracks();
 }
 

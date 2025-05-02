@@ -56,6 +56,7 @@ bool TrackManager::keyPressed(const juce::KeyPress& key, Component* originatingC
     {
         if(!tracks.empty())
             removeTrack(static_cast<int>(tracks.size() - 1));
+
         return true;
     }
     return false;
