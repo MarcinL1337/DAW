@@ -1,9 +1,11 @@
-#include "TrackPlayer.h"
+#include "TrackGuiManager.h"
 
-TrackPlayer::TrackPlayer(juce::ValueTree& parentTree) :
+#include <random>
+
+TrackGuiManager::TrackGuiManager(juce::ValueTree& parentTree) :
     tree{parentTree},
     timeline{currentNumOfSeconds, parentTree},
-    trackPlayerSideMenu(parentTree),
+    trackPlayerSideMenu{parentTree},
     trackGuiComponent{parentTree}
 {
     setWantsKeyboardFocus(true);
@@ -16,7 +18,7 @@ TrackPlayer::TrackPlayer(juce::ValueTree& parentTree) :
     trackPlayerSideMenu.setSize(TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getParentWidth(), 0);
 }
 
-void TrackPlayer::paint(juce::Graphics& g)
+void TrackGuiManager::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightgrey);
     g.drawRect(getLocalBounds());
@@ -25,7 +27,7 @@ void TrackPlayer::paint(juce::Graphics& g)
                                                 trackPlayerViewport.getViewPositionY());
 }
 
-void TrackPlayer::resized()
+void TrackGuiManager::resized()
 {
     timeline.setSize(currentNumOfSeconds * currentTrackGuiBoxWidth,
                      TrackPlayerConstants::timelineHeightRatio * getHeight());
@@ -52,7 +54,7 @@ void TrackPlayer::resized()
                                           getHeight() - trackPlayerViewport.getScrollBarThickness());
 }
 
-void TrackPlayer::viewportsInit()
+void TrackGuiManager::viewportsInit()
 {
     trackPlayerViewport.setScrollBarsShown(true, true);
     trackPlayerViewport.setViewedComponent(&trackGuiComponent, false);
@@ -66,12 +68,9 @@ void TrackPlayer::viewportsInit()
     trackPlayerSideMenuViewport.setViewedComponent(&trackPlayerSideMenu, false);
 }
 
-void TrackPlayer::makeNewTrackGui(const juce::String& newAudioFilePath)
+void TrackGuiManager::makeNewTrackGui()
 {
-    auto trackGui =
-        newAudioFilePath.isEmpty()
-            ? std::make_unique<TrackGui>(currentTrackGuiBoxWidth, currentNumOfSeconds, tree)
-            : std::make_unique<TrackGui>(currentTrackGuiBoxWidth, currentNumOfSeconds, tree, newAudioFilePath);
+    auto trackGui = std::make_unique<TrackGui>(currentTrackGuiBoxWidth, currentNumOfSeconds, tree);
 
     trackGui->setBounds(0,
                         getCurrentNumberOfTracks() * currentTrackGuiBoxHeight,
@@ -81,17 +80,16 @@ void TrackPlayer::makeNewTrackGui(const juce::String& newAudioFilePath)
     trackGuiComponent.addAndMakeVisible(trackGuiVector.back().get());
 }
 
-void TrackPlayer::addTrack(const juce::String& newAudioFilePath)
+void TrackGuiManager::addTrack()
 {
-    newAudioFilePath.isEmpty() ? makeNewTrackGui() : makeNewTrackGui(newAudioFilePath);
-
+    makeNewTrackGui();
     trackPlayerSideMenu.addTrackControls();
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
     resized();
     trackPlayerSideMenu.resized();
 }
 
-void TrackPlayer::removeTrack(const int trackIndex)
+void TrackGuiManager::removeTrack(const int trackIndex)
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(trackGuiVector.size()));
     trackGuiVector.erase(trackGuiVector.begin() + trackIndex);
@@ -106,7 +104,7 @@ void TrackPlayer::removeTrack(const int trackIndex)
     trackPlayerSideMenu.resized();
 }
 
-void TrackPlayer::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
+void TrackGuiManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
 {
     if(static_cast<int>(tree[property.toString()]) == ValueTreeConstants::doNothing)
         return;
@@ -129,30 +127,22 @@ void TrackPlayer::valueTreePropertyChanged(juce::ValueTree&, const juce::Identif
     }
 }
 
-TrackGui* TrackPlayer::findFirstEmptyTrackGui() const
+void TrackGuiManager::addWaveformToTrackGui(const juce::String& newAudioFilePath, const int trackIndex,
+                                            const NodeID newAudioClipID)
 {
-    for(auto& trackGui: trackGuiVector)
-        if(trackGui->hasNoAudioClips())
-            return trackGui.get();
-    return nullptr;
+    assert(trackIndex >= 0 && trackIndex < static_cast<int>(trackGuiVector.size()));
+    trackGuiVector[trackIndex]->addNewAudioFile(newAudioFilePath, newAudioClipID);
 }
 
-void TrackPlayer::addWaveformToTrackGui(const juce::String& newAudioFilePath, const int trackIndex)
+void TrackGuiManager::setOffsetOfWaveformInSeconds(const int trackIndex, const NodeID audioClipID,
+                                                   const double offsetSeconds)
 {
-    if(trackIndex >= 0 && trackIndex < static_cast<int>(trackGuiVector.size()))
-    {
-        trackGuiVector[trackIndex]->addNewAudioFile(newAudioFilePath);
-    }
-    else if(trackIndex == -1)
-    {
-        if(const auto maybeFreeTrackGui = findFirstEmptyTrackGui(); maybeFreeTrackGui != nullptr)
-            maybeFreeTrackGui->addNewAudioFile(newAudioFilePath);
-        else
-            addTrack(newAudioFilePath);
-    }
+    assert(trackIndex >= 0 && trackIndex < getCurrentNumberOfTracks());
+
+    trackGuiVector[trackIndex]->setOffsetOfWaveformInSeconds(audioClipID, offsetSeconds);
 }
 
-void TrackPlayer::changeTrackGuiBoxWidthAndPropagate(const int newBoxWidthPercentage)
+void TrackGuiManager::changeTrackGuiBoxWidthAndPropagate(const int newBoxWidthPercentage)
 {
     currentTrackGuiBoxWidth = baseTrackGuiBoxWidth * newBoxWidthPercentage / 100;
     resized();

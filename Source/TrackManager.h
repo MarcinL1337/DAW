@@ -6,14 +6,14 @@
 #include "Audio/AudioTrack.h"
 #include "Audio/MainAudio.h"
 #include "Constants.h"
-#include "TrackPlayer/TrackPlayer.h"
+#include "TrackPlayer/TrackGuiManager.h"
 
 class TrackManager final : public juce::Component,
                            public juce::KeyListener,
                            public juce::ValueTree::Listener
 {
 public:
-    TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef);
+    TrackManager(TrackGuiManager& trackPlayerRef, MainAudio& mainAudioRef);
     ~TrackManager() override = default;
 
     int addTrack();
@@ -34,7 +34,7 @@ public:
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
 
 private:
-    TrackPlayer& trackPlayer;
+    TrackGuiManager& trackPlayer;
     MainAudio& mainAudio;
     juce::ValueTree& tree;
     std::vector<std::unique_ptr<AudioTrack>> tracks;

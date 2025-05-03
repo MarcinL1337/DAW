@@ -9,7 +9,7 @@
 #include "TopMenu/Menu.h"
 #include "TrackManager.h"
 #include "TrackPlayer/Timeline.h"
-#include "TrackPlayer/TrackPlayer.h"
+#include "TrackPlayer/TrackGuiManager.h"
 
 class MainComponent final : public juce::Component
 {
@@ -27,7 +27,7 @@ private:
     MainAudio mainAudio;
     Menu topLevelMenu;
     MainToolbar mainToolbar;
-    TrackPlayer trackPlayer;
+    TrackGuiManager trackPlayer;
     TrackManager trackManager;
     SideMenu sideMenu;
 

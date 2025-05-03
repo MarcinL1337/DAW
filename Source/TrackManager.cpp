@@ -1,8 +1,8 @@
 #include "TrackManager.h"
 #include <algorithm>
 
-TrackManager::TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef) :
-    trackPlayer(trackPlayerRef), mainAudio(mainAudioRef), tree(trackPlayerRef.tree)
+TrackManager::TrackManager(TrackGuiManager& trackPlayerRef, MainAudio& mainAudioRef) :
+    trackPlayer{trackPlayerRef}, mainAudio{mainAudioRef}, tree{trackPlayerRef.tree}
 {
     // TODO: "W chuj mi się to nie podoba"~LilMarcin
     juce::Timer::callAfterDelay(200,
@@ -31,16 +31,19 @@ void TrackManager::removeTrack(const int trackIndex)
 NodeID TrackManager::addAudioClipToTrack(const int trackIndex, const juce::File& file) const
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
-    trackPlayer.addWaveformToTrackGui(file.getFullPathName(), trackIndex);
-    return tracks[trackIndex]->addAudioClip(file);
+    const NodeID newAudioClipID = tracks[trackIndex]->addAudioClip(file);
+    trackPlayer.addWaveformToTrackGui(file.getFullPathName(), trackIndex, newAudioClipID);
+    return newAudioClipID;
 }
 
+// TODO: I think waveform should send signal to change offset
 void TrackManager::setOffsetOfAudioClipInSeconds(const NodeID nodeID, const double offsetSeconds) const
 {
-    for(const auto& track: tracks)
-        if(const auto& clips = track->getAudioClips(); std::ranges::find(clips, nodeID) != clips.end())
+    for(int i = 0; i < static_cast<int>(tracks.size()); ++i)
+        if(const auto& clips = tracks[i]->getAudioClips(); std::ranges::find(clips, nodeID) != clips.end())
         {
-            track->setOffsetOfAudioClipInSeconds(nodeID, offsetSeconds);
+            tracks[i]->setOffsetOfAudioClipInSeconds(nodeID, offsetSeconds);
+            trackPlayer.setOffsetOfWaveformInSeconds(i, nodeID, offsetSeconds);
             return;
         }
 }
@@ -55,7 +58,7 @@ bool TrackManager::keyPressed(const juce::KeyPress& key, Component* originatingC
     if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '_')
     {
         if(!tracks.empty())
-            removeTrack(static_cast<int>(tracks.size() - 1));
+            removeTrack(0);
 
         return true;
     }

@@ -1,6 +1,6 @@
 #include "Timeline.h"
 
-#include "TrackPlayer.h"
+#include "TrackGuiManager.h"
 
 Timeline::Timeline(const int numOfSeconds, const juce::ValueTree& parentTree) :
     tree{parentTree}, currentNumOfSeconds{numOfSeconds}
@@ -38,6 +38,8 @@ void Timeline::drawLineOnTimeline(juce::Graphics& g, const uint32_t lineNumber) 
 
 void Timeline::resized()
 {
+    timeBarXOffset =
+        (timeBarTimeInSeconds * getWidth() / currentNumOfSeconds) - (TrackPlayerConstants::timeBarBoxSize / 2.0f);
     timeBar.setBounds(timeBarXOffset,
                       getHeight() - TrackPlayerConstants::timeBarBoxSize,
                       TrackPlayerConstants::timeBarBoxSize,
@@ -88,8 +90,6 @@ void Timeline::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier
     if(property == timeBarTime && !isCurrentlyDraggingTimeBar)
     {
         timeBarTimeInSeconds = tree[timeBarTime];
-        timeBarXOffset =
-            (timeBarTimeInSeconds * getWidth() / currentNumOfSeconds) - (TrackPlayerConstants::timeBarBoxSize / 2.0f);
         resized();
     }
 }
