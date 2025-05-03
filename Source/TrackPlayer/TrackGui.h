@@ -8,8 +8,7 @@ class TrackGui final : public juce::Component
 {
 public:
     explicit TrackGui(uint16_t boxWidth, int numOfSeconds, const juce::ValueTree& parentTree);
-    explicit TrackGui(uint16_t boxWidth, int numOfBoxes, const juce::ValueTree& parentTree,
-                      const juce::String& newAudioFilePath);
+
     TrackGui(const TrackGui&) = delete;
     TrackGui& operator=(const TrackGui&) = delete;
     ~TrackGui() override = default;
@@ -23,13 +22,14 @@ public:
     void changeNumOfSeconds(const int numOfSeconds) { currentNumOfSeconds = numOfSeconds; }
 
     bool hasNoAudioClips() const { return waveforms.empty(); }
-    void addNewAudioFile(const juce::String& newAudioFilePath);
+    void addNewAudioFile(const juce::String& newAudioFilePath, NodeID newAudioClipID);
+    void setOffsetOfWaveformInSeconds(NodeID audioClipID, double offsetSeconds) const;
 
 private:
     void paint(juce::Graphics& g) override;
     void resized() override;
 
-    void makeNewWaveformFromAudioFilePath(const juce::String& newAudioFilePath);
+    void makeNewWaveformFromAudioFilePath(const juce::String& newAudioFilePath, NodeID newAudioClipID);
 
     std::vector<std::unique_ptr<Waveform>> waveforms{};
     juce::ValueTree tree;
