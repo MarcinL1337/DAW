@@ -4,13 +4,6 @@ TrackGui::TrackGui(const uint16_t boxWidth, const int numOfSeconds, const juce::
     tree{parentTree}, currentNumOfSeconds{numOfSeconds}, currentBoxWidth{boxWidth}
 {}
 
-TrackGui::TrackGui(const uint16_t boxWidth, const int numOfBoxes, const juce::ValueTree& parentTree,
-                   const juce::String& newAudioFilePath, const NodeID newAudioClipID) :
-    TrackGui(boxWidth, numOfBoxes, parentTree)
-{
-    makeNewWaveformFromAudioFilePath(newAudioFilePath, newAudioClipID);
-}
-
 void TrackGui::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightgrey);

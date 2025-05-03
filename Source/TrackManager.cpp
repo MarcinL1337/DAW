@@ -1,7 +1,7 @@
 #include "TrackManager.h"
 #include <algorithm>
 
-TrackManager::TrackManager(TrackPlayer& trackPlayerRef, MainAudio& mainAudioRef) :
+TrackManager::TrackManager(TrackGuiManager& trackPlayerRef, MainAudio& mainAudioRef) :
     trackPlayer{trackPlayerRef}, mainAudio{mainAudioRef}, tree{trackPlayerRef.tree}
 {
     // TODO: "W chuj mi się to nie podoba"~LilMarcin

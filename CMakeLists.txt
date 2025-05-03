@@ -43,8 +43,8 @@ set(SourceFiles
         Source/Toolbar/MainToolbar.h
         Source/Toolbar/MainToolbar.cpp
 
-        Source/TrackPlayer/TrackPlayer.h
-        Source/TrackPlayer/TrackPlayer.cpp
+        Source/TrackPlayer/TrackGuiManager.h
+        Source/TrackPlayer/TrackGuiManager.cpp
         Source/TrackPlayer/Timeline.h
         Source/TrackPlayer/Timeline.cpp
         Source/TrackPlayer/trackGui.h

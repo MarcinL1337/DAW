@@ -8,8 +8,7 @@ class TrackGui final : public juce::Component
 {
 public:
     explicit TrackGui(uint16_t boxWidth, int numOfSeconds, const juce::ValueTree& parentTree);
-    explicit TrackGui(uint16_t boxWidth, int numOfBoxes, const juce::ValueTree& parentTree,
-                      const juce::String& newAudioFilePath, const NodeID newAudioClipID);
+
     TrackGui(const TrackGui&) = delete;
     TrackGui& operator=(const TrackGui&) = delete;
     ~TrackGui() override = default;
