@@ -3,7 +3,8 @@
 #include <random>
 
 TrackGuiManager::TrackGuiManager(juce::ValueTree& parentTree) :
-    tree{parentTree}, timeline{currentNumOfSeconds, parentTree},
+    tree{parentTree},
+    timeline{currentNumOfSeconds, parentTree},
     trackPlayerSideMenu{parentTree},
     trackGuiComponent{parentTree}
 {
@@ -14,6 +15,7 @@ TrackGuiManager::TrackGuiManager(juce::ValueTree& parentTree) :
     viewportsInit();
     tree.addListener(this);
     juce::Timer::callAfterDelay(100, [&] { grabKeyboardFocus(); });
+    trackPlayerSideMenu.setSize(TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getParentWidth(), 0);
 }
 
 void TrackGuiManager::paint(juce::Graphics& g)
@@ -37,8 +39,7 @@ void TrackGuiManager::resized()
 
     trackGuiComponent.setSize(timeline.getWidth(), sideMenuHeight - timeline.getHeight());
 
-    trackPlayerSideMenu.setBounds(
-        0, timeline.getHeight(), TrackPlayerConstants::trackPlayerSideMenuWidthRatio * getWidth(), sideMenuHeight);
+    trackPlayerSideMenu.setBounds(0, timeline.getHeight(), trackPlayerSideMenu.getWidth(), sideMenuHeight);
 
     trackPlayerViewport.setBounds(getLocalBounds()
                                       .removeFromRight(getWidth() - trackPlayerSideMenu.getWidth())
@@ -82,7 +83,7 @@ void TrackGuiManager::makeNewTrackGui()
 void TrackGuiManager::addTrack()
 {
     makeNewTrackGui();
-    trackPlayerSideMenu.incrementCurrentNumberOfTracks();
+    trackPlayerSideMenu.addTrackControls();
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
     resized();
     trackPlayerSideMenu.resized();
@@ -97,7 +98,7 @@ void TrackGuiManager::removeTrack(const int trackIndex)
         trackGuiVector[i]->setBounds(
             0, i * currentTrackGuiBoxHeight, trackGuiComponent.getWidth(), currentTrackGuiBoxHeight);
 
-    trackPlayerSideMenu.decrementCurrentNumberOfTracks();
+    trackPlayerSideMenu.removeTrackControls(trackIndex);
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
     resized();
     trackPlayerSideMenu.resized();
