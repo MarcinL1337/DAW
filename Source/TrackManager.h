@@ -36,7 +36,7 @@ public:
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
 
 private:
-    TrackGuiManager& trackPlayer;
+    TrackGuiManager& trackGuiManager;
     MainAudio& mainAudio;
     juce::ValueTree& tree;
     std::vector<std::unique_ptr<AudioTrack>> tracks;
