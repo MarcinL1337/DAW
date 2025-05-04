@@ -107,4 +107,11 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const bool muteValue = getTrackProperties(trackIndex).mute;
         setTrackProperty(trackIndex, AudioClipProperty::MUTE, !muteValue);
     }
+    if(property.toString() == "deleteTrackGui")
+    {
+        const int trackIndex = tree["deleteTrackGui"];
+        assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
+        std::cerr << "trackIndex = " << trackIndex << std::endl;
+        removeTrack(trackIndex);
+    }
 }

@@ -4,10 +4,12 @@
 #include "../Constants.h"
 #include "Waveform.h"
 
+class TrackGuiManager;
+
 class TrackGui final : public juce::Component
 {
 public:
-    explicit TrackGui(uint16_t boxWidth, int numOfSeconds, const juce::ValueTree& parentTree);
+    explicit TrackGui(uint16_t boxWidth, int numOfSeconds, juce::ValueTree& parentTree);
 
     TrackGui(const TrackGui&) = delete;
     TrackGui& operator=(const TrackGui&) = delete;
@@ -28,11 +30,25 @@ public:
 private:
     void paint(juce::Graphics& g) override;
     void resized() override;
+    void mouseDown(const juce::MouseEvent& event) override;
 
     void makeNewWaveformFromAudioFilePath(const juce::String& newAudioFilePath, NodeID newAudioClipID);
+    void showPopUpMenu();
+    void initPopUpMenu();
+    void deleteTrackFromGui() const;
+
+    enum popUpMenuOptions
+    {
+        noOptionChosen = 0,
+        deleteTrack,
+        deleteAudioClip,
+        duplicateTrack
+    };
 
     std::vector<std::unique_ptr<Waveform>> waveforms{};
-    juce::ValueTree tree;
+    juce::ValueTree& tree;
+    juce::Identifier deleteTrackGui{"deleteTrackGui"};
+    juce::PopupMenu menu;
 
     uint16_t currentBoxWidth;
     uint16_t currentBoxHeight{TrackPlayerConstants::startBoxHeight};
