@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
 #include <vector>
 #include "../Constants.h"
 #include "MainAudio.h"
@@ -37,6 +38,8 @@ public:
 
     std::vector<NodeID>& getAudioClips() { return audioClips; }
     const std::vector<NodeID>& getAudioClips() const { return audioClips; }
+
+    nlohmann::json toJson() const;
 
 private:
     std::vector<NodeID> audioClips;

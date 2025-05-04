@@ -28,6 +28,36 @@ void TrackManager::removeTrack(const int trackIndex)
     trackPlayer.removeTrack(trackIndex);
 }
 
+int TrackManager::duplicateTrack(const int trackIndex)
+{
+    assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
+    const nlohmann::json trackJson = tracks[trackIndex]->toJson();
+    return createTrackFromJson(trackJson);
+}
+
+int TrackManager::createTrackFromJson(const nlohmann::json& trackJson)
+{
+    const int newTrackIndex = addTrack();
+
+    for(const auto& clipJson: trackJson["audioClips"])
+        if(juce::File audioFile(clipJson["path"].get<std::string>()); audioFile.existsAsFile())
+        {
+            const NodeID clipId = addAudioClipToTrack(newTrackIndex, audioFile);
+            setOffsetOfAudioClipInSeconds(clipId, clipJson["offsetSeconds"]);
+        }
+
+    setTrackProperty(newTrackIndex, AudioClipProperty::GAIN, trackJson["properties"]["gain"].get<float>());
+    setTrackProperty(newTrackIndex, AudioClipProperty::PAN, trackJson["properties"]["pan"].get<float>());
+
+    const bool isMuted = trackJson["properties"]["mute"].get<bool>();
+    const bool isSoloed = trackJson["properties"]["solo"].get<bool>();
+    trackPlayer.setTrackButtonStates(newTrackIndex, isMuted, isSoloed);
+    setTrackProperty(newTrackIndex, AudioClipProperty::MUTE, isMuted);
+    setTrackProperty(newTrackIndex, AudioClipProperty::SOLO, isSoloed);
+
+    return newTrackIndex;
+}
+
 NodeID TrackManager::addAudioClipToTrack(const int trackIndex, const juce::File& file) const
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
@@ -59,6 +89,13 @@ bool TrackManager::keyPressed(const juce::KeyPress& key, Component* originatingC
     {
         if(!tracks.empty())
             removeTrack(0);
+
+        return true;
+    }
+    if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '{')
+    {
+        if(!tracks.empty())
+            duplicateTrack(0);
 
         return true;
     }

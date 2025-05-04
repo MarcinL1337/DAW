@@ -27,6 +27,14 @@ CPMAddPackage(
         GIT_TAG origin/master
 )
 
+CPMAddPackage(
+        NAME nlohmann_json
+        VERSION 3.11.3
+        GITHUB_REPOSITORY nlohmann/json
+        OPTIONS
+        "JSON_BuildTests OFF"
+)
+
 # Make sure you include any new source files here
 set(SourceFiles
         Source/Main.cpp
@@ -125,4 +133,5 @@ target_link_libraries(${PROJECT_NAME}
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags
+        nlohmann_json::nlohmann_json
 )

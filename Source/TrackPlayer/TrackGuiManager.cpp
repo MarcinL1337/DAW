@@ -89,6 +89,11 @@ void TrackGuiManager::addTrack()
     trackPlayerSideMenu.resized();
 }
 
+void TrackGuiManager::setTrackButtonStates(const int trackIndex, const bool muted, const bool soloed) const
+{
+    trackPlayerSideMenu.updateTrackButtonStates(trackIndex, muted, soloed);
+}
+
 void TrackGuiManager::removeTrack(const int trackIndex)
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(trackGuiVector.size()));

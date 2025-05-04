@@ -18,6 +18,8 @@ public:
 
     int addTrack();
     void removeTrack(int trackIndex);
+    int duplicateTrack(int trackIndex);
+    int createTrackFromJson(const nlohmann::json& trackJson);
     bool changeTrackOrder(int trackIndex, int newPosition);
 
     NodeID addAudioClipToTrack(int trackIndex, const juce::File& file) const;
