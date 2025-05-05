@@ -40,11 +40,13 @@ int TrackManager::createTrackFromJson(const nlohmann::json& trackJson)
     const int newTrackIndex = addTrack();
 
     for(const auto& clipJson: trackJson["audioClips"])
+    {
         if(juce::File audioFile(clipJson["path"].get<std::string>()); audioFile.existsAsFile())
         {
             const NodeID clipId = addAudioClipToTrack(newTrackIndex, audioFile);
             setOffsetOfAudioClipInSeconds(clipId, clipJson["offsetSeconds"]);
         }
+    }
 
     setTrackProperty(newTrackIndex, AudioClipProperty::GAIN, trackJson["properties"]["gain"].get<float>());
     setTrackProperty(newTrackIndex, AudioClipProperty::PAN, trackJson["properties"]["pan"].get<float>());

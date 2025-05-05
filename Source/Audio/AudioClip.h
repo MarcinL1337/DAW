@@ -11,7 +11,7 @@ public:
     ~AudioClip() override = default;
 
     bool loadFile(const juce::File& file);
-    juce::File getFile() const { return audioFile; }
+    juce::File& getFile() { return audioFile; }
 
     void setGain(const float gainDb) { gainProcessor.setGainDecibels(gainDb); }
     void setPan(const float pan) { panProcessor.setPan(juce::jlimit(-1.0f, 1.0f, pan)); }
