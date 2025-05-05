@@ -18,6 +18,8 @@ public:
 
     int addTrack();
     void removeTrack(int trackIndex);
+    int duplicateTrack(int trackIndex);
+    int createTrackFromJson(const nlohmann::json& trackJson);
     bool changeTrackOrder(int trackIndex, int newPosition);
 
     NodeID addAudioClipToTrack(int trackIndex, const juce::File& file) const;
@@ -34,7 +36,7 @@ public:
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
 
 private:
-    TrackGuiManager& trackPlayer;
+    TrackGuiManager& trackGuiManager;
     MainAudio& mainAudio;
     juce::ValueTree& tree;
     std::vector<std::unique_ptr<AudioTrack>> tracks;

@@ -23,6 +23,9 @@ public:
 
     void timerCallback() override;
 
+    juce::File getAudioClipPath(NodeID nodeID) const;
+    double getAudioClipOffsetInSeconds(NodeID nodeID) const;
+
 private:
     void audioProcessorGraphInit();
     void rebuildGraph();

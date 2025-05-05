@@ -101,3 +101,20 @@ void AudioTrack::setProperty(const AudioClipProperty property, const float float
 }
 
 TrackProperties AudioTrack::getProperties() const { return properties; }
+
+nlohmann::json AudioTrack::toJson() const
+{
+    nlohmann::json j;
+    j["properties"] = {
+        {"gain", properties.gain}, {"pan", properties.pan}, {"mute", properties.mute}, {"solo", properties.solo}};
+
+    j["audioClips"] = nlohmann::json::array();
+    for(const auto& clipId: audioClips)
+    {
+        auto clipPath = mainAudio.getAudioClipPath(clipId);
+        auto offset = mainAudio.getAudioClipOffsetInSeconds(clipId);
+
+        j["audioClips"].push_back({{"path", clipPath.getFullPathName().toStdString()}, {"offsetSeconds", offset}});
+    }
+    return j;
+}

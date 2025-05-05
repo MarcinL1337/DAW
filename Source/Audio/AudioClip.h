@@ -11,10 +11,12 @@ public:
     ~AudioClip() override = default;
 
     bool loadFile(const juce::File& file);
+    juce::File& getFile() { return audioFile; }
 
     void setGain(const float gainDb) { gainProcessor.setGainDecibels(gainDb); }
     void setPan(const float pan) { panProcessor.setPan(juce::jlimit(-1.0f, 1.0f, pan)); }
     void setOffset(const int64_t newOffsetSamples) { offsetSamples = newOffsetSamples; }
+    int64_t getOffset() const { return offsetSamples; }
     void setMute(const bool shouldMute) { mute = shouldMute; }
     void setSolo(const bool shouldSolo) { solo = shouldSolo; }
     bool isMuted() const { return mute; }
@@ -56,5 +58,6 @@ private:
     bool mute{false};
     bool solo{false};
 
+    juce::File audioFile;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioClip)
 };
