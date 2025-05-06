@@ -1,8 +1,8 @@
 #include "TrackManager.h"
 #include <algorithm>
 
-TrackManager::TrackManager(TrackGuiManager& trackPlayerRef, MainAudio& mainAudioRef) :
-    trackGuiManager{trackPlayerRef}, mainAudio{mainAudioRef}, tree{trackPlayerRef.tree}
+TrackManager::TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef) :
+    trackGuiManager{trackGuiManagerRef}, mainAudio{mainAudioRef}, tree{trackGuiManagerRef.tree}
 {
     // TODO: "W chuj mi się to nie podoba"~LilMarcin
     juce::Timer::callAfterDelay(200,
@@ -25,7 +25,7 @@ void TrackManager::removeTrack(const int trackIndex)
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
     tracks.erase(tracks.begin() + trackIndex);
-    trackGuiManager.removeTrack(trackIndex);
+    juce::Timer::callAfterDelay(1, [this, trackIndex]() { trackGuiManager.removeTrack(trackIndex); });
 }
 
 int TrackManager::duplicateTrack(const int trackIndex)
@@ -38,7 +38,6 @@ int TrackManager::duplicateTrack(const int trackIndex)
 int TrackManager::createTrackFromJson(const nlohmann::json& trackJson)
 {
     const int newTrackIndex = addTrack();
-
     for(const auto& clipJson: trackJson["audioClips"])
     {
         if(juce::File audioFile(clipJson["path"].get<std::string>()); audioFile.existsAsFile())
@@ -145,5 +144,17 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const int trackIndex = tree["muteButtonClicked"];
         const bool muteValue = getTrackProperties(trackIndex).mute;
         setTrackProperty(trackIndex, AudioClipProperty::MUTE, !muteValue);
+    }
+    if(property.toString() == "deleteTrackGui")
+    {
+        const int trackIndex = tree["deleteTrackGui"];
+        assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
+        removeTrack(trackIndex);
+    }
+    if(property.toString() == "duplicateTrackGui")
+    {
+        const int trackIndex = tree["duplicateTrackGui"];
+        assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
+        duplicateTrack(trackIndex);
     }
 }

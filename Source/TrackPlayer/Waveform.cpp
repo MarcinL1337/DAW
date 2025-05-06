@@ -8,6 +8,7 @@ Waveform::Waveform(const uint16_t boxWidth, juce::ValueTree& parentTree, const N
     audioClipID{newAudioClipID}
 {
     audioThumbnail.addChangeListener(this);
+    setInterceptsMouseClicks(false, false);
 }
 
 Waveform::Waveform(const juce::String& newAudioFilePath, const uint16_t boxWidth, juce::ValueTree& parentTree,

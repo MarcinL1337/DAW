@@ -127,20 +127,20 @@ void TrackGuiManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Ide
     }
     else if(property.toString() == "trackPlayerZoomPercentage")
     {
-        int newZoomPercentage{tree["trackPlayerZoomPercentage"]};
+        const int newZoomPercentage{tree["trackPlayerZoomPercentage"]};
         changeTrackGuiBoxWidthAndPropagate(newZoomPercentage);
     }
 }
 
 void TrackGuiManager::addWaveformToTrackGui(const juce::String& newAudioFilePath, const int trackIndex,
-                                            const NodeID newAudioClipID)
+                                            const NodeID newAudioClipID) const
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(trackGuiVector.size()));
     trackGuiVector[trackIndex]->addNewAudioFile(newAudioFilePath, newAudioClipID);
 }
 
 void TrackGuiManager::setOffsetOfWaveformInSeconds(const int trackIndex, const NodeID audioClipID,
-                                                   const double offsetSeconds)
+                                                   const double offsetSeconds) const
 {
     assert(trackIndex >= 0 && trackIndex < getCurrentNumberOfTracks());
 

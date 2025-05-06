@@ -11,19 +11,19 @@ public:
     explicit Timeline(int numOfSeconds, const juce::ValueTree& parentTree);
     ~Timeline() override = default;
 
-    void paint(juce::Graphics& g) override;
-    void resized() override;
-
-    void mouseDown(const juce::MouseEvent& event) override;
-    void mouseDrag(const juce::MouseEvent& event) override;
-    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
-    void mouseUp(const juce::MouseEvent& event) override;
-
     void changeBoxWidth(const uint16_t newBoxWidth) { currentTrackGuiBoxWidth = newBoxWidth; }
     void changeNumOfSeconds(const int newNumOfSeconds) { currentNumOfSeconds = newNumOfSeconds; }
 
 private:
+    void paint(juce::Graphics& g) override;
+    void resized() override;
     void drawLineOnTimeline(juce::Graphics& g, uint32_t lineNumber) const;
+
+    void mouseDown(const juce::MouseEvent& event) override;
+    void mouseDrag(const juce::MouseEvent& event) override;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
+    void mouseUp(const juce::MouseEvent& event) override;
 
     juce::ValueTree tree;
     juce::Identifier timeBarTime{"timeBarTime"};

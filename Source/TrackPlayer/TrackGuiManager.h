@@ -22,6 +22,8 @@ public:
 
 private:
     friend class TrackManager;
+    friend class TrackGui;
+
     void paint(juce::Graphics& g) override;
     void resized() override;
 
@@ -30,8 +32,8 @@ private:
     void addTrack();
     void setTrackButtonStates(int trackIndex, bool muted, bool soloed) const;
     void removeTrack(int trackIndex);
-    void addWaveformToTrackGui(const juce::String& newAudioFilePath, int trackIndex, NodeID newAudioClipID);
-    void setOffsetOfWaveformInSeconds(int trackIndex, NodeID audioClipID, double offsetSeconds);
+    void addWaveformToTrackGui(const juce::String& newAudioFilePath, int trackIndex, NodeID newAudioClipID) const;
+    void setOffsetOfWaveformInSeconds(int trackIndex, NodeID audioClipID, double offsetSeconds) const;
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;

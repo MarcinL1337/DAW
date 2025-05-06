@@ -1,8 +1,12 @@
 #include "TrackGui.h"
+#include "TrackGuiManager.h"
 
-TrackGui::TrackGui(const uint16_t boxWidth, const int numOfSeconds, const juce::ValueTree& parentTree) :
-    tree{parentTree}, currentNumOfSeconds{numOfSeconds}, currentBoxWidth{boxWidth}
-{}
+TrackGui::TrackGui(const uint16_t boxWidth, const int numOfSeconds, juce::ValueTree& parentTree) :
+    tree{parentTree}, currentBoxWidth{boxWidth}, currentNumOfSeconds{numOfSeconds}
+{
+    initPopUpMenuForTrack();
+    initPopUpMenuForClip();
+}
 
 void TrackGui::paint(juce::Graphics& g)
 {
@@ -33,6 +37,79 @@ void TrackGui::addNewAudioFile(const juce::String& newAudioFilePath, const NodeI
     makeNewWaveformFromAudioFilePath(newAudioFilePath, newAudioClipID);
 }
 
+void TrackGui::mouseDown(const juce::MouseEvent& event)
+{
+    if(event.mods.isRightButtonDown() and reallyContains(event.mouseDownPosition, true))
+    {
+        for(auto& waveform: waveforms)
+        {
+            if(waveform->getBoundsInParent().contains(event.mouseDownPosition.x, event.mouseDownPosition.y))
+            {
+                showPopUpMenuForClip();
+                return;
+            }
+        }
+        showPopUpMenuForTrack();
+    }
+}
+
+void TrackGui::initPopUpMenuForTrack()
+{
+    trackMenu.addItem(deleteTrack, "Delete track");
+    trackMenu.addItem(duplicateTrack, "Duplicate the track");
+    trackMenu.addItem(4, "Do an epic dab");
+}
+
+void TrackGui::showPopUpMenuForTrack()
+{
+    trackMenu.showMenuAsync(juce::PopupMenu::Options(),
+                            [this](const int option)
+                            {
+                                switch(option)
+                                {
+                                    case noOptionChosen:
+                                        break;
+                                    case deleteTrack:
+                                        deleteTrackFromGui();
+                                        break;
+                                    case duplicateTrack:
+                                        duplicateTrackFromGui();
+                                        break;
+                                    case 4:
+                                        std::cerr << "epic dab done" << std::endl;
+                                        break;
+                                    default:
+                                        std::unreachable();
+                                }
+                            });
+}
+
+void TrackGui::initPopUpMenuForClip()
+{
+    clipMenu.addItem(deleteAudioClip, "Delete audio clip");
+    clipMenu.addItem(4, "Do an epic yeet");
+}
+
+void TrackGui::showPopUpMenuForClip()
+{
+    clipMenu.showMenuAsync(juce::PopupMenu::Options(),
+                           [this](const int option)
+                           {
+                               switch(option)
+                               {
+                                   case noOptionChosen:
+                                       break;
+                                   case deleteAudioClip:
+                                       break;
+                                   case 4:
+                                       std::cerr << "epic yeet done" << std::endl;
+                                       break;
+                                   default:
+                                       std::unreachable();
+                               }
+                           });
+}
+
 void TrackGui::setOffsetOfWaveformInSeconds(const NodeID audioClipID, const double offsetSeconds) const
 {
     for(const auto& waveform: waveforms)
@@ -53,4 +130,34 @@ void TrackGui::changeBoxHeight(const uint16_t newBoxHeight)
 {
     currentBoxHeight = newBoxHeight;
     for(const auto& waveform: waveforms) { waveform->changeBoxHeight(newBoxHeight); }
+}
+
+void TrackGui::deleteTrackFromGui() const
+{
+    const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
+    auto index{0};
+    for(auto& trackGui: trackPlayer->trackGuiVector)
+    {
+        if(this == trackGui.get())
+        {
+            tree.setProperty(deleteTrackGui, index, nullptr);
+            tree.setProperty(deleteTrackGui, ValueTreeConstants::doNothing, nullptr);
+        }
+        index++;
+    }
+}
+
+void TrackGui::duplicateTrackFromGui() const
+{
+    const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
+    auto index{0};
+    for(auto& trackGui: trackPlayer->trackGuiVector)
+    {
+        if(this == trackGui.get())
+        {
+            tree.setProperty(duplicateTrackGui, index, nullptr);
+            tree.setProperty(duplicateTrackGui, ValueTreeConstants::doNothing, nullptr);
+        }
+        index++;
+    }
 }
