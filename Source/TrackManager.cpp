@@ -86,20 +86,6 @@ bool TrackManager::keyPressed(const juce::KeyPress& key, Component* originatingC
         addTrack();
         return true;
     }
-    if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '_')
-    {
-        if(!tracks.empty())
-            removeTrack(0);
-
-        return true;
-    }
-    if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '{')
-    {
-        if(!tracks.empty())
-            duplicateTrack(0);
-
-        return true;
-    }
     return false;
 }
 
