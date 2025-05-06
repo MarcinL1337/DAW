@@ -35,7 +35,6 @@ private:
     juce::AudioThumbnail audioThumbnail;
 
     juce::ValueTree& tree;
-    juce::Identifier numOfSecondsChanged{"numOfSecondsChanged"};
 
     uint16_t currentTrackGuiBoxWidth;
     uint16_t currentTrackGuiBoxHeight{};

@@ -27,7 +27,6 @@ private:
     std::unique_ptr<juce::MenuBarComponent> menuBarComponent;
     juce::ApplicationCommandManager commandManager;
     juce::ValueTree tree;
-    juce::Identifier newAudioFile{"newAudioFile"};
 
     std::string fileChooserDialogText{"Choose an audio file to open"};
     juce::File fileChooserStartDirectory{juce::File::getSpecialLocation(juce::File::userMusicDirectory)};

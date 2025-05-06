@@ -31,7 +31,7 @@ void Waveform::paint(juce::Graphics& g)
     const auto waveformLengthInPixels{audioThumbnail.getTotalLength() * currentTrackGuiBoxWidth};
     if(waveformLengthInPixels > getWidth())
     {
-        tree.setProperty(numOfSecondsChanged, std::ceil(audioThumbnail.getTotalLength()), nullptr);
+        tree.setProperty(ValueTreeIDs::numOfSecondsChanged, std::ceil(audioThumbnail.getTotalLength()), nullptr);
     }
     setSize(std::ceil(waveformLengthInPixels), getHeight());
     g.setColour(juce::Colours::violet);

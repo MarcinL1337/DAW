@@ -1,4 +1,5 @@
 #pragma once
+#include <juce_gui_extra/juce_gui_extra.h>
 #include <cstdint>
 
 namespace TopLevelMenuConstants
@@ -33,3 +34,19 @@ namespace ValueTreeConstants
 {
 constexpr int doNothing{0x42abcdef};
 }  // namespace ValueTreeConstants
+
+namespace ValueTreeIDs
+{
+inline static const juce::Identifier timeBarTime{"timeBarTime"};
+inline static const juce::Identifier playPauseButtonClicked{"playPauseButtonClicked"};
+inline static const juce::Identifier stopButtonClicked{"stopButtonClicked"};
+inline static const juce::Identifier isCurrentlyDraggingTimeBar{"isCurrentlyDraggingTimeBar"};
+inline static const juce::Identifier setPlayheadPosition{"setPlayheadPosition"};
+
+inline static const juce::Identifier soloButtonClicked{"soloButtonClicked"};
+inline static const juce::Identifier muteButtonClicked{"muteButtonClicked"};
+inline static const juce::Identifier newAudioFile{"newAudioFile"};
+
+inline static const juce::Identifier trackPlayerZoomPercentage{"trackPlayerZoomPercentage"};
+inline static const juce::Identifier numOfSecondsChanged{"numOfSecondsChanged"};
+}  // namespace ValueTreeIDs

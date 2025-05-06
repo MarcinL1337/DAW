@@ -1,4 +1,5 @@
 #include "ToolbarFactory.h"
+#include "../Constants.h"
 
 ToolbarFactory::ToolbarFactory(juce::ValueTree& valueTree) : tree(valueTree) {};
 
@@ -155,12 +156,12 @@ void ToolbarFactory::nextButtonClicked() { temporaryButtonsFunction("nextButton"
 void ToolbarFactory::replayButtonClicked() { temporaryButtonsFunction("replayButton"); }
 void ToolbarFactory::playPauseButtonClicked() const
 {
-    tree.setProperty("playPauseButtonClicked", true, nullptr);
-    tree.setProperty("playPauseButtonClicked", ValueTreeConstants::doNothing, nullptr);
+    tree.setProperty(ValueTreeIDs::playPauseButtonClicked, true, nullptr);
+    tree.setProperty(ValueTreeIDs::playPauseButtonClicked, ValueTreeConstants::doNothing, nullptr);
 }
 void ToolbarFactory::startRecordingButtonClicked() { temporaryButtonsFunction("startRecordingButton"); }
 void ToolbarFactory::stopButtonClicked() const
 {
-    tree.setProperty("stopButtonClicked", true, nullptr);
-    tree.setProperty("stopButtonClicked", ValueTreeConstants::doNothing, nullptr);
+    tree.setProperty(ValueTreeIDs::stopButtonClicked, true, nullptr);
+    tree.setProperty(ValueTreeIDs::stopButtonClicked, ValueTreeConstants::doNothing, nullptr);
 }

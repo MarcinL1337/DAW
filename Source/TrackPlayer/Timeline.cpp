@@ -52,7 +52,7 @@ void Timeline::mouseDown(const juce::MouseEvent& event)
     if(timeBar.getBounds().contains(lastMousePosition) and event.mods.isLeftButtonDown())
     {
         isCurrentlyDraggingTimeBar = true;
-        tree.setProperty("isCurrentlyDraggingTimeBar", true, nullptr);
+        tree.setProperty(ValueTreeIDs::isCurrentlyDraggingTimeBar, true, nullptr);
     }
 }
 
@@ -60,10 +60,10 @@ void Timeline::mouseUp(const juce::MouseEvent& event)
 {
     if(isCurrentlyDraggingTimeBar)
     {
-        tree.setProperty("setPlayheadPosition", ValueTreeConstants::doNothing, nullptr);
-        tree.setProperty("setPlayheadPosition", timeBarTimeInSeconds, nullptr);
+        tree.setProperty(ValueTreeIDs::setPlayheadPosition, ValueTreeConstants::doNothing, nullptr);
+        tree.setProperty(ValueTreeIDs::setPlayheadPosition, timeBarTimeInSeconds, nullptr);
         isCurrentlyDraggingTimeBar = false;
-        tree.setProperty("isCurrentlyDraggingTimeBar", false, nullptr);
+        tree.setProperty(ValueTreeIDs::isCurrentlyDraggingTimeBar, false, nullptr);
     }
 }
 
@@ -77,7 +77,7 @@ void Timeline::mouseDrag(const juce::MouseEvent& event)
                                       static_cast<float>(timeBarXOffset + event.getPosition().x - lastMousePosition.x));
         timeBarTimeInSeconds = (static_cast<float>(timeBarXOffset) + TrackPlayerConstants::timeBarBoxSize / 2.0f) /
                                getWidth() * currentNumOfSeconds;
-        tree.setProperty(timeBarTime, timeBarTimeInSeconds, nullptr);
+        tree.setProperty(ValueTreeIDs::timeBarTime, timeBarTimeInSeconds, nullptr);
         lastMousePosition = event.getPosition();
         resized();
     }
@@ -87,7 +87,7 @@ void Timeline::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier
 {
     if(static_cast<int>(tree[property]) == ValueTreeConstants::doNothing)
         return;
-    if(property == timeBarTime && !isCurrentlyDraggingTimeBar)
+    if(property == ValueTreeIDs::timeBarTime && !isCurrentlyDraggingTimeBar)
     {
         timeBarTimeInSeconds = tree[timeBarTime];
         resized();

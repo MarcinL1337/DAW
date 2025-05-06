@@ -89,8 +89,8 @@ void TrackPlayerSideMenu::setupSoloButton(const std::unique_ptr<juce::TextButton
                               .reduced(buttonMargin));
     soloButton->onClick = [this, currentRow, soloButtonPtr = soloButton.get()]()
     {
-        tree.setProperty("soloButtonClicked", ValueTreeConstants::doNothing, nullptr);
-        tree.setProperty("soloButtonClicked", currentRow, nullptr);
+        tree.setProperty(ValueTreeIDs::soloButtonClicked, ValueTreeConstants::doNothing, nullptr);
+        tree.setProperty(ValueTreeIDs::soloButtonClicked, currentRow, nullptr);
         const bool currentState = soloButtonPtr->getToggleState();
         soloButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
     };
@@ -104,8 +104,8 @@ void TrackPlayerSideMenu::setupMuteButton(const std::unique_ptr<juce::TextButton
                               .reduced(buttonMargin));
     muteButton->onClick = [this, currentRow, muteButtonPtr = muteButton.get()]()
     {
-        tree.setProperty("muteButtonClicked", ValueTreeConstants::doNothing, nullptr);
-        tree.setProperty("muteButtonClicked", currentRow, nullptr);
+        tree.setProperty(ValueTreeIDs::muteButtonClicked, ValueTreeConstants::doNothing, nullptr);
+        tree.setProperty(ValueTreeIDs::muteButtonClicked, currentRow, nullptr);
         const bool currentState = muteButtonPtr->getToggleState();
         muteButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
     };

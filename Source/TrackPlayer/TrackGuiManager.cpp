@@ -111,11 +111,11 @@ void TrackGuiManager::removeTrack(const int trackIndex)
 
 void TrackGuiManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
 {
-    if(static_cast<int>(tree[property.toString()]) == ValueTreeConstants::doNothing)
+    if(static_cast<int>(tree[property]) == ValueTreeConstants::doNothing)
         return;
-    if(property.toString() == "numOfSecondsChanged")
+    if(property == ValueTreeIDs::numOfSecondsChanged)
     {
-        currentNumOfSeconds = tree["numOfSecondsChanged"];
+        currentNumOfSeconds = tree[ValueTreeIDs::numOfSecondsChanged];
         timeline.changeNumOfSeconds(currentNumOfSeconds);
         resized();
         for(const auto& trackGui: trackGuiVector)
@@ -125,9 +125,9 @@ void TrackGuiManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Ide
             trackGui->repaint();
         }
     }
-    else if(property.toString() == "trackPlayerZoomPercentage")
+    else if(property == ValueTreeIDs::trackPlayerZoomPercentage)
     {
-        int newZoomPercentage{tree["trackPlayerZoomPercentage"]};
+        int newZoomPercentage{tree[ValueTreeIDs::trackPlayerZoomPercentage]};
         changeTrackGuiBoxWidthAndPropagate(newZoomPercentage);
     }
 }
