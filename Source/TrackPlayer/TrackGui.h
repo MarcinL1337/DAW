@@ -33,9 +33,12 @@ private:
     void mouseDown(const juce::MouseEvent& event) override;
 
     void makeNewWaveformFromAudioFilePath(const juce::String& newAudioFilePath, NodeID newAudioClipID);
-    void showPopUpMenu();
-    void initPopUpMenu();
+    void showPopUpMenuForTrack();
+    void initPopUpMenuForTrack();
+    void showPopUpMenuForClip();
+    void initPopUpMenuForClip();
     void deleteTrackFromGui() const;
+    void duplicateTrackFromGui() const;
 
     enum popUpMenuOptions
     {
@@ -48,7 +51,9 @@ private:
     std::vector<std::unique_ptr<Waveform>> waveforms{};
     juce::ValueTree& tree;
     juce::Identifier deleteTrackGui{"deleteTrackGui"};
-    juce::PopupMenu menu;
+    juce::Identifier duplicateTrackGui{"duplicateTrackGui"};
+    juce::PopupMenu trackMenu;
+    juce::PopupMenu clipMenu;
 
     uint16_t currentBoxWidth;
     uint16_t currentBoxHeight{TrackPlayerConstants::startBoxHeight};

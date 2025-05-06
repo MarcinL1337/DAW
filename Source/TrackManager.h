@@ -13,7 +13,7 @@ class TrackManager final : public juce::Component,
                            public juce::ValueTree::Listener
 {
 public:
-    TrackManager(TrackGuiManager& trackPlayerRef, MainAudio& mainAudioRef);
+    TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef);
     ~TrackManager() override = default;
 
     int addTrack();

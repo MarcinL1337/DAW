@@ -4,7 +4,8 @@
 TrackGui::TrackGui(const uint16_t boxWidth, const int numOfSeconds, juce::ValueTree& parentTree) :
     tree{parentTree}, currentBoxWidth{boxWidth}, currentNumOfSeconds{numOfSeconds}
 {
-    initPopUpMenu();
+    initPopUpMenuForTrack();
+    initPopUpMenuForClip();
 }
 
 void TrackGui::paint(juce::Graphics& g)
@@ -44,42 +45,69 @@ void TrackGui::mouseDown(const juce::MouseEvent& event)
         {
             if(waveform->getBoundsInParent().contains(event.mouseDownPosition.x, event.mouseDownPosition.y))
             {
-                // handle specific audio clip removal
+                showPopUpMenuForClip();
+                return;
             }
         }
-        showPopUpMenu();
+        showPopUpMenuForTrack();
     }
 }
 
-void TrackGui::initPopUpMenu()
+void TrackGui::initPopUpMenuForTrack()
 {
-    menu.addItem(deleteTrack, "Delete track");
-    menu.addItem(deleteAudioClip, "Delete audio clip");
-    menu.addItem(duplicateTrack, "Duplicate the track");
-    menu.addItem(3, "Do an epic dab");
+    trackMenu.addItem(deleteTrack, "Delete track");
+    trackMenu.addItem(duplicateTrack, "Duplicate the track");
+    trackMenu.addItem(4, "Do an epic dab");
 }
 
-void TrackGui::showPopUpMenu()
+void TrackGui::showPopUpMenuForTrack()
 {
-    menu.showMenuAsync(juce::PopupMenu::Options(),
-                       [this](const int option)
-                       {
-                           switch(option)
+    trackMenu.showMenuAsync(juce::PopupMenu::Options(),
+                            [this](const int option)
+                            {
+                                switch(option)
+                                {
+                                    case noOptionChosen:
+                                        break;
+                                    case deleteTrack:
+                                        deleteTrackFromGui();
+                                        break;
+                                    case duplicateTrack:
+                                        duplicateTrackFromGui();
+                                        break;
+                                    case 4:
+                                        std::cerr << "epic dab done" << std::endl;
+                                        break;
+                                    default:
+                                        std::unreachable();
+                                }
+                            });
+}
+
+void TrackGui::initPopUpMenuForClip()
+{
+    clipMenu.addItem(deleteAudioClip, "Delete audio clip");
+    clipMenu.addItem(4, "Do an epic yeet");
+}
+
+void TrackGui::showPopUpMenuForClip()
+{
+    clipMenu.showMenuAsync(juce::PopupMenu::Options(),
+                           [this](const int option)
                            {
-                               case noOptionChosen:
-                                   break;
-                               case deleteTrack:
-                                   deleteTrackFromGui();
-                                   break;
-                               case deleteAudioClip:
-                                   break;
-                               case 4:
-                                   std::cerr << "epic dab done" << std::endl;
-                                   break;
-                               default:
-                                   std::unreachable();
-                           }
-                       });
+                               switch(option)
+                               {
+                                   case noOptionChosen:
+                                       break;
+                                   case deleteAudioClip:
+                                       break;
+                                   case 4:
+                                       std::cerr << "epic yeet done" << std::endl;
+                                       break;
+                                   default:
+                                       std::unreachable();
+                               }
+                           });
 }
 
 void TrackGui::setOffsetOfWaveformInSeconds(const NodeID audioClipID, const double offsetSeconds) const
@@ -114,6 +142,21 @@ void TrackGui::deleteTrackFromGui() const
         {
             tree.setProperty(deleteTrackGui, index, nullptr);
             tree.setProperty(deleteTrackGui, ValueTreeConstants::doNothing, nullptr);
+        }
+        index++;
+    }
+}
+
+void TrackGui::duplicateTrackFromGui() const
+{
+    const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
+    auto index{0};
+    for(auto& trackGui: trackPlayer->trackGuiVector)
+    {
+        if(this == trackGui.get())
+        {
+            tree.setProperty(duplicateTrackGui, index, nullptr);
+            tree.setProperty(duplicateTrackGui, ValueTreeConstants::doNothing, nullptr);
         }
         index++;
     }
