@@ -145,15 +145,15 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const bool muteValue = getTrackProperties(trackIndex).mute;
         setTrackProperty(trackIndex, AudioClipProperty::MUTE, !muteValue);
     }
-    if(property.toString() == "deleteTrackGui")
+    if(property == ValueTreeIDs::deleteTrackGui)
     {
-        const int trackIndex = tree["deleteTrackGui"];
+        const int trackIndex = tree[ValueTreeIDs::deleteTrackGui];
         assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
         removeTrack(trackIndex);
     }
-    if(property.toString() == "duplicateTrackGui")
+    if(property == ValueTreeIDs::duplicateTrackGui)
     {
-        const int trackIndex = tree["duplicateTrackGui"];
+        const int trackIndex = tree[ValueTreeIDs::duplicateTrackGui];
         assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
         duplicateTrack(trackIndex);
     }

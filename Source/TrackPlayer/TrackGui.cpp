@@ -140,8 +140,8 @@ void TrackGui::deleteTrackFromGui() const
     {
         if(this == trackGui.get())
         {
-            tree.setProperty(deleteTrackGui, index, nullptr);
-            tree.setProperty(deleteTrackGui, ValueTreeConstants::doNothing, nullptr);
+            tree.setProperty(ValueTreeIDs::deleteTrackGui, index, nullptr);
+            tree.setProperty(ValueTreeIDs::deleteTrackGui, ValueTreeConstants::doNothing, nullptr);
         }
         index++;
     }
@@ -155,8 +155,8 @@ void TrackGui::duplicateTrackFromGui() const
     {
         if(this == trackGui.get())
         {
-            tree.setProperty(duplicateTrackGui, index, nullptr);
-            tree.setProperty(duplicateTrackGui, ValueTreeConstants::doNothing, nullptr);
+            tree.setProperty(ValueTreeIDs::duplicateTrackGui, index, nullptr);
+            tree.setProperty(ValueTreeIDs::duplicateTrackGui, ValueTreeConstants::doNothing, nullptr);
         }
         index++;
     }

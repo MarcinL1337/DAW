@@ -49,4 +49,7 @@ inline static const juce::Identifier newAudioFile{"newAudioFile"};
 
 inline static const juce::Identifier trackPlayerZoomPercentage{"trackPlayerZoomPercentage"};
 inline static const juce::Identifier numOfSecondsChanged{"numOfSecondsChanged"};
+
+inline static const juce::Identifier deleteTrackGui{"deleteTrackGui"};
+inline static const juce::Identifier duplicateTrackGui{"duplicateTrackGui"};
 }  // namespace ValueTreeIDs

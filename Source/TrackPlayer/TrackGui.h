@@ -50,8 +50,6 @@ private:
 
     std::vector<std::unique_ptr<Waveform>> waveforms{};
     juce::ValueTree& tree;
-    juce::Identifier deleteTrackGui{"deleteTrackGui"};
-    juce::Identifier duplicateTrackGui{"duplicateTrackGui"};
     juce::PopupMenu trackMenu;
     juce::PopupMenu clipMenu;
 
