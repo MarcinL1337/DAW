@@ -146,3 +146,9 @@ void TrackPlayerSideMenu::removeTrackControls(int trackIndex)
     decrementCurrentNumberOfTracks();
 }
 
+void TrackPlayerSideMenu::updateTrackButtonStates(const int trackIndex, const bool muted, const bool soloed) const
+{
+    assert(trackIndex >= 0 && trackIndex < trackControlsVector.size());
+    trackControlsVector[trackIndex].muteButton->setToggleState(muted, juce::dontSendNotification);
+    trackControlsVector[trackIndex].soloButton->setToggleState(soloed, juce::dontSendNotification);
+}

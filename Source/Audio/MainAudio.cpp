@@ -189,3 +189,14 @@ void MainAudio::timerCallback()
         tree.setProperty("timeBarTime", positionInSeconds, nullptr);
     }
 }
+
+juce::File MainAudio::getAudioClipPath(const NodeID nodeID) const
+{
+    return dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->getFile();
+}
+
+double MainAudio::getAudioClipOffsetInSeconds(const NodeID nodeID) const
+{
+    const auto offsetSamples = dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->getOffset();
+    return static_cast<double>(offsetSamples) / getSampleRate();
+}

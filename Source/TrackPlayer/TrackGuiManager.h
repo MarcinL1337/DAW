@@ -30,6 +30,7 @@ private:
     void makeNewTrackGui();
     void viewportsInit();
     void addTrack();
+    void setTrackButtonStates(int trackIndex, bool muted, bool soloed) const;
     void removeTrack(int trackIndex);
     void addWaveformToTrackGui(const juce::String& newAudioFilePath, int trackIndex, NodeID newAudioClipID) const;
     void setOffsetOfWaveformInSeconds(int trackIndex, NodeID audioClipID, double offsetSeconds) const;

@@ -20,7 +20,8 @@ void AudioClip::releaseResources()
 
 bool AudioClip::loadFile(const juce::File& file)
 {
-    std::unique_ptr<juce::AudioFormatReader> temp_reader(formatManager.createReaderFor(file));
+    audioFile = file;
+    std::unique_ptr<juce::AudioFormatReader> temp_reader(formatManager.createReaderFor(audioFile));
     reader = std::move(temp_reader);
     return reader != nullptr;
 }

@@ -22,6 +22,7 @@ public:
 
     void removeTrackControls(int trackIndex);
     void addTrackControls();
+    void updateTrackButtonStates(int trackIndex, bool muted, bool soloed) const;
 
     uint16_t getCurrentNumberOfTracks() const { return currentNumberOfTracks; }
     void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }
