@@ -130,6 +130,15 @@ void TrackGuiManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Ide
         const int newZoomPercentage{tree[ValueTreeIDs::trackPlayerZoomPercentage]};
         changeTrackGuiBoxWidthAndPropagate(newZoomPercentage);
     }
+    else if(property == ValueTreeIDs::timeBarTime)
+    {
+        updatePlayheadFollowing();
+    }
+    else if(property == ValueTreeIDs::followModeChanged)
+    {
+        setFollowMode(
+            static_cast<PlayheadFollowConstants::Mode>(static_cast<int>(tree[ValueTreeIDs::followModeChanged])));
+    }
 }
 
 void TrackGuiManager::addWaveformToTrackGui(const juce::String& newAudioFilePath, const int trackIndex,
@@ -157,5 +166,39 @@ void TrackGuiManager::changeTrackGuiBoxWidthAndPropagate(const int newBoxWidthPe
     {
         trackGui->setSize(trackGuiComponent.getWidth(), currentTrackGuiBoxHeight);
         trackGui->changeBoxWidth(currentTrackGuiBoxWidth);
+    }
+}
+
+void TrackGuiManager::updatePlayheadFollowing()
+{
+    if(!tree.hasProperty(ValueTreeIDs::timeBarTime))
+        return;
+
+    if(tree.hasProperty(ValueTreeIDs::isCurrentlyDraggingTimeBar) &&
+       static_cast<bool>(tree[ValueTreeIDs::isCurrentlyDraggingTimeBar]))
+        return;
+
+    const auto timeBarValue = static_cast<float>(tree[ValueTreeIDs::timeBarTime]);
+    const auto timeBarPosition = timeBarValue * currentTrackGuiBoxWidth;
+    const auto viewportWidth = trackPlayerViewport.getViewWidth();
+    const auto viewportX = trackPlayerViewport.getViewPositionX();
+
+    switch(followMode)
+    {
+        case PlayheadFollowConstants::Mode::NoFollow:
+            break;
+
+        case PlayheadFollowConstants::Mode::SmoothFollow:
+            trackPlayerViewport.setViewPosition(static_cast<int>(timeBarPosition - viewportWidth / 2),
+                                                trackPlayerViewport.getViewPositionY());
+            break;
+
+        case PlayheadFollowConstants::Mode::JumpFollow:
+            if(timeBarPosition < viewportX || timeBarPosition > viewportX + viewportWidth - viewportWidth / 30)
+            {
+                trackPlayerViewport.setViewPosition(static_cast<int>(timeBarPosition),
+                                                    trackPlayerViewport.getViewPositionY());
+            }
+            break;
     }
 }

@@ -20,6 +20,9 @@ public:
 
     uint16_t getCurrentNumberOfTracks() const { return trackGuiVector.size(); }
 
+    void setFollowMode(const PlayheadFollowConstants::Mode mode) { followMode = mode; }
+    PlayheadFollowConstants::Mode getFollowMode() const { return followMode; }
+
 private:
     friend class TrackManager;
     friend class TrackGui;
@@ -40,6 +43,8 @@ private:
 
     void changeTrackGuiBoxWidthAndPropagate(const int newBoxWidthPercentage);
 
+    void updatePlayheadFollowing();
+
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
     juce::Viewport trackPlayerSideMenuViewport{};
@@ -57,4 +62,5 @@ private:
     uint16_t baseTrackGuiBoxWidth{TrackPlayerConstants::startBoxWidth};
     uint16_t currentTrackGuiBoxWidth{baseTrackGuiBoxWidth};
     uint16_t currentTrackGuiBoxHeight{TrackPlayerConstants::startBoxHeight};
+    PlayheadFollowConstants::Mode followMode{PlayheadFollowConstants::Mode::NoFollow};
 };

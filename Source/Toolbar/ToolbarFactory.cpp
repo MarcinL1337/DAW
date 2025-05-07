@@ -1,32 +1,38 @@
 #include "ToolbarFactory.h"
 #include "../Constants.h"
 
-ToolbarFactory::ToolbarFactory(juce::ValueTree& valueTree) : tree(valueTree) {};
+ToolbarFactory::ToolbarFactory(juce::ValueTree& valueTree) : tree(valueTree)
+{
+    assert(!tree.hasProperty(ValueTreeIDs::followModeChanged));
+    tree.setProperty(
+        ValueTreeIDs::followModeChanged, static_cast<int>(PlayheadFollowConstants::Mode::NoFollow), nullptr);
+}
 
 void ToolbarFactory::getAllToolbarItemIds(juce::Array<int>& ids)
 {
-    const juce::Array<int> toolbarButtons{
-        separatorBarId, spacerId, flexibleSpacerId, previous, next, replay, playPause, stop, startRecording};
+    const juce::Array<int> toolbarButtons{separatorBarId,
+                                          spacerId,
+                                          flexibleSpacerId,
+                                          previous,
+                                          next,
+                                          replay,
+                                          playPause,
+                                          stop,
+                                          startRecording,
+                                          followMode};
     ids.addArray(toolbarButtons);
 }
 
 void ToolbarFactory::getDefaultItemSet(juce::Array<int>& ids)
 {
-    const juce::Array<int> toolbarDefaultButtons{previous,
-                                                 separatorBarId,
-                                                 next,
-                                                 separatorBarId,
-                                                 replay,
-                                                 separatorBarId,
-                                                 playPause,
-                                                 separatorBarId,
-                                                 startRecording,
-                                                 separatorBarId,
-                                                 stop};
+    const juce::Array<int> toolbarDefaultButtons{
+        previous,       separatorBarId, next,           separatorBarId, replay,           separatorBarId, playPause,
+        separatorBarId, startRecording, separatorBarId, stop,           flexibleSpacerId, followMode,     spacerId,
+        spacerId,       spacerId,       spacerId,       spacerId,       spacerId,         spacerId};
     ids.addArray(toolbarDefaultButtons);
 }
 
-juce::ToolbarItemComponent* ToolbarFactory::createItem(int itemId)
+juce::ToolbarItemComponent* ToolbarFactory::createItem(const int itemId)
 {
     switch(itemId)
     {
@@ -51,9 +57,13 @@ juce::ToolbarItemComponent* ToolbarFactory::createItem(int itemId)
             startRecordingButton->addListener(this);
             return startRecordingButton;
         case stop:
-            stopButton = createButtonFromImage(stop, "Stop recording");
+            stopButton = createButtonFromImage(stop, "Stop");
             stopButton->addListener(this);
             return stopButton;
+        case followMode:
+            followModeButton = createButtonFromImage(itemId, "Follow mode");
+            followModeButton->addListener(this);
+            return followModeButton;
         default:
             std::unreachable();
     }
@@ -90,6 +100,10 @@ juce::ToolbarButton* ToolbarFactory::createButtonFromImage(int itemId,
         case stop:
             png = BinaryData::stopButton_png;
             pngSize.emplace(BinaryData::stopButton_pngSize);
+            break;
+        case followMode:
+            png = BinaryData::followModeButton_png;
+            pngSize.emplace(BinaryData::followModeButton_pngSize);
             break;
         default:
             std::unreachable();
@@ -149,6 +163,10 @@ void ToolbarFactory::buttonClicked(juce::Button* button)
     {
         stopButtonClicked();
     }
+    if(button == followModeButton)
+    {
+        followModeButtonClicked();
+    }
 }
 
 void ToolbarFactory::previousButtonClicked() { temporaryButtonsFunction("previousButton"); }
@@ -164,4 +182,24 @@ void ToolbarFactory::stopButtonClicked() const
 {
     tree.setProperty(ValueTreeIDs::stopButtonClicked, true, nullptr);
     tree.setProperty(ValueTreeIDs::stopButtonClicked, ValueTreeConstants::doNothing, nullptr);
+}
+
+void ToolbarFactory::followModeButtonClicked() const
+{
+    assert(tree.hasProperty(ValueTreeIDs::followModeChanged));
+    const int currentMode = tree[ValueTreeIDs::followModeChanged];
+
+    juce::PopupMenu menu;
+    menu.addItem(1, "No Follow", true, currentMode == 0);
+    menu.addItem(2, "Smooth Follow", true, currentMode == 1);
+    menu.addItem(3, "Jump Follow", true, currentMode == 2);
+
+    menu.showMenuAsync(juce::PopupMenu::Options().withTargetComponent(followModeButton),
+                       [this](const int result)
+                       {
+                           if(result > 0)
+                           {
+                               tree.setProperty(ValueTreeIDs::followModeChanged, result - 1, nullptr);
+                           }
+                       });
 }
