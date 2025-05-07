@@ -30,7 +30,13 @@ void Waveform::changeListenerCallback(juce::ChangeBroadcaster* source)
 
 void Waveform::paint(juce::Graphics& g)
 {
-    g.setColour(juce::Colours::violet);
+    g.setColour(juce::Colour(30, 30, 30).withAlpha(0.75f));
+    g.fillRect(getLocalBounds());
+
+    g.setColour(juce::Colours::white.withAlpha(0.3f));
+    g.drawRect(getLocalBounds());
+
+    g.setColour(juce::Colour(10, 190, 150).withAlpha(0.9f));
     audioThumbnail.drawChannel(g, getLocalBounds(), 0.0, audioThumbnail.getTotalLength(), 0, 1.0f);
 }
 
