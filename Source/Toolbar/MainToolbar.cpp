@@ -44,11 +44,11 @@ void MainToolbar::initTimeBarValueLabel()
 
 void MainToolbar::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
 {
-    if(static_cast<int>(tree[property.toString()]) == ValueTreeConstants::doNothing)
+    if(static_cast<int>(tree[property]) == ValueTreeConstants::doNothing)
         return;
-    if(property.toString() == "timeBarTime")
+    if(property == ValueTreeIDs::timeBarTime)
     {
-        timeBarValue = tree["timeBarTime"];
+        timeBarValue = tree[ValueTreeIDs::timeBarTime];
         repaint();
     }
 }

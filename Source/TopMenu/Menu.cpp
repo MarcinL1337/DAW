@@ -141,8 +141,9 @@ void Menu::openFileButtonClicked()
                                 auto selectedFileFullPath{chooser.getResult().getFullPathName()};
                                 if(selectedFileFullPath.isNotEmpty())
                                 {
-                                    tree.setProperty(newAudioFile, ValueTreeConstants::doNothing, nullptr);
-                                    tree.setProperty(newAudioFile, selectedFileFullPath, nullptr);
+                                    tree.setProperty(
+                                        ValueTreeIDs::newAudioFile, ValueTreeConstants::doNothing, nullptr);
+                                    tree.setProperty(ValueTreeIDs::newAudioFile, selectedFileFullPath, nullptr);
                                 }
                             });
 }

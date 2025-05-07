@@ -1,4 +1,5 @@
 #include "SideMenu.h"
+#include "../Constants.h"
 
 SideMenu::SideMenu(const juce::ValueTree& parentTree) : tree{parentTree}
 {
@@ -61,6 +62,6 @@ void SideMenu::sliderValueChanged(juce::Slider* changedSlider)
 {
     if(changedSlider == &zoomSlider)
     {
-        tree.setProperty(trackPlayerZoomPercentage, changedSlider->getValue(), nullptr);
+        tree.setProperty(ValueTreeIDs::trackPlayerZoomPercentage, changedSlider->getValue(), nullptr);
     }
 }

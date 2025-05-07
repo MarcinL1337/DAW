@@ -19,6 +19,7 @@ Waveform::Waveform(const juce::String& newAudioFilePath, const uint16_t boxWidth
     formatManager.registerBasicFormats();
     formatReader = formatManager.createReaderFor(newAudioFile);
     audioThumbnail.setSource(new juce::FileInputSource(newAudioFile));
+    setOffsetSeconds(0);
 }
 
 void Waveform::changeListenerCallback(juce::ChangeBroadcaster* source)
@@ -29,29 +30,40 @@ void Waveform::changeListenerCallback(juce::ChangeBroadcaster* source)
 
 void Waveform::paint(juce::Graphics& g)
 {
-    const auto waveformLengthInPixels{audioThumbnail.getTotalLength() * currentTrackGuiBoxWidth};
-    if(waveformLengthInPixels > getWidth())
-    {
-        tree.setProperty(numOfSecondsChanged, std::ceil(audioThumbnail.getTotalLength()), nullptr);
-    }
-    setSize(std::ceil(waveformLengthInPixels), getHeight());
-    g.setColour(juce::Colours::violet);
+    g.setColour(juce::Colour(30, 30, 30).withAlpha(0.75f));
+    g.fillRect(getLocalBounds());
 
-    const float offsetPixels = offsetSeconds * currentTrackGuiBoxWidth;
-    g.addTransform(juce::AffineTransform::translation(offsetPixels, 0));
+    g.setColour(juce::Colours::white.withAlpha(0.3f));
+    g.drawRect(getLocalBounds());
 
-    audioThumbnail.drawChannel(g, getBounds(), 0.0, audioThumbnail.getTotalLength(), 0, 1.0f);
+    g.setColour(juce::Colour(10, 190, 150).withAlpha(0.9f));
+    audioThumbnail.drawChannel(g, getLocalBounds(), 0.0, audioThumbnail.getTotalLength(), 0, 1.0f);
 }
 
-void Waveform::resized() {}
+void Waveform::resized()
+{
+    const float offsetPixels = offsetSeconds * currentTrackGuiBoxWidth;
+    const auto waveformLengthInPixels{audioThumbnail.getTotalLength() * currentTrackGuiBoxWidth};
+    setBounds(offsetPixels, 0, std::ceil(waveformLengthInPixels), getHeight());
+}
 
-void Waveform::changeBoxWidth(const uint16_t newBoxWidth) { currentTrackGuiBoxWidth = newBoxWidth; }
+void Waveform::changeBoxWidth(const uint16_t newBoxWidth)
+{
+    currentTrackGuiBoxWidth = newBoxWidth;
+    resized();
+}
 
 void Waveform::changeBoxHeight(const uint16_t newBoxHeight) { currentTrackGuiBoxHeight = newBoxHeight; }
 
 void Waveform::setOffsetSeconds(const double newOffsetSeconds)
 {
     offsetSeconds = newOffsetSeconds;
-    repaint();
+    const float offsetPixels = offsetSeconds * currentTrackGuiBoxWidth;
+    const auto waveformLengthInPixels{audioThumbnail.getTotalLength() * currentTrackGuiBoxWidth};
+    if(waveformLengthInPixels + offsetPixels > getWidth())
+    {
+        tree.setProperty(
+            ValueTreeIDs::numOfSecondsChanged, std::ceil(audioThumbnail.getTotalLength()) + offsetSeconds, nullptr);
+    }
 }
 

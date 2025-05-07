@@ -86,20 +86,6 @@ bool TrackManager::keyPressed(const juce::KeyPress& key, Component* originatingC
         addTrack();
         return true;
     }
-    if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '_')
-    {
-        if(!tracks.empty())
-            removeTrack(0);
-
-        return true;
-    }
-    if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '{')
-    {
-        if(!tracks.empty())
-            duplicateTrack(0);
-
-        return true;
-    }
     return false;
 }
 
@@ -124,36 +110,36 @@ TrackProperties TrackManager::getTrackProperties(const int trackIndex) const
 
 void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
 {
-    if(static_cast<int>(tree[property.toString()]) == ValueTreeConstants::doNothing)
+    if(static_cast<int>(tree[property]) == ValueTreeConstants::doNothing)
         return;
-    if(property.toString() == "newAudioFile")
+    if(property == ValueTreeIDs::newAudioFile)
     {
-        const juce::var newAudioFilePath = tree["newAudioFile"];
+        const juce::var newAudioFilePath = tree[ValueTreeIDs::newAudioFile];
 
         const auto index = addTrack();
         addAudioClipToTrack(index, juce::File(newAudioFilePath));
     }
-    if(property.toString() == "soloButtonClicked")
+    if(property == ValueTreeIDs::soloButtonClicked)
     {
-        const int trackIndex = tree["soloButtonClicked"];
+        const int trackIndex = tree[ValueTreeIDs::soloButtonClicked];
         const bool soloValue = getTrackProperties(trackIndex).solo;
         setTrackProperty(trackIndex, AudioClipProperty::SOLO, !soloValue);
     }
-    if(property.toString() == "muteButtonClicked")
+    if(property == ValueTreeIDs::muteButtonClicked)
     {
-        const int trackIndex = tree["muteButtonClicked"];
+        const int trackIndex = tree[ValueTreeIDs::muteButtonClicked];
         const bool muteValue = getTrackProperties(trackIndex).mute;
         setTrackProperty(trackIndex, AudioClipProperty::MUTE, !muteValue);
     }
-    if(property.toString() == "deleteTrackGui")
+    if(property == ValueTreeIDs::deleteTrackGui)
     {
-        const int trackIndex = tree["deleteTrackGui"];
+        const int trackIndex = tree[ValueTreeIDs::deleteTrackGui];
         assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
         removeTrack(trackIndex);
     }
-    if(property.toString() == "duplicateTrackGui")
+    if(property == ValueTreeIDs::duplicateTrackGui)
     {
-        const int trackIndex = tree["duplicateTrackGui"];
+        const int trackIndex = tree[ValueTreeIDs::duplicateTrackGui];
         assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
         duplicateTrack(trackIndex);
     }

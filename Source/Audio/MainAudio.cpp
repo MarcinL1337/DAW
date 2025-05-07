@@ -148,24 +148,24 @@ bool MainAudio::isAnySoloed() const
 
 void MainAudio::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
 {
-    if(static_cast<int>(tree[property.toString()]) == ValueTreeConstants::doNothing)
+    if(static_cast<int>(tree[property]) == ValueTreeConstants::doNothing)
         return;
-    if(property.toString() == "playPauseButtonClicked")
+    if(property == ValueTreeIDs::playPauseButtonClicked)
     {
         if(transportIsPlaying)
             pause();
         else
             play();
     }
-    else if(property.toString() == "stopButtonClicked")
+    else if(property == ValueTreeIDs::stopButtonClicked)
         stop();
-    else if(property.toString() == "setPlayheadPosition")
+    else if(property == ValueTreeIDs::setPlayheadPosition)
     {
-        const double positionSeconds = tree["setPlayheadPosition"];
+        const double positionSeconds = tree[ValueTreeIDs::setPlayheadPosition];
         const auto positionSamples = static_cast<int64_t>(positionSeconds * getSampleRate());
         setPlayheadPosition(positionSamples);
     }
-    else if(property.toString() == "isCurrentlyDraggingTimeBar")
+    else if(property == ValueTreeIDs::isCurrentlyDraggingTimeBar)
     {
         static bool wasPlaying = false;
         if(isPlaying())
@@ -186,7 +186,7 @@ void MainAudio::timerCallback()
     if(transportIsPlaying)
     {
         const double positionInSeconds = static_cast<double>(currentPositionSamples) / getSampleRate();
-        tree.setProperty("timeBarTime", positionInSeconds, nullptr);
+        tree.setProperty(ValueTreeIDs::timeBarTime, positionInSeconds, nullptr);
     }
 }
 

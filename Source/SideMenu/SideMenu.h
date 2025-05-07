@@ -50,5 +50,4 @@ private:
     const int zoomSliderHeight{60};
 
     juce::ValueTree tree;
-    juce::Identifier trackPlayerZoomPercentage{"trackPlayerZoomPercentage"};
 };
