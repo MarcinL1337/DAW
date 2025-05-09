@@ -14,6 +14,8 @@ public:
     ~ToolbarFactory() override = default;
 
 private:
+    void initPlayheadFollowMode() const;
+
     void getAllToolbarItemIds(juce::Array<int>& ids) override;
     void getDefaultItemSet(juce::Array<int>& ids) override;
     juce::ToolbarItemComponent* createItem(int itemId) override;
@@ -27,6 +29,7 @@ private:
     void playPauseButtonClicked() const;
     void startRecordingButtonClicked();
     void stopButtonClicked() const;
+    void followModeButtonClicked() const;
 
     enum SpecialItemIds
     {
@@ -45,7 +48,8 @@ private:
         replay,
         playPause,
         startRecording,
-        stop
+        stop,
+        followMode
     };
 
     juce::ToolbarButton* previousButton{nullptr};
@@ -54,6 +58,7 @@ private:
     juce::ToolbarButton* replayButton{nullptr};
     juce::ToolbarButton* startRecordingButton{nullptr};
     juce::ToolbarButton* stopButton{nullptr};
+    juce::ToolbarButton* followModeButton{nullptr};
 
     juce::ValueTree& tree;
 };
