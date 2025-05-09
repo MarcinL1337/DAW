@@ -2,12 +2,14 @@
 #include "../Constants.h"
 
 ToolbarFactory::ToolbarFactory(juce::ValueTree& valueTree) : tree(valueTree)
+{ initPlayheadFollowMode(); }
+
+void ToolbarFactory::initPlayheadFollowMode() const
 {
     assert(!tree.hasProperty(ValueTreeIDs::followModeChanged));
     tree.setProperty(
         ValueTreeIDs::followModeChanged, static_cast<int>(PlayheadFollowConstants::Mode::NoFollow), nullptr);
 }
-
 void ToolbarFactory::getAllToolbarItemIds(juce::Array<int>& ids)
 {
     const juce::Array<int> toolbarButtons{separatorBarId,
@@ -25,10 +27,22 @@ void ToolbarFactory::getAllToolbarItemIds(juce::Array<int>& ids)
 
 void ToolbarFactory::getDefaultItemSet(juce::Array<int>& ids)
 {
-    const juce::Array<int> toolbarDefaultButtons{
-        previous,       separatorBarId, next,           separatorBarId, replay,           separatorBarId, playPause,
-        separatorBarId, startRecording, separatorBarId, stop,           flexibleSpacerId, followMode,     spacerId,
-        spacerId,       spacerId,       spacerId,       spacerId,       spacerId,         spacerId};
+// TODO: Delete this shit and fix toolbar length
+#define REPEAT7(x) x, x, x, x, x, x, x
+    const juce::Array<int> toolbarDefaultButtons{previous,
+                                                 separatorBarId,
+                                                 next,
+                                                 separatorBarId,
+                                                 replay,
+                                                 separatorBarId,
+                                                 playPause,
+                                                 separatorBarId,
+                                                 startRecording,
+                                                 separatorBarId,
+                                                 stop,
+                                                 flexibleSpacerId,
+                                                 followMode,
+                                                 REPEAT7(spacerId)};
     ids.addArray(toolbarDefaultButtons);
 }
 
@@ -190,16 +204,17 @@ void ToolbarFactory::followModeButtonClicked() const
     const int currentMode = tree[ValueTreeIDs::followModeChanged];
 
     juce::PopupMenu menu;
-    menu.addItem(1, "No Follow", true, currentMode == 0);
-    menu.addItem(2, "Smooth Follow", true, currentMode == 1);
-    menu.addItem(3, "Jump Follow", true, currentMode == 2);
+    menu.addItem(1, "No Follow", true, currentMode == static_cast<int>(PlayheadFollowConstants::Mode::NoFollow));
+    menu.addItem(
+        2, "Smooth Follow", true, currentMode == static_cast<int>(PlayheadFollowConstants::Mode::SmoothFollow));
+    menu.addItem(3, "Jump Follow", true, currentMode == static_cast<int>(PlayheadFollowConstants::Mode::JumpFollow));
 
     menu.showMenuAsync(juce::PopupMenu::Options().withTargetComponent(followModeButton),
                        [this](const int result)
                        {
                            if(result > 0)
                            {
-                               tree.setProperty(ValueTreeIDs::followModeChanged, result - 1, nullptr);
+                               tree.setProperty(ValueTreeIDs::followModeChanged, result, nullptr);
                            }
                        });
 }

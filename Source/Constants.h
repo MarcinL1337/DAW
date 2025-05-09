@@ -59,7 +59,7 @@ namespace PlayheadFollowConstants
 {
 enum class Mode
 {
-    NoFollow,
+    NoFollow = 1,
     SmoothFollow,
     JumpFollow
 };

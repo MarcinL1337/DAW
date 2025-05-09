@@ -194,11 +194,16 @@ void TrackGuiManager::updatePlayheadFollowing()
             break;
 
         case PlayheadFollowConstants::Mode::JumpFollow:
+            // viewportWidth / 30 defines a margin near the right edge of the viewport.
+            // This ensures the playhead triggers a viewport scroll slightly before it actually leaves the visible area,
+            // providing a smoother user experience and preventing the playhead from sticking to the very edge.
             if(timeBarPosition < viewportX || timeBarPosition > viewportX + viewportWidth - viewportWidth / 30)
             {
                 trackPlayerViewport.setViewPosition(static_cast<int>(timeBarPosition),
                                                     trackPlayerViewport.getViewPositionY());
             }
             break;
+        default:
+            std::unreachable;
     }
 }

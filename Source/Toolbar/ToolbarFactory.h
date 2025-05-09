@@ -14,6 +14,8 @@ public:
     ~ToolbarFactory() override = default;
 
 private:
+    void initPlayheadFollowMode() const;
+
     void getAllToolbarItemIds(juce::Array<int>& ids) override;
     void getDefaultItemSet(juce::Array<int>& ids) override;
     juce::ToolbarItemComponent* createItem(int itemId) override;
