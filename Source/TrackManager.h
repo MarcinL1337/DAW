@@ -6,6 +6,7 @@
 #include "Audio/AudioTrack.h"
 #include "Audio/MainAudio.h"
 #include "Constants.h"
+#include "SideMenu/SideMenu.h"
 #include "TrackPlayer/TrackGuiManager.h"
 
 class TrackManager final : public juce::Component,
@@ -13,19 +14,19 @@ class TrackManager final : public juce::Component,
                            public juce::ValueTree::Listener
 {
 public:
-    TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef);
+    TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef, SideMenu& sideMenuRef);
     ~TrackManager() override = default;
 
     int addTrack();
     void removeTrack(int trackIndex);
     int duplicateTrack(int trackIndex);
     int createTrackFromJson(const nlohmann::json& trackJson);
-    bool changeTrackOrder(int trackIndex, int newPosition);
+    bool changeTrackOrder(int trackIndex, int newPosition);  // to be implemented
 
     NodeID addAudioClipToTrack(int trackIndex, const juce::File& file) const;
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
-    bool removeAudioClipFromTrack(int trackIndex, NodeID clipId);
-    bool moveAudioClipBetweenTracks(int sourceTrackIndex, int destTrackIndex, NodeID clipId);
+    bool removeAudioClipFromTrack(int trackIndex, NodeID clipId);                              // to be implemented
+    bool moveAudioClipBetweenTracks(int sourceTrackIndex, int destTrackIndex, NodeID clipId);  // to be implemented
 
     bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
 
@@ -33,11 +34,13 @@ public:
     void setTrackProperty(int trackIndex, AudioClipProperty property, float floatValue) const;
     TrackProperties getTrackProperties(int trackIndex) const;
 
-    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
 
 private:
     TrackGuiManager& trackGuiManager;
     MainAudio& mainAudio;
+    SideMenu& sideMenu;
     juce::ValueTree& tree;
     std::vector<std::unique_ptr<AudioTrack>> tracks;
 };

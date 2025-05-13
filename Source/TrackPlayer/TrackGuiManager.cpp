@@ -106,7 +106,8 @@ void TrackGuiManager::removeTrack(const int trackIndex)
     trackPlayerSideMenu.removeTrackControls(trackIndex);
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
     resized();
-    trackPlayerSideMenu.resized();
+    // trackPlayerSideMenu.repaint();
+    // trackPlayerSideMenu.resized();
 }
 
 void TrackGuiManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)

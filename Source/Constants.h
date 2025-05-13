@@ -23,6 +23,8 @@ constexpr uint8_t timeBarBoxSize{15u};
 
 constexpr float trackPlayerSideMenuWidthRatio{0.12f};
 
+constexpr int noTrackChosen{-1};
+
 }  // namespace TrackPlayerConstants
 
 namespace SideMenuConstants
@@ -47,9 +49,16 @@ inline static const juce::Identifier soloButtonClicked{"soloButtonClicked"};
 inline static const juce::Identifier muteButtonClicked{"muteButtonClicked"};
 inline static const juce::Identifier newAudioFile{"newAudioFile"};
 
+inline static const juce::Identifier trackGainChanged{"trackGainChanged"};
+inline static const juce::Identifier trackFaderChanged{"trackFaderChanged"};
+inline static const juce::Identifier trackDelayChanged{"trackDelayChanged"};
+inline static const juce::Identifier trackReverbChanged{"trackReverbChanged"};
+inline static const juce::Identifier trackBassBoostChanged{"trackBassBoostChanged"};
+
 inline static const juce::Identifier trackPlayerZoomPercentage{"trackPlayerZoomPercentage"};
 inline static const juce::Identifier numOfSecondsChanged{"numOfSecondsChanged"};
 
 inline static const juce::Identifier deleteTrackGui{"deleteTrackGui"};
 inline static const juce::Identifier duplicateTrackGui{"duplicateTrackGui"};
+inline static const juce::Identifier setSelectedTrack{"setSelectedTrack"};
 }  // namespace ValueTreeIDs
