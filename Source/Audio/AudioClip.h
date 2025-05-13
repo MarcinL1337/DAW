@@ -14,6 +14,7 @@ public:
     juce::File& getFile() { return audioFile; }
 
     void setGain(const float gainDb) { gainProcessor.setGainDecibels(gainDb); }
+    float getGain() const { return gainProcessor.getGainDecibels(); }
     void setPan(const float pan) { panProcessor.setPan(juce::jlimit(-1.0f, 1.0f, pan)); }
     void setOffset(const int64_t newOffsetSamples) { offsetSamples = newOffsetSamples; }
     int64_t getOffset() const { return offsetSamples; }

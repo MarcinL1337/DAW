@@ -106,7 +106,6 @@ void TrackGuiManager::removeTrack(const int trackIndex)
     trackPlayerSideMenu.removeTrackControls(trackIndex);
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
     resized();
-    trackPlayerSideMenu.resized();
 }
 
 void TrackGuiManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
@@ -115,14 +114,18 @@ void TrackGuiManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Ide
         return;
     if(property == ValueTreeIDs::numOfSecondsChanged)
     {
-        currentNumOfSeconds = tree[ValueTreeIDs::numOfSecondsChanged];
-        timeline.changeNumOfSeconds(currentNumOfSeconds);
-        resized();
-        for(const auto& trackGui: trackGuiVector)
+        const int newNumOfSeconds = tree[ValueTreeIDs::numOfSecondsChanged];
+        if(newNumOfSeconds > currentNumOfSeconds)
         {
-            trackGui->changeNumOfSeconds(currentNumOfSeconds);
-            trackGui->setSize(trackGuiComponent.getWidth(), currentTrackGuiBoxHeight);
-            trackGui->repaint();
+            currentNumOfSeconds = newNumOfSeconds;
+            timeline.changeNumOfSeconds(currentNumOfSeconds);
+            resized();
+            for(const auto& trackGui: trackGuiVector)
+            {
+                trackGui->changeNumOfSeconds(currentNumOfSeconds);
+                trackGui->setSize(trackGuiComponent.getWidth(), currentTrackGuiBoxHeight);
+                trackGui->repaint();
+            }
         }
     }
     else if(property == ValueTreeIDs::trackPlayerZoomPercentage)

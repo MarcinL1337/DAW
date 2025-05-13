@@ -1,8 +1,8 @@
 #include "TrackManager.h"
 #include <algorithm>
 
-TrackManager::TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef) :
-    trackGuiManager{trackGuiManagerRef}, mainAudio{mainAudioRef}, tree{trackGuiManagerRef.tree}
+TrackManager::TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef, SideMenu& sideMenuRef) :
+    trackGuiManager{trackGuiManagerRef}, mainAudio{mainAudioRef}, sideMenu{sideMenuRef}, tree{trackGuiManagerRef.tree}
 {
     // TODO: "W chuj mi się to nie podoba"~LilMarcin
     juce::Timer::callAfterDelay(200,
@@ -18,6 +18,7 @@ int TrackManager::addTrack()
 {
     trackGuiManager.addTrack();
     tracks.push_back(std::make_unique<AudioTrack>(mainAudio));
+    sideMenu.addTrack();
     return static_cast<int>(tracks.size() - 1);
 }
 
@@ -26,6 +27,7 @@ void TrackManager::removeTrack(const int trackIndex)
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
     tracks.erase(tracks.begin() + trackIndex);
     juce::Timer::callAfterDelay(1, [this, trackIndex]() { trackGuiManager.removeTrack(trackIndex); });
+    sideMenu.removeTrack(trackIndex);
 }
 
 int TrackManager::duplicateTrack(const int trackIndex)
@@ -119,25 +121,31 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const auto index = addTrack();
         addAudioClipToTrack(index, juce::File(newAudioFilePath));
     }
-    if(property == ValueTreeIDs::soloButtonClicked)
+    else if(property == ValueTreeIDs::soloButtonClicked)
     {
         const int trackIndex = tree[ValueTreeIDs::soloButtonClicked];
         const bool soloValue = getTrackProperties(trackIndex).solo;
         setTrackProperty(trackIndex, AudioClipProperty::SOLO, !soloValue);
     }
-    if(property == ValueTreeIDs::muteButtonClicked)
+    else if(property == ValueTreeIDs::muteButtonClicked)
     {
         const int trackIndex = tree[ValueTreeIDs::muteButtonClicked];
         const bool muteValue = getTrackProperties(trackIndex).mute;
         setTrackProperty(trackIndex, AudioClipProperty::MUTE, !muteValue);
     }
-    if(property == ValueTreeIDs::deleteTrackGui)
+    else if(property == ValueTreeIDs::trackGainChanged)
+    {
+        const int trackIndex = tree[ValueTreeIDs::trackGainChanged][0];
+        const float gainValue = tree[ValueTreeIDs::trackGainChanged][1];
+        setTrackProperty(trackIndex, AudioClipProperty::GAIN, gainValue);
+    }
+    else if(property == ValueTreeIDs::deleteTrackGui)
     {
         const int trackIndex = tree[ValueTreeIDs::deleteTrackGui];
         assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
         removeTrack(trackIndex);
     }
-    if(property == ValueTreeIDs::duplicateTrackGui)
+    else if(property == ValueTreeIDs::duplicateTrackGui)
     {
         const int trackIndex = tree[ValueTreeIDs::duplicateTrackGui];
         assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
