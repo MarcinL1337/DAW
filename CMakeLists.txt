@@ -77,6 +77,8 @@ set(SourceFiles
         Source/Audio/AudioClip.cpp
         Source/Audio/AudioTrack.h
         Source/Audio/AudioTrack.cpp
+        Source/Audio/FadeTypes.h
+        Source/Audio/FadeCalculator.cpp
 
         Source/TrackManager.h
         Source/TrackManager.cpp
