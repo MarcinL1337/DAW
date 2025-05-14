@@ -114,6 +114,7 @@ juce_add_binary_data(BinaryData SOURCES
         Assets/ToolbarImages/recordButton.png
         Assets/ToolbarImages/replayButton.png
         Assets/ToolbarImages/stopButton.png
+        Assets/ToolbarImages/followModeButton.png
 )
 
 # JUCE libraries to bring into our project

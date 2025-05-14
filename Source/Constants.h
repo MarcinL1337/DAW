@@ -44,6 +44,7 @@ inline static const juce::Identifier playPauseButtonClicked{"playPauseButtonClic
 inline static const juce::Identifier stopButtonClicked{"stopButtonClicked"};
 inline static const juce::Identifier isCurrentlyDraggingTimeBar{"isCurrentlyDraggingTimeBar"};
 inline static const juce::Identifier setPlayheadPosition{"setPlayheadPosition"};
+inline static const juce::Identifier followModeChanged{"followModeChanged"};
 
 inline static const juce::Identifier soloButtonClicked{"soloButtonClicked"};
 inline static const juce::Identifier muteButtonClicked{"muteButtonClicked"};
@@ -62,3 +63,13 @@ inline static const juce::Identifier deleteTrackGui{"deleteTrackGui"};
 inline static const juce::Identifier duplicateTrackGui{"duplicateTrackGui"};
 inline static const juce::Identifier setSelectedTrack{"setSelectedTrack"};
 }  // namespace ValueTreeIDs
+
+namespace PlayheadFollowConstants
+{
+enum class Mode
+{
+    NoFollow = 1,
+    SmoothFollow,
+    JumpFollow
+};
+}  // namespace PlayheadFollowConstants
