@@ -56,6 +56,11 @@ void MainAudio::setGainOfAudioClip(const NodeID nodeID, const float gain) const
 {
     dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setGain(gain);
 }
+float MainAudio::getGainOfAudioClip(const NodeID nodeID) const
+{
+    return dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->getGain();
+}
+
 void MainAudio::setOffsetOfAudioClipInSeconds(const NodeID nodeID, const double offsetSeconds) const
 {
     dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setOffset(offsetSeconds * getSampleRate());

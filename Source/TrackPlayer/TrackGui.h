@@ -37,8 +37,7 @@ private:
     void initPopUpMenuForTrack();
     void showPopUpMenuForClip();
     void initPopUpMenuForClip();
-    void deleteTrackFromGui() const;
-    void duplicateTrackFromGui() const;
+    void triggerTrackGuiAction(const juce::Identifier& actionId) const;
 
     enum popUpMenuOptions
     {

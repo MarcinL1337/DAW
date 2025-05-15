@@ -39,7 +39,7 @@ void TrackGui::addNewAudioFile(const juce::String& newAudioFilePath, const NodeI
 
 void TrackGui::mouseDown(const juce::MouseEvent& event)
 {
-    if(event.mods.isRightButtonDown() and reallyContains(event.mouseDownPosition, true))
+    if(event.mods.isRightButtonDown())
     {
         for(auto& waveform: waveforms)
         {
@@ -50,6 +50,10 @@ void TrackGui::mouseDown(const juce::MouseEvent& event)
             }
         }
         showPopUpMenuForTrack();
+    }
+    if(event.mods.isLeftButtonDown())
+    {
+        triggerTrackGuiAction(ValueTreeIDs::setSelectedTrack);
     }
 }
 
@@ -70,10 +74,10 @@ void TrackGui::showPopUpMenuForTrack()
                                     case noOptionChosen:
                                         break;
                                     case deleteTrack:
-                                        deleteTrackFromGui();
+                                        triggerTrackGuiAction(ValueTreeIDs::deleteTrackGui);
                                         break;
                                     case duplicateTrack:
-                                        duplicateTrackFromGui();
+                                        triggerTrackGuiAction(ValueTreeIDs::duplicateTrackGui);
                                         break;
                                     case 4:
                                         std::cerr << "epic dab done" << std::endl;
@@ -132,7 +136,7 @@ void TrackGui::changeBoxHeight(const uint16_t newBoxHeight)
     for(const auto& waveform: waveforms) { waveform->changeBoxHeight(newBoxHeight); }
 }
 
-void TrackGui::deleteTrackFromGui() const
+void TrackGui::triggerTrackGuiAction(const juce::Identifier& actionId) const
 {
     const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
     auto index{0};
@@ -140,23 +144,8 @@ void TrackGui::deleteTrackFromGui() const
     {
         if(this == trackGui.get())
         {
-            tree.setProperty(ValueTreeIDs::deleteTrackGui, index, nullptr);
-            tree.setProperty(ValueTreeIDs::deleteTrackGui, ValueTreeConstants::doNothing, nullptr);
-        }
-        index++;
-    }
-}
-
-void TrackGui::duplicateTrackFromGui() const
-{
-    const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
-    auto index{0};
-    for(auto& trackGui: trackPlayer->trackGuiVector)
-    {
-        if(this == trackGui.get())
-        {
-            tree.setProperty(ValueTreeIDs::duplicateTrackGui, index, nullptr);
-            tree.setProperty(ValueTreeIDs::duplicateTrackGui, ValueTreeConstants::doNothing, nullptr);
+            tree.setProperty(actionId, index, nullptr);
+            tree.setProperty(actionId, ValueTreeConstants::doNothing, nullptr);
         }
         index++;
     }
