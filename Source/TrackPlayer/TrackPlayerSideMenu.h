@@ -11,10 +11,11 @@ struct trackControls
     std::unique_ptr<juce::Label> trackNameLabel;
 };
 
-class TrackPlayerSideMenu final : public juce::Component
+class TrackPlayerSideMenu final : public juce::Component,
+                                  public juce::ValueTree::Listener
 {
 public:
-    explicit TrackPlayerSideMenu(const juce::ValueTree& parentTree);
+    explicit TrackPlayerSideMenu(juce::ValueTree& parentTree);
     ~TrackPlayerSideMenu() override = default;
 
     void paint(juce::Graphics& g) override;
@@ -28,9 +29,9 @@ public:
     void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }
     void decrementCurrentNumberOfTracks() { currentNumberOfTracks--; }
 
-    void resizeAllTrackButtons(const int newBoxHeight);
-
 private:
+    void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property) override;
+
     void setupRecordButton(const std::unique_ptr<juce::TextButton>& recordButton, juce::Rectangle<int>& buttonArea,
                            const uint16_t currentRow);
     void setupSoloButton(const std::unique_ptr<juce::TextButton>& soloButton, juce::Rectangle<int>& buttonArea,
@@ -43,10 +44,13 @@ private:
     juce::Rectangle<int> getCurrentTrackButtonsArea(const uint16_t currentRow) const;
     juce::Rectangle<int> getCurrentTrackNameArea(const uint16_t currentRow) const;
 
-    juce::ValueTree tree;
+    void resizeAllTrackButtons(const int newBoxHeight);
+
+    juce::ValueTree& tree;
 
     std::vector<trackControls> trackControlsVector{};
 
+    int currentSelectedTrack{0};
     uint16_t currentNumberOfTracks{0u};
     uint16_t trackButtonsSize{};
     uint16_t buttonMargin{};

@@ -1,12 +1,14 @@
 #include "TrackPlayerSideMenu.h"
 #include "../TrackManager.h"
 
-TrackPlayerSideMenu::TrackPlayerSideMenu(const juce::ValueTree& parentTree) : tree(parentTree) {}
+TrackPlayerSideMenu::TrackPlayerSideMenu(juce::ValueTree& parentTree) : tree(parentTree) { tree.addListener(this); }
 
 void TrackPlayerSideMenu::paint(juce::Graphics& g)
 {
-    g.setColour(juce::Colours::whitesmoke);
+    g.setColour(juce::Colours::darkgrey);
+    g.fillRect(0, currentSelectedTrack * currentTrackGuiBoxHeight, getWidth(), currentTrackGuiBoxHeight);
 
+    g.setColour(juce::Colours::whitesmoke);
     for(auto i{0u}; i < getCurrentNumberOfTracks() + 1; ++i)
     {
         g.drawLine(0, i * currentTrackGuiBoxHeight, getWidth(), i * currentTrackGuiBoxHeight, 0.75);
@@ -17,6 +19,18 @@ void TrackPlayerSideMenu::resized()
 {
     trackButtonsSize = static_cast<uint16_t>(0.15 * getWidth());
     buttonMargin = static_cast<uint16_t>(0.01 * getWidth());
+}
+
+void TrackPlayerSideMenu::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
+{
+    if(static_cast<int>(tree[property]) == ValueTreeConstants::doNothing)
+        return;
+
+    if(property == ValueTreeIDs::setSelectedTrack)
+    {
+        currentSelectedTrack = tree[ValueTreeIDs::setSelectedTrack];
+        repaint();
+    }
 }
 
 void TrackPlayerSideMenu::resizeAllTrackButtons(const int newBoxHeight)

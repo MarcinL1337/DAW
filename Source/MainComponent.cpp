@@ -1,7 +1,12 @@
 #include "MainComponent.h"
 
 MainComponent::MainComponent() :
-    mainAudio(tree), topLevelMenu(tree), mainToolbar(tree), trackPlayer(tree), trackManager(trackPlayer, mainAudio), sideMenu(tree)
+    mainAudio(tree),
+    topLevelMenu(tree),
+    mainToolbar(tree),
+    trackPlayer(tree),
+    trackManager(trackPlayer, mainAudio, sideMenu),
+    sideMenu(tree)
 {
     // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
     setSize(getParentWidth(), getParentHeight());
@@ -13,7 +18,7 @@ MainComponent::MainComponent() :
     addAndMakeVisible(sideMenu);
     flexBoxInit();
 
-    juce::Timer::callAfterDelay(50, [&] { addTestTracks(); });
+    addTestTracks();
 }
 
 void MainComponent::paint(juce::Graphics& g)

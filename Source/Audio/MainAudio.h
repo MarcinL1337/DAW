@@ -39,6 +39,7 @@ private:
     void removeAudioClip(NodeID nodeID);
     void setPanOfAudioClip(NodeID nodeID, float pan) const;
     void setGainOfAudioClip(NodeID nodeID, float gain) const;
+    float getGainOfAudioClip(NodeID nodeID) const;
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
     void setSoloOfAudioClip(NodeID nodeID, bool solo) const;
     void setMuteOfAudioClip(NodeID nodeID, bool mute) const;
