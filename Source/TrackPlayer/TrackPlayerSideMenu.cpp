@@ -33,6 +33,18 @@ void TrackPlayerSideMenu::valueTreePropertyChanged(juce::ValueTree&, const juce:
     }
 }
 
+void TrackPlayerSideMenu::mouseDown(const juce::MouseEvent& event)
+{
+    if(event.mods.isLeftButtonDown())
+    {
+        const int trackIndexClicked = event.getMouseDownY() / currentTrackGuiBoxHeight;
+        if(trackIndexClicked < getCurrentNumberOfTracks())
+        {
+            tree.setProperty(ValueTreeIDs::setSelectedTrack, trackIndexClicked, nullptr);
+        }
+    }
+}
+
 void TrackPlayerSideMenu::resizeAllTrackButtons(const int newBoxHeight)
 {
     currentTrackGuiBoxHeight = newBoxHeight;
@@ -73,7 +85,7 @@ void TrackPlayerSideMenu::addTrackControls()
     setupRecordButton(recordButton, currentTrackButtonsArea, currentRow);
     setupSoloButton(soloButton, currentTrackButtonsArea, currentRow);
     setupMuteButton(muteButton, currentTrackButtonsArea, currentRow);
-    setupTrackNameLabel(trackNameLabel, currentTrackNameArea, currentRow);
+    setupTrackNameLabel(trackNameLabel, currentTrackNameArea);
 
     trackControlsVector.push_back(
         {std::move(recordButton), std::move(soloButton), std::move(muteButton), std::move(trackNameLabel)});
@@ -92,7 +104,11 @@ void TrackPlayerSideMenu::setupRecordButton(const std::unique_ptr<juce::TextButt
     recordButton->setBounds(buttonArea.removeFromRight(trackButtonsSize)
                                 .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
                                 .reduced(buttonMargin));
-    recordButton->onClick = [this, currentRow]() { std::cout << "Recording[" << currentRow + 1 << "]" << std::endl; };
+    recordButton->onClick = [this, currentRow]()
+    {
+        std::cout << "Recording[" << currentRow + 1 << "]" << std::endl;
+        tree.setProperty(ValueTreeIDs::setSelectedTrack, currentRow, nullptr);
+    };
 }
 
 void TrackPlayerSideMenu::setupSoloButton(const std::unique_ptr<juce::TextButton>& soloButton,
@@ -105,6 +121,7 @@ void TrackPlayerSideMenu::setupSoloButton(const std::unique_ptr<juce::TextButton
     {
         tree.setProperty(ValueTreeIDs::soloButtonClicked, ValueTreeConstants::doNothing, nullptr);
         tree.setProperty(ValueTreeIDs::soloButtonClicked, currentRow, nullptr);
+        tree.setProperty(ValueTreeIDs::setSelectedTrack, currentRow, nullptr);
         const bool currentState = soloButtonPtr->getToggleState();
         soloButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
     };
@@ -120,13 +137,14 @@ void TrackPlayerSideMenu::setupMuteButton(const std::unique_ptr<juce::TextButton
     {
         tree.setProperty(ValueTreeIDs::muteButtonClicked, ValueTreeConstants::doNothing, nullptr);
         tree.setProperty(ValueTreeIDs::muteButtonClicked, currentRow, nullptr);
+        tree.setProperty(ValueTreeIDs::setSelectedTrack, currentRow, nullptr);
         const bool currentState = muteButtonPtr->getToggleState();
         muteButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
     };
 }
 
 void TrackPlayerSideMenu::setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel,
-                                              juce::Rectangle<int>& trackNameArea, const uint16_t currentRow)
+                                              juce::Rectangle<int>& trackNameArea)
 {
     trackNameLabel->setBounds(trackNameArea.removeFromRight(0.9 * trackNameArea.getWidth()));
     trackNameLabel->setEditable(false, true, false);
@@ -140,7 +158,10 @@ juce::Rectangle<int> TrackPlayerSideMenu::getCurrentTrackButtonsArea(const uint1
 
 juce::Rectangle<int> TrackPlayerSideMenu::getCurrentTrackNameArea(const uint16_t currentRow) const
 {
-    return juce::Rectangle<int>{0, currentRow * currentTrackGuiBoxHeight, getWidth() / 2, currentTrackGuiBoxHeight};
+    return juce::Rectangle<int>{0,
+                                currentRow * currentTrackGuiBoxHeight + currentTrackGuiBoxHeight / 4,
+                                getWidth() / 2,
+                                currentTrackGuiBoxHeight / 2};
 }
 
 void TrackPlayerSideMenu::removeTrackControls(int trackIndex)
@@ -155,7 +176,7 @@ void TrackPlayerSideMenu::removeTrackControls(int trackIndex)
         setupRecordButton(recordButton, currentTrackButtonsArea, trackIndex);
         setupSoloButton(soloButton, currentTrackButtonsArea, trackIndex);
         setupMuteButton(muteButton, currentTrackButtonsArea, trackIndex);
-        setupTrackNameLabel(trackNameLabel, currentTrackNameArea, trackIndex);
+        setupTrackNameLabel(trackNameLabel, currentTrackNameArea);
     }
     decrementCurrentNumberOfTracks();
 }
