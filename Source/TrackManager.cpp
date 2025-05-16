@@ -52,6 +52,8 @@ int TrackManager::createTrackFromJson(const nlohmann::json& trackJson)
     setTrackProperty(newTrackIndex, AudioClipProperty::GAIN, trackJson["properties"]["gain"].get<float>());
     setTrackProperty(newTrackIndex, AudioClipProperty::PAN, trackJson["properties"]["pan"].get<float>());
 
+    sideMenu.setTrackProperties(newTrackIndex, trackJson["properties"]["gain"].get<float>() /* delay, reverb, ... */);
+
     const bool isMuted = trackJson["properties"]["mute"].get<bool>();
     const bool isSoloed = trackJson["properties"]["solo"].get<bool>();
     trackGuiManager.setTrackButtonStates(newTrackIndex, isMuted, isSoloed);
