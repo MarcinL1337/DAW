@@ -62,9 +62,9 @@ void Waveform::setOffsetSeconds(const double newOffsetSeconds)
     const auto waveformLengthInPixels{audioThumbnail.getTotalLength() * currentTrackGuiBoxWidth};
     if(waveformLengthInPixels + offsetPixels > getWidth())
     {
-        std::cerr << "Dupa = " << std::ceil(audioThumbnail.getTotalLength()) + offsetSeconds << std::endl;
         tree.setProperty(
             ValueTreeIDs::numOfSecondsChanged, std::ceil(audioThumbnail.getTotalLength()) + offsetSeconds, nullptr);
     }
+    resized();
 }
 

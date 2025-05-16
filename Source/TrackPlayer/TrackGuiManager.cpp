@@ -117,8 +117,8 @@ void TrackGuiManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Ide
         const int newNumOfSeconds = tree[ValueTreeIDs::numOfSecondsChanged];
         if(newNumOfSeconds > currentNumOfSeconds)
         {
-            currentNumOfSeconds = newNumOfSeconds;
             timeline.changeNumOfSeconds(currentNumOfSeconds);
+            currentNumOfSeconds = newNumOfSeconds;
             resized();
             for(const auto& trackGui: trackGuiVector)
             {
