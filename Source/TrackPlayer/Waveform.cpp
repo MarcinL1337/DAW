@@ -50,7 +50,7 @@ void Waveform::resized()
     const auto waveformLengthInPixels{audioThumbnail.getTotalLength() * currentTrackGuiBoxWidth};
     setBounds(offsetPixels, 0, std::ceil(waveformLengthInPixels), getHeight());
 
-    updateFadeInAudioProcessor();
+    updateFadesInAudioProcessor();
 }
 
 void Waveform::changeBoxWidth(const uint16_t newBoxWidth)
@@ -73,7 +73,7 @@ void Waveform::setOffsetSeconds(const double newOffsetSeconds)
             ValueTreeIDs::numOfSecondsChanged, std::ceil(audioThumbnail.getTotalLength()) + offsetSeconds, nullptr);
     }
 
-    updateFadeInAudioProcessor();
+    updateFadesInAudioProcessor();
 }
 
 void Waveform::mouseDown(const juce::MouseEvent& event)
@@ -120,7 +120,7 @@ void Waveform::mouseUp(const juce::MouseEvent& event)
 {
     draggingFadeIn = false;
     draggingFadeOut = false;
-    updateFadeInAudioProcessor();
+    updateFadesInAudioProcessor();
 }
 
 void Waveform::mouseMove(const juce::MouseEvent& event)
@@ -217,7 +217,7 @@ void Waveform::drawFadeShape(juce::Graphics& g)
         for(int x = 0; x <= fadeInWidth; ++x)
         {
             float position = static_cast<float>(x) / fadeInWidth;
-            float fadeValue = FadeCalculator::getFadeValue(position, fadeInData.type, true);
+            float fadeValue = Fade::getFadeValue(position, fadeInData.type, true);
             fadeInPath.lineTo(x, height - fadeValue * height);
         }
 
@@ -238,7 +238,7 @@ void Waveform::drawFadeShape(juce::Graphics& g)
         for(int x = 0; x <= fadeOutWidth; ++x)
         {
             float position = static_cast<float>(x) / fadeOutWidth;
-            float fadeValue = FadeCalculator::getFadeValue(position, fadeOutData.type, false);
+            float fadeValue = Fade::getFadeValue(position, fadeOutData.type, false);
             fadeOutPath.lineTo(startX + x, height - fadeValue * height);
         }
 
@@ -271,7 +271,7 @@ void Waveform::showFadeTypeMenu(bool isFadeIn)
                                else
                                    setFadeOutType(selectedType);
 
-                               updateFadeInAudioProcessor();
+                               updateFadesInAudioProcessor();
                                repaint();
                            }
                        });
@@ -282,7 +282,7 @@ void Waveform::setFadeInLength(float lengthInSeconds)
     fadeInData.lengthSeconds =
         juce::jlimit(0.0f, static_cast<float>(audioThumbnail.getTotalLength()) / 2.0f, lengthInSeconds);
     fadeInData.enabled = fadeInData.lengthSeconds > 0.0f;
-    updateFadeInAudioProcessor();
+    updateFadesInAudioProcessor();
     repaint();
 }
 
@@ -291,25 +291,25 @@ void Waveform::setFadeOutLength(float lengthInSeconds)
     fadeOutData.lengthSeconds =
         juce::jlimit(0.0f, static_cast<float>(audioThumbnail.getTotalLength()) / 2.0f, lengthInSeconds);
     fadeOutData.enabled = fadeOutData.lengthSeconds > 0.0f;
-    updateFadeInAudioProcessor();
+    updateFadesInAudioProcessor();
     repaint();
 }
 
 void Waveform::setFadeInType(FadeType type)
 {
     fadeInData.type = type;
-    updateFadeInAudioProcessor();
+    updateFadesInAudioProcessor();
     repaint();
 }
 
 void Waveform::setFadeOutType(FadeType type)
 {
     fadeOutData.type = type;
-    updateFadeInAudioProcessor();
+    updateFadesInAudioProcessor();
     repaint();
 }
 
-void Waveform::updateFadeInAudioProcessor()
+void Waveform::updateFadesInAudioProcessor()
 {
     auto* mainComponent = findParentComponentOfClass<juce::Component>();
     if(!mainComponent)

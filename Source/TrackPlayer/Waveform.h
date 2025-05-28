@@ -2,7 +2,7 @@
 
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_gui_extra/juce_gui_extra.h>
-#include "../Audio/FadeTypes.h"
+#include "../Audio/Fade.h"
 #include "../Constants.h"
 
 using NodeID = juce::AudioProcessorGraph::NodeID;
@@ -47,7 +47,7 @@ private:
     bool isMouseOverFadeInHandle(const juce::Point<int>& position) const;
     bool isMouseOverFadeOutHandle(const juce::Point<int>& position) const;
     void updateFadeAfterDrag(bool isFadeIn, float newLength);
-    void updateFadeInAudioProcessor();
+    void updateFadesInAudioProcessor();
 
     // TODO: when TrackManager will be ready, think if formatReader and formatManager are necessary here
     juce::AudioBuffer<float> samplesBuffer{};

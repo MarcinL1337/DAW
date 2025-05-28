@@ -1,8 +1,8 @@
+#include "Fade.h"
 #include <juce_core/juce_core.h>
 #include <cmath>
-#include "FadeTypes.h"
 
-float FadeCalculator::getFadeValue(float position, FadeType type, bool isFadeIn)
+float Fade::getFadeValue(float position, const FadeType type, const bool isFadeIn)
 {
     position = juce::jlimit(0.0f, 1.0f, position);
 

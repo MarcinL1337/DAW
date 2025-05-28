@@ -15,7 +15,7 @@ struct FadeData
     FadeType type = FadeType::Linear;
 };
 
-class FadeCalculator
+class Fade
 {
 public:
     static float getFadeValue(float position, FadeType type, bool isFadeIn);
