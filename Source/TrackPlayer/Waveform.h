@@ -28,6 +28,7 @@ private:
     void resized() override;
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
+    // TODO: when TrackManager will be ready, think if formatReader and formatManager are necessary here
     juce::AudioBuffer<float> samplesBuffer{};
     juce::AudioFormatReader* formatReader{nullptr};  // change to unique_ptr -> for now it stays as is
     juce::AudioFormatManager formatManager;

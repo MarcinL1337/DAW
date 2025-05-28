@@ -23,8 +23,8 @@ public:
     bool getDragging() const { return isDragging; }
 
     int getHandleX(int componentWidth, uint16_t boxWidth) const;
-    bool isMouseOverHandle(const juce::Point<int>& mousePos, int componentWidth,
-                          uint16_t boxWidth, int componentHeight) const;
+    bool isMouseOverHandle(const juce::Point<int>& mousePos, int componentWidth, uint16_t boxWidth,
+                           int componentHeight) const;
 
     const juce::Path& getPath() const { return path; }
     void rebuildPath(int componentWidth, int componentHeight, uint16_t boxWidth);
