@@ -77,11 +77,15 @@ set(SourceFiles
         Source/Audio/AudioClip.cpp
         Source/Audio/AudioTrack.h
         Source/Audio/AudioTrack.cpp
-        Source/Audio/Fade.h
-        Source/Audio/Fade.cpp
 
         Source/TrackManager.h
         Source/TrackManager.cpp
+
+        Source/Fade/Fade.cpp
+        Source/Fade/FadeController.cpp
+        Source/Fade/FadeHandle.cpp
+        Source/Fade/FadeRenderer.cpp
+        Source/Fade/FadeMouseHandler.cpp
 )
 
 juce_add_gui_app(${PROJECT_NAME}

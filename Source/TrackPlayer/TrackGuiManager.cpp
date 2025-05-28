@@ -207,6 +207,6 @@ void TrackGuiManager::updatePlayheadFollowing()
             }
             break;
         default:
-            std::unreachable;
+            std::unreachable();
     }
 }

@@ -1,6 +1,9 @@
 #pragma once
+#include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <cstdint>
+
+using NodeID = juce::AudioProcessorGraph::NodeID;
 
 namespace TopLevelMenuConstants
 {
