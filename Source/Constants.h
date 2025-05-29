@@ -1,9 +1,6 @@
 #pragma once
-#include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <cstdint>
-
-using NodeID = juce::AudioProcessorGraph::NodeID;
 
 namespace TopLevelMenuConstants
 {
@@ -76,3 +73,9 @@ enum class Mode
     JumpFollow
 };
 }  // namespace PlayheadFollowConstants
+
+namespace FadeConstants
+{
+constexpr int handleSize{10};
+constexpr int handleBorderThickness{1};
+}  // namespace FadeConstants

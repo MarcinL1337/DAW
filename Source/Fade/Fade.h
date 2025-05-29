@@ -1,5 +1,4 @@
 #pragma once
-
 #include <juce_core/juce_core.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 
@@ -20,16 +19,17 @@ struct FadeData
 
 namespace Fade
 {
-constexpr std::array<const char*, 4> FADE_TYPE_NAMES = {"Linear", "Logarithmic", "Exponential", "S-Curve"};
+inline const juce::StringArray& getFadeTypeNames()
+{
+    static const juce::StringArray names{"Linear", "Logarithmic", "Exponential", "S-Curve"};
+    return names;
+}
 
-inline juce::StringArray getFadeTypeNames()
-{ return {FADE_TYPE_NAMES.data(), FADE_TYPE_NAMES.size()}; }
-
-inline FadeType getFadeTypeFromIndex(int index) { return static_cast<FadeType>(juce::jlimit(0, 3, index)); }
+inline FadeType getFadeTypeFromIndex(const int index) { return static_cast<FadeType>(index); }
 
 inline int getIndexFromFadeType(FadeType type) { return static_cast<int>(type); }
 
-inline float getFadeValue(float position, FadeType type, bool isFadeIn)
+inline float getFadeValue(float position, const FadeType type, const bool isFadeIn)
 {
     position = juce::jlimit(0.0f, 1.0f, isFadeIn ? position : 1.0f - position);
 

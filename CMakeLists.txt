@@ -84,7 +84,6 @@ set(SourceFiles
         Source/Fade/Fade.cpp
         Source/Fade/FadeController.cpp
         Source/Fade/FadeHandle.cpp
-        Source/Fade/FadeRenderer.cpp
         Source/Fade/FadeMouseHandler.cpp
 )
 

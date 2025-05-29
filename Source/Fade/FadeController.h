@@ -1,10 +1,8 @@
 #pragma once
-
-#include <juce_gui_extra/juce_gui_extra.h>
-#include "../Constants.h"
-#include "FadeHandle.h"
-#include "FadeRenderer.h"
+#include <juce_audio_utils/juce_audio_utils.h>
 #include "FadeMouseHandler.h"
+
+using NodeID = juce::AudioProcessorGraph::NodeID;
 
 class FadeController final : public juce::Component
 {
@@ -41,8 +39,6 @@ private:
 
     uint16_t currentBoxWidth{TrackPlayerConstants::startBoxWidth};
     float currentAudioLength{0.0f};
-
-    bool needsRepaint{false};
 
     static juce::PopupMenu createTypeMenu(FadeType currentType);
     static void handleTypeMenuResult(int result, bool isFadeIn, FadeController* controller);

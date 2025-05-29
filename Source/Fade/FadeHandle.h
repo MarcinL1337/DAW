@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include "../Constants.h"
 #include "Fade.h"
 
 class FadeHandle
@@ -34,6 +35,12 @@ public:
 
     const FadeData& getData() const { return data; }
 
+    void drawHandle(juce::Graphics& g, int componentWidth, uint16_t boxWidth, int componentHeight) const;
+    void drawPath(juce::Graphics& g) const;
+
+    static juce::Colour getFadeInColour() { return juce::Colours::red.withAlpha(0.4f); }
+    static juce::Colour getFadeOutColour() { return juce::Colours::blue.withAlpha(0.4f); }
+
 private:
     FadeData data;
     juce::Path path;
@@ -42,5 +49,6 @@ private:
     bool isInType;
     bool pathNeedsRebuild{true};
 
+    static juce::Colour getHandleColour(bool isMouseOver);
     void rebuildPathInternal(int componentWidth, int componentHeight, uint16_t boxWidth);
 };

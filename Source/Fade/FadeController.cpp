@@ -10,7 +10,6 @@ void FadeController::setFadeType(const bool isFadeIn, const FadeType type)
 {
     auto& handle = isFadeIn ? fadeIn : fadeOut;
     handle.setType(type);
-    needsRepaint = true;
     repaint();
     notifyAudioProcessor();
 }
@@ -38,7 +37,11 @@ FadeType FadeController::getFadeType(const bool isFadeIn) const { return (isFade
 void FadeController::paint(juce::Graphics& g)
 {
     rebuildPathsIfNeeded();
-    FadeRenderer::drawAllFades(g, fadeIn, fadeOut, getWidth(), currentBoxWidth, getHeight());
+
+    fadeIn.drawPath(g);
+    fadeOut.drawPath(g);
+    fadeIn.drawHandle(g, getWidth(), currentBoxWidth, getHeight());
+    fadeOut.drawHandle(g, getWidth(), currentBoxWidth, getHeight());
 }
 
 void FadeController::resized() { rebuildPathsIfNeeded(); }

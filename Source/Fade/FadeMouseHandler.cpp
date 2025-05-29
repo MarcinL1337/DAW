@@ -2,14 +2,13 @@
 
 FadeMouseHandler::FadeMouseHandler(FadeHandle& fadeIn, FadeHandle& fadeOut) : fadeIn(fadeIn), fadeOut(fadeOut) {}
 
-bool FadeMouseHandler::handleMouseDown(const juce::MouseEvent& event, int componentWidth, uint16_t boxWidth,
-                                       int componentHeight)
+bool FadeMouseHandler::handleMouseDown(const juce::MouseEvent& event, const int componentWidth, const uint16_t boxWidth,
+                                       const int componentHeight) const
 {
-    const auto pos = event.getPosition();
-
     if(event.mods.isLeftButtonDown())
     {
-        if(fadeIn.isMouseOverHandle(pos, componentWidth, boxWidth, componentHeight))
+        const auto pos = event.getPosition();
+        if(fadeIn.isMouseOverHandle(event.getPosition(), componentWidth, boxWidth, componentHeight))
         {
             fadeIn.setDragging(true);
             return true;
@@ -20,64 +19,43 @@ bool FadeMouseHandler::handleMouseDown(const juce::MouseEvent& event, int compon
             return true;
         }
     }
-
     return false;
 }
 
-bool FadeMouseHandler::handleMouseDrag(const juce::MouseEvent& event, uint16_t boxWidth, float currentAudioLength)
+bool FadeMouseHandler::handleMouseDrag(const juce::MouseEvent& event, const uint16_t boxWidth,
+                                       const float currentAudioLength)
 {
-    if(!hasActiveHandle())
+    auto* handle = getActiveHandle();
+    if(!handle)
         return false;
-
-    auto& handle = *getActiveHandle();
 
     if(event.x < 0 || event.x > event.originalComponent->getWidth())
         return false;
 
-    const float newLength = handle.isFadeIn() ? static_cast<float>(event.x) / boxWidth
-                                              : static_cast<float>(event.getEventRelativeTo(event.originalComponent).x -
-                                                                   event.originalComponent->getWidth()) /
-                                                    (-static_cast<float>(boxWidth));
+    const float newLength = handle->isFadeIn()
+                                ? static_cast<float>(event.x) / boxWidth
+                                : static_cast<float>(event.getEventRelativeTo(event.originalComponent).x -
+                                                     event.originalComponent->getWidth()) /
+                                      (-static_cast<float>(boxWidth));
 
-    updateFadeLength(handle, newLength, currentAudioLength);
+    handle->setLength(newLength, currentAudioLength);
     return true;
 }
 
-bool FadeMouseHandler::handleMouseUp(const juce::MouseEvent& event)
+bool FadeMouseHandler::handleMouseUp(const juce::MouseEvent& event) const
 {
-    if(!hasActiveHandle())
+    if(!getActiveHandle())
         return false;
-
     fadeIn.setDragging(false);
     fadeOut.setDragging(false);
     return true;
 }
 
-bool FadeMouseHandler::handleMouseMove(const juce::MouseEvent& event, int componentWidth, uint16_t boxWidth,
-                                       int componentHeight)
+bool FadeMouseHandler::handleMouseMove(const juce::MouseEvent& event, const int componentWidth, const uint16_t boxWidth,
+                                       const int componentHeight) const
 {
     return updateMouseOverStates(event.getPosition(), componentWidth, boxWidth, componentHeight);
 }
-
-FadeHandle* FadeMouseHandler::getActiveHandle()
-{
-    if(fadeIn.getDragging())
-        return &fadeIn;
-    if(fadeOut.getDragging())
-        return &fadeOut;
-    return nullptr;
-}
-
-const FadeHandle* FadeMouseHandler::getActiveHandle() const
-{
-    if(fadeIn.getDragging())
-        return &fadeIn;
-    if(fadeOut.getDragging())
-        return &fadeOut;
-    return nullptr;
-}
-
-bool FadeMouseHandler::hasActiveHandle() const { return fadeIn.getDragging() || fadeOut.getDragging(); }
 
 juce::MouseCursor FadeMouseHandler::getAppropriateMouseCursor() const
 {
@@ -85,7 +63,7 @@ juce::MouseCursor FadeMouseHandler::getAppropriateMouseCursor() const
                                                              : juce::MouseCursor::NormalCursor;
 }
 
-void FadeMouseHandler::reset()
+void FadeMouseHandler::reset() const
 {
     fadeIn.setDragging(false);
     fadeOut.setDragging(false);
@@ -93,18 +71,11 @@ void FadeMouseHandler::reset()
     fadeOut.setMouseOver(false);
 }
 
-bool FadeMouseHandler::updateMouseOverStates(const juce::Point<int>& mousePos, int componentWidth, uint16_t boxWidth,
-                                             int componentHeight)
+bool FadeMouseHandler::updateMouseOverStates(const juce::Point<int>& mousePos, const int componentWidth,
+                                             const uint16_t boxWidth, const int componentHeight) const
 {
     const bool wasOverAny = fadeIn.getMouseOver() || fadeOut.getMouseOver();
-
     fadeIn.setMouseOver(fadeIn.isMouseOverHandle(mousePos, componentWidth, boxWidth, componentHeight));
     fadeOut.setMouseOver(fadeOut.isMouseOverHandle(mousePos, componentWidth, boxWidth, componentHeight));
-
     return wasOverAny != (fadeIn.getMouseOver() || fadeOut.getMouseOver());
-}
-
-void FadeMouseHandler::updateFadeLength(FadeHandle& handle, float newLength, float maxLength)
-{
-    handle.setLength(newLength, maxLength);
 }
