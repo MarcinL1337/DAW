@@ -1,15 +1,14 @@
 #include "FadeController.h"
 
 FadeController::FadeController(juce::ValueTree& parentTree, NodeID audioClipID) :
-    tree(parentTree), audioClipID(audioClipID), mouseHandler(fadeIn, fadeOut)
+    tree(parentTree), audioClipID(audioClipID)
 {
     setInterceptsMouseClicks(true, false);
 }
 
 void FadeController::setFadeType(const bool isFadeIn, const FadeType type)
 {
-    auto& handle = isFadeIn ? fadeIn : fadeOut;
-    handle.setType(type);
+    getHandle(isFadeIn).data.type = type;
     repaint();
     notifyAudioProcessor();
 }
@@ -17,68 +16,82 @@ void FadeController::setFadeType(const bool isFadeIn, const FadeType type)
 void FadeController::updateForNewAudioLength(const float audioLengthSeconds)
 {
     currentAudioLength = audioLengthSeconds;
-
-    fadeIn.updateForNewAudioLength(audioLengthSeconds);
-    fadeOut.updateForNewAudioLength(audioLengthSeconds);
-
     rebuildPathsIfNeeded();
 }
 
 void FadeController::updateForNewBoxWidth(const uint16_t newBoxWidth)
 {
     currentBoxWidth = newBoxWidth;
-    fadeIn.updateForNewBoxWidth(newBoxWidth);
-    fadeOut.updateForNewBoxWidth(newBoxWidth);
     rebuildPathsIfNeeded();
 }
 
-FadeType FadeController::getFadeType(const bool isFadeIn) const { return (isFadeIn ? fadeIn : fadeOut).getType(); }
+FadeType FadeController::getFadeType(const bool isFadeIn) const { return getHandle(isFadeIn).data.type; }
 
 void FadeController::paint(juce::Graphics& g)
 {
     rebuildPathsIfNeeded();
-
     fadeIn.drawPath(g);
     fadeOut.drawPath(g);
-    fadeIn.drawHandle(g, getWidth(), currentBoxWidth, getHeight());
-    fadeOut.drawHandle(g, getWidth(), currentBoxWidth, getHeight());
+
+    const ComponentDimensions dims{getWidth(), getHeight(), currentBoxWidth};
+    fadeIn.drawHandle(g, dims);
+    fadeOut.drawHandle(g, dims);
 }
 
 void FadeController::resized() { rebuildPathsIfNeeded(); }
 
 void FadeController::mouseDown(const juce::MouseEvent& event)
 {
-    if(event.mods.isRightButtonDown())
+    const ComponentDimensions dims{getWidth(), getHeight(), currentBoxWidth};
+    const auto pos = event.getPosition();
+
+    auto checkHandle = [&](FadeHandle& handle, const bool isFadeIn) -> bool
     {
-        if(fadeIn.isMouseOverHandle(event.getPosition(), getWidth(), currentBoxWidth, getHeight()))
-            showTypeMenu(true);
-        else if(fadeOut.isMouseOverHandle(event.getPosition(), getWidth(), currentBoxWidth, getHeight()))
-            showTypeMenu(false);
-    }
-    else
-    {
-        mouseHandler.handleMouseDown(event, getWidth(), currentBoxWidth, getHeight());
-    }
+        if(!handle.isMouseOverHandle(pos, dims))
+            return false;
+
+        if(event.mods.isRightButtonDown())
+        {
+            showTypeMenu(isFadeIn);
+        }
+        else if(event.mods.isLeftButtonDown())
+        {
+            handle.isDragging = true;
+        }
+        return true;
+    };
+
+    checkHandle(fadeIn, true) || checkHandle(fadeOut, false);
 }
 
 void FadeController::mouseDrag(const juce::MouseEvent& event)
 {
-    if(mouseHandler.handleMouseDrag(event, currentBoxWidth, currentAudioLength))
-    {
-        rebuildPathsIfNeeded();
-        repaint();
-    }
+    auto* handle = getActiveHandle();
+    if(!handle || event.x < 0 || event.x > getWidth())
+        return;
+
+    const float newLength = handle->isInType ? static_cast<float>(event.x) / currentBoxWidth
+                                             : static_cast<float>(event.getEventRelativeTo(this).x - getWidth()) /
+                                                   (-static_cast<float>(currentBoxWidth));
+
+    handle->setLength(newLength, currentAudioLength);
+    rebuildPathsIfNeeded();
+    repaint();
 }
 
 void FadeController::mouseUp(const juce::MouseEvent& event)
 {
-    if(mouseHandler.handleMouseUp(event))
+    if(getActiveHandle())
+    {
+        fadeIn.isDragging = false;
+        fadeOut.isDragging = false;
         notifyAudioProcessor();
+    }
 }
 
 void FadeController::mouseMove(const juce::MouseEvent& event)
 {
-    if(mouseHandler.handleMouseMove(event, getWidth(), currentBoxWidth, getHeight()))
+    if(updateMouseOverStates(event.getPosition()))
     {
         rebuildPathsIfNeeded();
         repaint();
@@ -88,59 +101,67 @@ void FadeController::mouseMove(const juce::MouseEvent& event)
 
 void FadeController::showTypeMenu(bool isFadeIn)
 {
-    juce::PopupMenu menu = createTypeMenu(isFadeIn ? fadeIn.getType() : fadeOut.getType());
-
-    menu.showMenuAsync(juce::PopupMenu::Options(),
-                       [this, isFadeIn](const int result) { handleTypeMenuResult(result, isFadeIn, this); });
-}
-
-void FadeController::notifyAudioProcessor()
-{
-    juce::var fadeDataVar;
-    auto* fadeDataObj = new juce::DynamicObject();
-
-    fadeDataObj->setProperty("audioClipID", static_cast<int>(audioClipID.uid));
-    fadeDataObj->setProperty("fadeInEnabled", fadeIn.isEnabled());
-    fadeDataObj->setProperty("fadeInLength", fadeIn.getLength());
-    fadeDataObj->setProperty("fadeInType", static_cast<int>(fadeIn.getType()));
-    fadeDataObj->setProperty("fadeOutEnabled", fadeOut.isEnabled());
-    fadeDataObj->setProperty("fadeOutLength", fadeOut.getLength());
-    fadeDataObj->setProperty("fadeOutType", static_cast<int>(fadeOut.getType()));
-
-    tree.setProperty("updateFadeData", juce::var(fadeDataObj), nullptr);
-}
-
-void FadeController::updateMouseCursor() { setMouseCursor(mouseHandler.getAppropriateMouseCursor()); }
-
-void FadeController::rebuildPathsIfNeeded()
-{
-    fadeIn.rebuildPath(getWidth(), getHeight(), currentBoxWidth);
-    fadeOut.rebuildPath(getWidth(), getHeight(), currentBoxWidth);
-}
-
-juce::PopupMenu FadeController::createTypeMenu(FadeType currentType)
-{
     juce::PopupMenu menu;
     const auto typeNames = Fade::getFadeTypeNames();
+    const auto currentType = getHandle(isFadeIn).data.type;
 
     for(int i = 0; i < typeNames.size(); ++i)
         menu.addItem(i + 1, typeNames[i], true, Fade::getFadeTypeFromIndex(i) == currentType);
 
-    return menu;
+    menu.showMenuAsync(juce::PopupMenu::Options(),
+                       [this, isFadeIn](const int result)
+                       {
+                           if(result > 0)
+                               setFadeType(isFadeIn, Fade::getFadeTypeFromIndex(result - 1));
+                       });
 }
 
-void FadeController::handleTypeMenuResult(const int result, const bool isFadeIn, FadeController* controller)
+void FadeController::notifyAudioProcessor()
 {
-    if(result > 0 && controller)
-        controller->setFadeType(isFadeIn, Fade::getFadeTypeFromIndex(result - 1));
+    auto* fadeDataObj = new juce::DynamicObject();
+
+    fadeDataObj->setProperty("audioClipID", static_cast<int>(audioClipID.uid));
+    fadeDataObj->setProperty("fadeInEnabled", fadeIn.data.enabled);
+    fadeDataObj->setProperty("fadeInLength", fadeIn.data.lengthSeconds);
+    fadeDataObj->setProperty("fadeInType", static_cast<int>(fadeIn.data.type));
+    fadeDataObj->setProperty("fadeOutEnabled", fadeOut.data.enabled);
+    fadeDataObj->setProperty("fadeOutLength", fadeOut.data.lengthSeconds);
+    fadeDataObj->setProperty("fadeOutType", static_cast<int>(fadeOut.data.type));
+
+    tree.setProperty("updateFadeData", juce::var(fadeDataObj), nullptr);
+}
+
+void FadeController::updateMouseCursor()
+{
+    setMouseCursor((fadeIn.isMouseOver || fadeOut.isMouseOver) ? juce::MouseCursor::LeftRightResizeCursor
+                                                               : juce::MouseCursor::NormalCursor);
+}
+
+void FadeController::rebuildPathsIfNeeded()
+{
+    const ComponentDimensions dims{
+        static_cast<int>(currentAudioLength * currentBoxWidth), getHeight(), currentBoxWidth};
+    fadeIn.rebuildPath(dims);
+    fadeOut.rebuildPath(dims);
 }
 
 bool FadeController::hitTest(const int x, const int y)
 {
-    if(const juce::Point point(x, y); fadeIn.isMouseOverHandle(point, getWidth(), currentBoxWidth, getHeight()) ||
-                                      fadeOut.isMouseOverHandle(point, getWidth(), currentBoxWidth, getHeight()))
-    {
-        return true;
-    }
-    return false;
+    const ComponentDimensions dims{getWidth(), getHeight(), currentBoxWidth};
+    const juce::Point point(x, y);
+    return fadeIn.isMouseOverHandle(point, dims) || fadeOut.isMouseOverHandle(point, dims);
+}
+
+FadeHandle* FadeController::getActiveHandle()
+{
+    return fadeIn.isDragging ? &fadeIn : (fadeOut.isDragging ? &fadeOut : nullptr);
+}
+
+bool FadeController::updateMouseOverStates(const juce::Point<int>& mousePos)
+{
+    const ComponentDimensions dims{getWidth(), getHeight(), currentBoxWidth};
+    const bool wasOverAny = fadeIn.isMouseOver || fadeOut.isMouseOver;
+    fadeIn.isMouseOver = fadeIn.isMouseOverHandle(mousePos, dims);
+    fadeOut.isMouseOver = fadeOut.isMouseOverHandle(mousePos, dims);
+    return wasOverAny != (fadeIn.isMouseOver || fadeOut.isMouseOver);
 }

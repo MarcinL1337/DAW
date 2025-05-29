@@ -78,4 +78,13 @@ namespace FadeConstants
 {
 constexpr int handleSize{10};
 constexpr int handleBorderThickness{1};
+constexpr int mouseInteractionDistance{10};
+constexpr float fadePathAlpha{0.4f};
+
+inline const auto fadeInBaseColour{juce::Colour(0xff4A90E2)};
+inline const auto fadeOutBaseColour{juce::Colour(0xff7B68EE)};
+inline const auto handleMouseOverColour{juce::Colours::white};
+inline const auto handleNormalColour{juce::Colours::lightblue};
+
+inline const juce::StringArray fadeTypeNames{"Linear", "Logarithmic", "Exponential", "S-Curve"};
 }  // namespace FadeConstants

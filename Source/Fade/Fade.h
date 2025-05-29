@@ -1,6 +1,7 @@
 #pragma once
 #include <juce_core/juce_core.h>
 #include <juce_gui_extra/juce_gui_extra.h>
+#include "../Constants.h"
 
 enum class FadeType
 {
@@ -19,31 +20,12 @@ struct FadeData
 
 namespace Fade
 {
-inline const juce::StringArray& getFadeTypeNames()
-{
-    static const juce::StringArray names{"Linear", "Logarithmic", "Exponential", "S-Curve"};
-    return names;
-}
+inline const juce::StringArray& getFadeTypeNames() { return FadeConstants::fadeTypeNames; }
 
 inline FadeType getFadeTypeFromIndex(const int index) { return static_cast<FadeType>(index); }
-
 inline int getIndexFromFadeType(FadeType type) { return static_cast<int>(type); }
 
-inline float getFadeValue(float position, const FadeType type, const bool isFadeIn)
-{
-    position = juce::jlimit(0.0f, 1.0f, isFadeIn ? position : 1.0f - position);
+float getFadeValue(float position, FadeType type, bool isFadeIn);
 
-    switch(type)
-    {
-        case FadeType::Logarithmic:
-            return std::log10(1.0f + position * 9.0f);
-        case FadeType::Exponential:
-            return position * position;
-        case FadeType::SCurve:
-            return (std::sin((position - 0.5f) * juce::MathConstants<float>::pi) + 1.0f) * 0.5f;
-        default:
-            return position;  // Linear
-    }
-}
 juce::Path buildFadePath(const FadeData& fadeData, bool isFadeIn, int width, int height, uint16_t boxWidth);
 }  // namespace Fade

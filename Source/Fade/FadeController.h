@@ -1,6 +1,6 @@
 #pragma once
 #include <juce_audio_utils/juce_audio_utils.h>
-#include "FadeMouseHandler.h"
+#include "FadeHandle.h"
 
 using NodeID = juce::AudioProcessorGraph::NodeID;
 
@@ -12,7 +12,6 @@ public:
     void setFadeType(bool isFadeIn, FadeType type);
     void updateForNewAudioLength(float audioLengthSeconds);
     void updateForNewBoxWidth(uint16_t newBoxWidth);
-
     FadeType getFadeType(bool isFadeIn) const;
 
 protected:
@@ -29,17 +28,16 @@ private:
     void notifyAudioProcessor();
     void updateMouseCursor();
     void rebuildPathsIfNeeded();
+    FadeHandle* getActiveHandle();
+    bool updateMouseOverStates(const juce::Point<int>& mousePos);
+
+    FadeHandle& getHandle(const bool isFadeIn) { return isFadeIn ? fadeIn : fadeOut; }
+    const FadeHandle& getHandle(const bool isFadeIn) const { return isFadeIn ? fadeIn : fadeOut; }
 
     juce::ValueTree& tree;
     NodeID audioClipID;
-
     FadeHandle fadeIn{true};
     FadeHandle fadeOut{false};
-    FadeMouseHandler mouseHandler{fadeIn, fadeOut};
-
     uint16_t currentBoxWidth{TrackPlayerConstants::startBoxWidth};
     float currentAudioLength{0.0f};
-
-    static juce::PopupMenu createTypeMenu(FadeType currentType);
-    static void handleTypeMenuResult(int result, bool isFadeIn, FadeController* controller);
 };
