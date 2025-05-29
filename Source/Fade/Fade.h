@@ -23,9 +23,7 @@ namespace Fade
 constexpr std::array<const char*, 4> FADE_TYPE_NAMES = {"Linear", "Logarithmic", "Exponential", "S-Curve"};
 
 inline juce::StringArray getFadeTypeNames()
-{
-    return juce::StringArray(FADE_TYPE_NAMES.data(), FADE_TYPE_NAMES.size());
-}
+{ return {FADE_TYPE_NAMES.data(), FADE_TYPE_NAMES.size()}; }
 
 inline FadeType getFadeTypeFromIndex(int index) { return static_cast<FadeType>(juce::jlimit(0, 3, index)); }
 

@@ -1,7 +1,6 @@
 #include "Fade.h"
 #include <juce_core/juce_core.h>
 
-
 juce::Path Fade::buildFadePath(const FadeData& fadeData, bool isFadeIn, int width, int height, uint16_t boxWidth)
 {
     juce::Path path;

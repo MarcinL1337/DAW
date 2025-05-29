@@ -11,16 +11,11 @@ class FadeController final : public juce::Component
 public:
     explicit FadeController(juce::ValueTree& parentTree, NodeID audioClipID);
 
-    void setFadeLength(bool isFadeIn, float lengthInSeconds);
     void setFadeType(bool isFadeIn, FadeType type);
     void updateForNewAudioLength(float audioLengthSeconds);
     void updateForNewBoxWidth(uint16_t newBoxWidth);
 
-    float getFadeLength(bool isFadeIn) const;
     FadeType getFadeType(bool isFadeIn) const;
-    bool isFadeEnabled(bool isFadeIn) const;
-
-    const FadeHandle& getFadeHandle(bool isFadeIn) const;
 
 protected:
     void paint(juce::Graphics& g) override;
@@ -29,6 +24,7 @@ protected:
     void mouseDrag(const juce::MouseEvent& event) override;
     void mouseUp(const juce::MouseEvent& event) override;
     void mouseMove(const juce::MouseEvent& event) override;
+    bool hitTest(int x, int y) override;
 
 private:
     void showTypeMenu(bool isFadeIn);

@@ -6,16 +6,7 @@ FadeController::FadeController(juce::ValueTree& parentTree, NodeID audioClipID) 
     setInterceptsMouseClicks(true, false);
 }
 
-void FadeController::setFadeLength(bool isFadeIn, float lengthInSeconds)
-{
-    auto& handle = isFadeIn ? fadeIn : fadeOut;
-    handle.setLength(lengthInSeconds, currentAudioLength);
-    needsRepaint = true;
-    repaint();
-    notifyAudioProcessor();
-}
-
-void FadeController::setFadeType(bool isFadeIn, FadeType type)
+void FadeController::setFadeType(const bool isFadeIn, const FadeType type)
 {
     auto& handle = isFadeIn ? fadeIn : fadeOut;
     handle.setType(type);
@@ -24,7 +15,7 @@ void FadeController::setFadeType(bool isFadeIn, FadeType type)
     notifyAudioProcessor();
 }
 
-void FadeController::updateForNewAudioLength(float audioLengthSeconds)
+void FadeController::updateForNewAudioLength(const float audioLengthSeconds)
 {
     currentAudioLength = audioLengthSeconds;
 
@@ -34,7 +25,7 @@ void FadeController::updateForNewAudioLength(float audioLengthSeconds)
     rebuildPathsIfNeeded();
 }
 
-void FadeController::updateForNewBoxWidth(uint16_t newBoxWidth)
+void FadeController::updateForNewBoxWidth(const uint16_t newBoxWidth)
 {
     currentBoxWidth = newBoxWidth;
     fadeIn.updateForNewBoxWidth(newBoxWidth);
@@ -42,13 +33,7 @@ void FadeController::updateForNewBoxWidth(uint16_t newBoxWidth)
     rebuildPathsIfNeeded();
 }
 
-float FadeController::getFadeLength(bool isFadeIn) const { return (isFadeIn ? fadeIn : fadeOut).getLength(); }
-
-FadeType FadeController::getFadeType(bool isFadeIn) const { return (isFadeIn ? fadeIn : fadeOut).getType(); }
-
-bool FadeController::isFadeEnabled(bool isFadeIn) const { return (isFadeIn ? fadeIn : fadeOut).isEnabled(); }
-
-const FadeHandle& FadeController::getFadeHandle(bool isFadeIn) const { return isFadeIn ? fadeIn : fadeOut; }
+FadeType FadeController::getFadeType(const bool isFadeIn) const { return (isFadeIn ? fadeIn : fadeOut).getType(); }
 
 void FadeController::paint(juce::Graphics& g)
 {
@@ -85,9 +70,7 @@ void FadeController::mouseDrag(const juce::MouseEvent& event)
 void FadeController::mouseUp(const juce::MouseEvent& event)
 {
     if(mouseHandler.handleMouseUp(event))
-    {
         notifyAudioProcessor();
-    }
 }
 
 void FadeController::mouseMove(const juce::MouseEvent& event)
@@ -97,7 +80,6 @@ void FadeController::mouseMove(const juce::MouseEvent& event)
         rebuildPathsIfNeeded();
         repaint();
     }
-
     updateMouseCursor();
 }
 
@@ -106,7 +88,7 @@ void FadeController::showTypeMenu(bool isFadeIn)
     juce::PopupMenu menu = createTypeMenu(isFadeIn ? fadeIn.getType() : fadeOut.getType());
 
     menu.showMenuAsync(juce::PopupMenu::Options(),
-                       [this, isFadeIn](int result) { handleTypeMenuResult(result, isFadeIn, this); });
+                       [this, isFadeIn](const int result) { handleTypeMenuResult(result, isFadeIn, this); });
 }
 
 void FadeController::notifyAudioProcessor()
@@ -136,20 +118,26 @@ void FadeController::rebuildPathsIfNeeded()
 juce::PopupMenu FadeController::createTypeMenu(FadeType currentType)
 {
     juce::PopupMenu menu;
-    auto typeNames = Fade::getFadeTypeNames();
+    const auto typeNames = Fade::getFadeTypeNames();
 
     for(int i = 0; i < typeNames.size(); ++i)
-    {
         menu.addItem(i + 1, typeNames[i], true, Fade::getFadeTypeFromIndex(i) == currentType);
-    }
 
     return menu;
 }
 
-void FadeController::handleTypeMenuResult(int result, bool isFadeIn, FadeController* controller)
+void FadeController::handleTypeMenuResult(const int result, const bool isFadeIn, FadeController* controller)
 {
     if(result > 0 && controller)
-    {
         controller->setFadeType(isFadeIn, Fade::getFadeTypeFromIndex(result - 1));
+}
+
+bool FadeController::hitTest(const int x, const int y)
+{
+    if(const juce::Point point(x, y); fadeIn.isMouseOverHandle(point, getWidth(), currentBoxWidth, getHeight()) ||
+                                      fadeOut.isMouseOverHandle(point, getWidth(), currentBoxWidth, getHeight()))
+    {
+        return true;
     }
+    return false;
 }

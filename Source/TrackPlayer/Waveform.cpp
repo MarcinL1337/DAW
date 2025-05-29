@@ -9,7 +9,7 @@ Waveform::Waveform(const uint16_t boxWidth, juce::ValueTree& parentTree, const N
     audioClipID{newAudioClipID}
 {
     audioThumbnail.addChangeListener(this);
-    setInterceptsMouseClicks(false, false);
+    setInterceptsMouseClicks(false, true);
     fadeController = std::make_unique<FadeController>(tree, audioClipID);
 }
 
