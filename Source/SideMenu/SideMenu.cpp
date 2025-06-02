@@ -71,8 +71,8 @@ void SideMenu::sliderValueChanged(juce::Slider* changedSlider)
     else if(changedSlider == &gainSlider)
     {
         sliderValuesPerTrack.at(currentTrackIndex).gainValue = gainSlider.getValue();
-        const juce::Array<juce::var> tmp{currentTrackIndex, gainSlider.getValue()};
-        tree.setProperty(ValueTreeIDs::trackGainChanged, tmp, nullptr);
+        const juce::Array<juce::var> trackAndGainInfo{currentTrackIndex, gainSlider.getValue()};
+        tree.setProperty(ValueTreeIDs::trackGainChanged, trackAndGainInfo, nullptr);
     }
     else if(changedSlider == &faderSlider)
     {

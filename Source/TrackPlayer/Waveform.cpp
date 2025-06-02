@@ -66,5 +66,6 @@ void Waveform::setOffsetSeconds(const double newOffsetSeconds)
         tree.setProperty(
             ValueTreeIDs::numOfSecondsChanged, std::ceil(audioThumbnail.getTotalLength()) + offsetSeconds, nullptr);
     }
+    resized();
 }
 

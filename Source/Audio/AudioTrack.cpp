@@ -46,27 +46,14 @@ void AudioTrack::setProperty(const AudioClipProperty property, const bool boolVa
     {
         case AudioClipProperty::MUTE:
             properties.mute = boolValue;
+            for(const auto& clipId: audioClips) { mainAudio.setMuteOfAudioClip(clipId, boolValue); }
             break;
         case AudioClipProperty::SOLO:
             properties.solo = boolValue;
+            for(const auto& clipId: audioClips) { mainAudio.setSoloOfAudioClip(clipId, boolValue); }
             break;
         default:
-            return;
-    }
-
-    for(const auto& clipId: audioClips)
-    {
-        switch(property)
-        {
-            case AudioClipProperty::MUTE:
-                mainAudio.setMuteOfAudioClip(clipId, boolValue);
-                break;
-            case AudioClipProperty::SOLO:
-                mainAudio.setSoloOfAudioClip(clipId, boolValue);
-                break;
-            default:
-                break;
-        }
+            std::unreachable();
     }
 }
 
@@ -76,27 +63,14 @@ void AudioTrack::setProperty(const AudioClipProperty property, const float float
     {
         case AudioClipProperty::GAIN:
             properties.gain = floatValue;
+            for(const auto& clipId: audioClips) { mainAudio.setGainOfAudioClip(clipId, floatValue); }
             break;
         case AudioClipProperty::PAN:
             properties.pan = floatValue;
+            for(const auto& clipId: audioClips) { mainAudio.setPanOfAudioClip(clipId, floatValue); }
             break;
         default:
-            return;
-    }
-
-    for(const auto& clipId: audioClips)
-    {
-        switch(property)
-        {
-            case AudioClipProperty::GAIN:
-                mainAudio.setGainOfAudioClip(clipId, floatValue);
-                break;
-            case AudioClipProperty::PAN:
-                mainAudio.setPanOfAudioClip(clipId, floatValue);
-                break;
-            default:
-                break;
-        }
+            std::unreachable();
     }
 }
 
