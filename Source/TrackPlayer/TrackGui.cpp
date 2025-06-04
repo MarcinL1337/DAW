@@ -3,10 +3,7 @@
 
 TrackGui::TrackGui(const uint16_t boxWidth, const int numOfSeconds, juce::ValueTree& parentTree) :
     tree{parentTree}, currentBoxWidth{boxWidth}, currentNumOfSeconds{numOfSeconds}
-{
-    initPopUpMenuForTrack();
-    initPopUpMenuForClip();
-}
+{}
 
 void TrackGui::paint(juce::Graphics& g)
 {
@@ -41,15 +38,15 @@ void TrackGui::mouseDown(const juce::MouseEvent& event)
 {
     if(event.mods.isRightButtonDown())
     {
-        for(auto& waveform: waveforms)
+        for(const auto& waveform: waveforms)
         {
             if(waveform->getBoundsInParent().contains(event.mouseDownPosition.x, event.mouseDownPosition.y))
             {
-                showPopUpMenuForClip();
+                showPopUpMenuForClip(*waveform);
                 return;
             }
         }
-        showPopUpMenuForTrack();
+        showPopUpMenuForTrack(event.mouseDownPosition.x);
     }
     if(event.mods.isLeftButtonDown())
     {
@@ -57,17 +54,22 @@ void TrackGui::mouseDown(const juce::MouseEvent& event)
     }
 }
 
-void TrackGui::initPopUpMenuForTrack()
+juce::PopupMenu TrackGui::initPopUpMenuForTrack()
 {
+    juce::PopupMenu trackMenu;
+
     trackMenu.addItem(deleteTrack, "Delete track");
     trackMenu.addItem(duplicateTrack, "Duplicate the track");
-    trackMenu.addItem(4, "Do an epic dab");
+    trackMenu.addItem(pasteAudioClip, "Paste audio clip", isAnyWaveformCopied, false);
+
+    return trackMenu;
 }
 
-void TrackGui::showPopUpMenuForTrack()
+void TrackGui::showPopUpMenuForTrack(const float clickOffset)
 {
+    auto trackMenu = initPopUpMenuForTrack();
     trackMenu.showMenuAsync(juce::PopupMenu::Options(),
-                            [this](const int option)
+                            [this, clickOffset](const int option)
                             {
                                 switch(option)
                                 {
@@ -79,8 +81,8 @@ void TrackGui::showPopUpMenuForTrack()
                                     case duplicateTrack:
                                         triggerTrackGuiAction(ValueTreeIDs::duplicateTrackGui);
                                         break;
-                                    case 4:
-                                        std::cerr << "epic dab done" << std::endl;
+                                    case pasteAudioClip:
+                                        handleClipPaste(clickOffset);
                                         break;
                                     default:
                                         std::unreachable();
@@ -88,25 +90,35 @@ void TrackGui::showPopUpMenuForTrack()
                             });
 }
 
-void TrackGui::initPopUpMenuForClip()
+juce::PopupMenu TrackGui::initPopUpMenuForClip()
 {
+    juce::PopupMenu clipMenu;
+
     clipMenu.addItem(deleteAudioClip, "Delete audio clip");
-    clipMenu.addItem(4, "Do an epic yeet");
+    clipMenu.addItem(copyAudioClip, "Copy audio clip");
+    clipMenu.addItem(cutAudioClip, "Cut audio clip");
+
+    return clipMenu;
 }
 
-void TrackGui::showPopUpMenuForClip()
+void TrackGui::showPopUpMenuForClip(const Waveform& clipWaveform)
 {
+    auto clipMenu = initPopUpMenuForClip();
     clipMenu.showMenuAsync(juce::PopupMenu::Options(),
-                           [this](const int option)
+                           [this, &clipWaveform](const int option)
                            {
                                switch(option)
                                {
                                    case noOptionChosen:
                                        break;
                                    case deleteAudioClip:
+                                       handleClipDelete(clipWaveform);
                                        break;
-                                   case 4:
-                                       std::cerr << "epic yeet done" << std::endl;
+                                   case copyAudioClip:
+                                       handleClipCopy(clipWaveform);
+                                       break;
+                                   case cutAudioClip:
+                                       handleClipCut(clipWaveform);
                                        break;
                                    default:
                                        std::unreachable();
@@ -139,14 +151,52 @@ void TrackGui::changeBoxHeight(const uint16_t newBoxHeight)
 void TrackGui::triggerTrackGuiAction(const juce::Identifier& actionId) const
 {
     const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
-    auto index{0};
-    for(auto& trackGui: trackPlayer->trackGuiVector)
-    {
-        if(this == trackGui.get())
-        {
-            tree.setProperty(actionId, index, nullptr);
-            tree.setProperty(actionId, ValueTreeConstants::doNothing, nullptr);
-        }
-        index++;
-    }
+    const auto currentTrackIndex = std::distance(
+        trackPlayer->trackGuiVector.begin(),
+        std::ranges::find_if(trackPlayer->trackGuiVector, [this](auto& trackGui) { return this == trackGui.get(); }));
+
+    tree.setProperty(actionId, currentTrackIndex, nullptr);
+    tree.setProperty(actionId, ValueTreeConstants::doNothing, nullptr);
+}
+
+void TrackGui::handleClipDelete(const Waveform& clipWaveform)
+{
+    const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
+    const auto currentTrackIndex = std::distance(
+        trackPlayer->trackGuiVector.begin(),
+        std::ranges::find_if(trackPlayer->trackGuiVector, [this](auto& trackGui) { return this == trackGui.get(); }));
+
+    const juce::Array<juce::var> deletedClipInfo{currentTrackIndex,
+                                                 static_cast<int>(clipWaveform.getAudioClipID().uid)};
+    tree.setProperty(ValueTreeIDs::deleteAudioClip, deletedClipInfo, nullptr);
+
+    waveforms.erase(std::ranges::find_if(
+        waveforms, [&clipWaveform](auto& waveformPtr) { return waveformPtr.get() == &clipWaveform; }));
+}
+
+void TrackGui::handleClipCopy(const Waveform& clipWaveform)
+{
+    isAnyWaveformCopied = true;
+    tree.setProperty(ValueTreeIDs::copyAudioClip, static_cast<int>(clipWaveform.getAudioClipID().uid), nullptr);
+    tree.setProperty(ValueTreeIDs::copyAudioClip, ValueTreeConstants::doNothing, nullptr);
+}
+
+void TrackGui::handleClipCut(const Waveform& clipWaveform)
+{
+    handleClipCopy(clipWaveform);
+    handleClipDelete(clipWaveform);
+}
+
+void TrackGui::handleClipPaste(const float clickOffset)
+{
+    const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
+    const int currentTrackIndex = static_cast<int>(std::distance(
+        trackPlayer->trackGuiVector.begin(),
+        std::ranges::find_if(trackPlayer->trackGuiVector, [this](auto& trackGui) { return this == trackGui.get(); })));
+
+    float clickPositionToSeconds{clickOffset / static_cast<float>(currentBoxWidth)};
+    const juce::Array<juce::var> pasteInfo{currentTrackIndex, clickPositionToSeconds};
+
+    tree.setProperty(ValueTreeIDs::pasteAudioClip, pasteInfo, nullptr);
+    isAnyWaveformCopied = false;
 }

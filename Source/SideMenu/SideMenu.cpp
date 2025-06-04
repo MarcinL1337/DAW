@@ -72,8 +72,8 @@ void SideMenu::sliderValueChanged(juce::Slider* changedSlider)
     {
         // TODO: investigate bug where changing gain and switching between tracks
         sliderValuesPerTrack.at(currentTrackIndex).gainValue = gainSlider.getValue();
-        const juce::Array<juce::var> sliderChange{currentTrackIndex, gainSlider.getValue()};
-        tree.setProperty(ValueTreeIDs::trackGainChanged, sliderChange, nullptr);
+        const juce::Array<juce::var> trackAndGainInfo{currentTrackIndex, gainSlider.getValue()};
+        tree.setProperty(ValueTreeIDs::trackGainChanged, trackAndGainInfo, nullptr);
     }
     else if(changedSlider == &faderSlider)
     {

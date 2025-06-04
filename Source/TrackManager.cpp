@@ -4,13 +4,7 @@
 TrackManager::TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef, SideMenu& sideMenuRef) :
     trackGuiManager{trackGuiManagerRef}, mainAudio{mainAudioRef}, sideMenu{sideMenuRef}, tree{trackGuiManagerRef.tree}
 {
-    // TODO: "W chuj mi się to nie podoba"~LilMarcin
-    juce::Timer::callAfterDelay(200,
-                                [this]
-                                {
-                                    if(auto* parent = getParentComponent())
-                                        parent->addKeyListener(this);
-                                });
+    trackGuiManagerRef.addKeyListener(this);
     tree.addListener(this);
 }
 
@@ -83,6 +77,13 @@ void TrackManager::setOffsetOfAudioClipInSeconds(const NodeID nodeID, const doub
         }
 }
 
+bool TrackManager::removeAudioClipFromTrack(const int trackIndex, const NodeID clipId) const
+{
+    assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
+
+    return tracks[trackIndex]->removeAudioClip(clipId);
+}
+
 bool TrackManager::keyPressed(const juce::KeyPress& key, Component* originatingComponent)
 {
     if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '+')
@@ -152,5 +153,32 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const int trackIndex = tree[ValueTreeIDs::duplicateTrackGui];
         assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
         duplicateTrack(trackIndex);
+    }
+    else if(property == ValueTreeIDs::deleteAudioClip)
+    {
+        const int trackIndex = tree[ValueTreeIDs::deleteAudioClip][0];
+        const int audioClipUid = tree[ValueTreeIDs::deleteAudioClip][1];
+        const NodeID audioClipID{static_cast<uint32_t>(audioClipUid)};
+
+        assert(removeAudioClipFromTrack(trackIndex, audioClipID));
+    }
+    else if(property == ValueTreeIDs::copyAudioClip)
+    {
+        const int audioClipUid = tree[ValueTreeIDs::copyAudioClip];
+        const NodeID audioClipID{static_cast<uint32_t>(audioClipUid)};
+
+        currentlyCopiedClipFilePath.emplace(mainAudio.getAudioClipPath(audioClipID));
+    }
+    else if(property == ValueTreeIDs::pasteAudioClip)
+    {
+        if(currentlyCopiedClipFilePath.has_value())
+        {
+            const int trackIndex = tree[ValueTreeIDs::pasteAudioClip][0];
+            const float pastedClipOffset = tree[ValueTreeIDs::pasteAudioClip][1];
+
+            const auto newNodeId = addAudioClipToTrack(trackIndex, currentlyCopiedClipFilePath.value());
+            setOffsetOfAudioClipInSeconds(newNodeId, pastedClipOffset);
+            currentlyCopiedClipFilePath = std::nullopt;
+        }
     }
 }

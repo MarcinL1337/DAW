@@ -1,4 +1,5 @@
 #include "TrackGuiComponent.h"
+#include "TrackGuiManager.h"
 
 TrackGuiComponent::TrackGuiComponent(const juce::ValueTree& parentTree) : tree{parentTree} { tree.addListener(this); }
 
