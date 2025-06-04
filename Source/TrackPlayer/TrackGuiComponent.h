@@ -19,8 +19,6 @@ public:
     void changeBoxWidth(uint16_t newBoxWidth);
 
 private:
-    // void mouseDown(const juce::MouseEvent& event) override;
-
     juce::ValueTree tree;
 
     float timeBarTime{};

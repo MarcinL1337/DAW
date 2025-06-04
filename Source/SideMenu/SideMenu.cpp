@@ -70,6 +70,7 @@ void SideMenu::sliderValueChanged(juce::Slider* changedSlider)
     }
     else if(changedSlider == &gainSlider)
     {
+        // TODO: investigate bug where changing gain and switching between tracks
         sliderValuesPerTrack.at(currentTrackIndex).gainValue = gainSlider.getValue();
         const juce::Array<juce::var> trackAndGainInfo{currentTrackIndex, gainSlider.getValue()};
         tree.setProperty(ValueTreeIDs::trackGainChanged, trackAndGainInfo, nullptr);
@@ -164,4 +165,9 @@ void SideMenu::removeTrack(const int trackToBeDeletedIndex)
 {
     sliderValuesPerTrack.erase(sliderValuesPerTrack.begin() + trackToBeDeletedIndex);
     chooseNewTrackToBeSelected(trackToBeDeletedIndex);
+}
+
+void SideMenu::setTrackProperties(const int trackIndex, const float gainValue)
+{
+    sliderValuesPerTrack.at(trackIndex).gainValue = gainValue;
 }

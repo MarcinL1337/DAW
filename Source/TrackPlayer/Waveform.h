@@ -13,7 +13,6 @@ public:
     explicit Waveform(uint16_t boxWidth, juce::ValueTree& parentTree, NodeID newAudioClipID);
     explicit Waveform(const juce::String& newAudioFilePath, uint16_t boxWidth, juce::ValueTree& parentTree,
                       NodeID newAudioClipID);
-    // Waveform(const Waveform&);
     ~Waveform() override = default;
 
     void changeBoxWidth(uint16_t newBoxWidth);

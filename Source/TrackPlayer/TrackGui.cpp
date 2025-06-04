@@ -3,10 +3,7 @@
 
 TrackGui::TrackGui(const uint16_t boxWidth, const int numOfSeconds, juce::ValueTree& parentTree) :
     tree{parentTree}, currentBoxWidth{boxWidth}, currentNumOfSeconds{numOfSeconds}
-{
-    // initPopUpMenuForTrack();
-    // initPopUpMenuForClip();
-}
+{}
 
 void TrackGui::paint(juce::Graphics& g)
 {
