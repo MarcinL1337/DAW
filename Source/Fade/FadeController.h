@@ -1,6 +1,7 @@
 #pragma once
+
 #include <juce_audio_utils/juce_audio_utils.h>
-#include "FadeHandle.h"
+#include "../Constants.h"
 
 using NodeID = juce::AudioProcessorGraph::NodeID;
 
@@ -9,10 +10,8 @@ class FadeController final : public juce::Component
 public:
     explicit FadeController(juce::ValueTree& parentTree, NodeID audioClipID);
 
-    void setFadeType(bool isFadeIn, FadeType type);
     void updateForNewAudioLength(float audioLengthSeconds);
     void updateForNewBoxWidth(uint16_t newBoxWidth);
-    FadeType getFadeType(bool isFadeIn) const;
 
 protected:
     void paint(juce::Graphics& g) override;
@@ -24,20 +23,21 @@ protected:
     bool hitTest(int x, int y) override;
 
 private:
-    void showTypeMenu(bool isFadeIn);
+    juce::Path buildFadePath(bool isFadeIn, int width, int height);
+    void showFunctionMenu(bool isFadeIn);
     void notifyAudioProcessor();
-    void updateMouseCursor();
-    void rebuildPathsIfNeeded();
-    FadeHandle* getActiveHandle();
-    bool updateMouseOverStates(const juce::Point<int>& mousePos);
+    void rebuildPaths();
+    juce::Point<int> getHandlePosition(bool isFadeIn) const;
+    void drawHandle(juce::Graphics& g, bool isFadeIn) const;
+    bool isMouseOverHandle(const juce::Point<int>& mousePos, bool isFadeIn) const;
 
-    FadeHandle& getHandle(const bool isFadeIn) { return isFadeIn ? fadeIn : fadeOut; }
-    const FadeHandle& getHandle(const bool isFadeIn) const { return isFadeIn ? fadeIn : fadeOut; }
+    Fade::Data& getFadeData(const bool isFadeIn) { return fadeData[isFadeIn ? 0 : 1]; }
+    const Fade::Data& getFadeData(const bool isFadeIn) const { return fadeData[isFadeIn ? 0 : 1]; }
 
     juce::ValueTree& tree;
     NodeID audioClipID;
-    FadeHandle fadeIn{true};
-    FadeHandle fadeOut{false};
+    std::array<Fade::Data, 2> fadeData;  // [0] = fade in, [1] = fade out
+    juce::Optional<bool> draggingHandle;
     uint16_t currentBoxWidth{TrackPlayerConstants::startBoxWidth};
-    float currentAudioLength{0.0f};
+    const int handleSize{8};
 };

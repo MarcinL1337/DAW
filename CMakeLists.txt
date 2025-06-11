@@ -81,12 +81,8 @@ set(SourceFiles
         Source/TrackManager.h
         Source/TrackManager.cpp
 
-        Source/Fade/Fade.h
-        Source/Fade/Fade.cpp
         Source/Fade/FadeController.h
         Source/Fade/FadeController.cpp
-        Source/Fade/FadeHandle.h
-        Source/Fade/FadeHandle.cpp
 )
 
 juce_add_gui_app(${PROJECT_NAME}

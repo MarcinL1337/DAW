@@ -78,17 +78,36 @@ enum class Mode
 };
 }  // namespace PlayheadFollowConstants
 
-namespace FadeConstants
+namespace Fade
 {
-constexpr int handleSize{10};
-constexpr int handleBorderThickness{1};
-constexpr int mouseInteractionDistance{10};
-constexpr float fadePathAlpha{0.4f};
+enum class Function
+{
+    Linear = 1,
+    Logarithmic,
+    Exponential,
+    SCurve
+};
 
-inline const auto fadeInBaseColour{juce::Colour(0xff4A90E2)};
-inline const auto fadeOutBaseColour{juce::Colour(0xff7B68EE)};
-inline const auto handleMouseOverColour{juce::Colours::white};
-inline const auto handleNormalColour{juce::Colours::lightblue};
+struct Data
+{
+    float lengthSeconds = 0.0f;
+    Function function = Function::Linear;
+    juce::Path Path;
+};
 
-inline const juce::StringArray fadeTypeNames{"Linear", "Logarithmic", "Exponential", "S-Curve"};
-}  // namespace FadeConstants
+inline float getFadeValue(float position, const Function function, const bool isFadeIn)
+{
+    position = isFadeIn ? position : 1.0f - position;
+    switch(function)
+    {
+        case Function::Logarithmic:
+            return std::log10(1.0f + position * 9.0f);
+        case Function::Exponential:
+            return position * position;
+        case Function::SCurve:
+            return (std::sin((position - 0.5f) * juce::MathConstants<float>::pi) + 1.0f) * 0.5f;
+        default:  // Linear
+            return position;
+    }
+}
+}  // namespace Fade
