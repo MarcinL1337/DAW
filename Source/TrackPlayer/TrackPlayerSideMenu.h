@@ -31,6 +31,7 @@ public:
 
 private:
     void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property) override;
+    void mouseDown(const juce::MouseEvent& event) override;
 
     void setupRecordButton(const std::unique_ptr<juce::TextButton>& recordButton, juce::Rectangle<int>& buttonArea,
                            const uint16_t currentRow);
@@ -38,8 +39,7 @@ private:
                          const uint16_t currentRow);
     void setupMuteButton(const std::unique_ptr<juce::TextButton>& muteButton, juce::Rectangle<int>& buttonArea,
                          const uint16_t currentRow);
-    void setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel, juce::Rectangle<int>& trackNameArea,
-                             const uint16_t currentRow);
+    void setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel, juce::Rectangle<int>& trackNameArea);
 
     juce::Rectangle<int> getCurrentTrackButtonsArea(const uint16_t currentRow) const;
     juce::Rectangle<int> getCurrentTrackNameArea(const uint16_t currentRow) const;

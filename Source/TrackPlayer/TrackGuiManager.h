@@ -26,6 +26,7 @@ public:
 private:
     friend class TrackManager;
     friend class TrackGui;
+    friend class TrackGuiComponent;
 
     void paint(juce::Graphics& g) override;
     void resized() override;

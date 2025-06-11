@@ -34,6 +34,7 @@ public:
 
     void addTrack();
     void removeTrack(const int trackToBeDeletedIndex);
+    void setTrackProperties(const int trackIndex, const float gainValue);
 
 private:
     void paint(juce::Graphics& g) override;

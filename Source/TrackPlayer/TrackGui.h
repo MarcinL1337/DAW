@@ -28,29 +28,37 @@ public:
     void setOffsetOfWaveformInSeconds(NodeID audioClipID, double offsetSeconds) const;
 
 private:
+    friend class TrackGuiComponent;
+
     void paint(juce::Graphics& g) override;
     void resized() override;
     void mouseDown(const juce::MouseEvent& event) override;
 
     void makeNewWaveformFromAudioFilePath(const juce::String& newAudioFilePath, NodeID newAudioClipID);
-    void showPopUpMenuForTrack();
-    void initPopUpMenuForTrack();
-    void showPopUpMenuForClip();
-    void initPopUpMenuForClip();
+    static juce::PopupMenu initPopUpMenuForTrack();
+    static juce::PopupMenu initPopUpMenuForClip();
+    void showPopUpMenuForTrack(const float clickOffset);
+    void showPopUpMenuForClip(const Waveform& clipWaveform);
     void triggerTrackGuiAction(const juce::Identifier& actionId) const;
+    void handleClipDelete(const Waveform& clipWaveform);
+    void handleClipCopy(const Waveform& clipWaveform);
+    void handleClipCut(const Waveform& clipWaveform);
+    void handleClipPaste(const float clickOffset);
 
     enum popUpMenuOptions
     {
         noOptionChosen = 0,
         deleteTrack,
+        duplicateTrack,
         deleteAudioClip,
-        duplicateTrack
+        copyAudioClip,
+        cutAudioClip,
+        pasteAudioClip
     };
 
+    inline static bool isAnyWaveformCopied{false};
     std::vector<std::unique_ptr<Waveform>> waveforms{};
     juce::ValueTree& tree;
-    juce::PopupMenu trackMenu;
-    juce::PopupMenu clipMenu;
 
     uint16_t currentBoxWidth;
     uint16_t currentBoxHeight{TrackPlayerConstants::startBoxHeight};
