@@ -6,7 +6,11 @@ FadeController::FadeController(juce::ValueTree& parentTree, const NodeID audioCl
     setInterceptsMouseClicks(true, false);
 }
 
-void FadeController::updateForNewAudioLength(const float) { rebuildPaths(); }
+void FadeController::updateForNewAudioLength(const float audioLengthSeconds)
+{
+    this->audioLengthSeconds = audioLengthSeconds;
+    rebuildPaths();
+}
 
 void FadeController::updateForNewBoxWidth(const uint16_t newBoxWidth)
 {
@@ -41,8 +45,12 @@ void FadeController::mouseDrag(const juce::MouseEvent& event)
         return;
 
     const bool isFadeIn = *draggingHandle;
-    getFadeData(isFadeIn).lengthSeconds =
-        static_cast<float>(isFadeIn ? event.x : getWidth() - event.x) / currentBoxWidth;
+    const float newLengthSeconds = static_cast<float>(isFadeIn ? event.x : getWidth() - event.x) / currentBoxWidth;
+
+    const float otherFadeLength = getFadeData(!isFadeIn).lengthSeconds;
+    const float maxAllowedLength = audioLengthSeconds - otherFadeLength - 0.1f;  // min 0.1 sec gap between fades
+
+    getFadeData(isFadeIn).lengthSeconds = juce::jlimit(0.0f, juce::jmax(0.0f, maxAllowedLength), newLengthSeconds);
 
     rebuildPaths();
     repaint();
@@ -81,7 +89,18 @@ void FadeController::showFunctionMenu(bool isFadeIn)
                        });
 }
 
-void FadeController::notifyAudioProcessor() {}
+void FadeController::notifyAudioProcessor()
+{
+    juce::Array<juce::var> fadeInfo;
+    fadeInfo.add(static_cast<int>(audioClipID.uid));
+    fadeInfo.add(fadeData[0].lengthSeconds);
+    fadeInfo.add(static_cast<int>(fadeData[0].function));
+    fadeInfo.add(fadeData[1].lengthSeconds);
+    fadeInfo.add(static_cast<int>(fadeData[1].function));
+
+    tree.setProperty(ValueTreeIDs::audioClipFadeChanged, fadeInfo, nullptr);
+    tree.setProperty(ValueTreeIDs::audioClipFadeChanged, ValueTreeConstants::doNothing, nullptr);
+}
 
 void FadeController::rebuildPaths()
 {
@@ -139,3 +158,10 @@ juce::Path FadeController::buildFadePath(const bool isFadeIn, const int width, c
     path.closeSubPath();
     return path;
 }
+
+float FadeController::getFadeMultiplier(const double timePosition, const double totalLength) const
+{
+    return Fade::getFadeMultiplier(timePosition, totalLength, fadeData[0], fadeData[1]);
+}
+
+bool FadeController::hasFade() const { return fadeData[0].lengthSeconds > 0.0f || fadeData[1].lengthSeconds > 0.0f; }

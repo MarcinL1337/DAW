@@ -2,6 +2,7 @@
 
 #include <juce_audio_utils/juce_audio_utils.h>
 #include "../Constants.h"
+#include "Fade.h"
 
 using NodeID = juce::AudioProcessorGraph::NodeID;
 
@@ -22,6 +23,9 @@ protected:
     void mouseMove(const juce::MouseEvent& event) override;
     bool hitTest(int x, int y) override;
 
+    float getFadeMultiplier(double timePosition, double totalLength) const;
+    bool hasFade() const;
+
 private:
     juce::Path buildFadePath(bool isFadeIn, int width, int height);
     void showFunctionMenu(bool isFadeIn);
@@ -40,4 +44,7 @@ private:
     juce::Optional<bool> draggingHandle;
     uint16_t currentBoxWidth{TrackPlayerConstants::startBoxWidth};
     const int handleSize{8};
+    float audioLengthSeconds{0.0f};
+
+    friend class Waveform;
 };

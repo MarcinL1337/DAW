@@ -25,6 +25,7 @@ public:
 
 private:
     void paint(juce::Graphics& g) override;
+    void drawWaveformWithFade(juce::Graphics& g, const juce::Rectangle<int>& bounds);
     void resized() override;
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 

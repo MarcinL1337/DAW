@@ -66,6 +66,8 @@ inline static const juce::Identifier setSelectedTrack{"setSelectedTrack"};
 inline static const juce::Identifier deleteAudioClip{"deleteAudioClip"};
 inline static const juce::Identifier copyAudioClip{"copyAudioClip"};
 inline static const juce::Identifier pasteAudioClip{"pasteAudioClip"};
+
+inline static const juce::Identifier audioClipFadeChanged{"audioClipFadeChanged"};
 }  // namespace ValueTreeIDs
 
 namespace PlayheadFollowConstants
@@ -77,37 +79,3 @@ enum class Mode
     JumpFollow
 };
 }  // namespace PlayheadFollowConstants
-
-namespace Fade
-{
-enum class Function
-{
-    Linear = 1,
-    Logarithmic,
-    Exponential,
-    SCurve
-};
-
-struct Data
-{
-    float lengthSeconds = 0.0f;
-    Function function = Function::Linear;
-    juce::Path Path;
-};
-
-inline float getFadeValue(float position, const Function function, const bool isFadeIn)
-{
-    position = isFadeIn ? position : 1.0f - position;
-    switch(function)
-    {
-        case Function::Logarithmic:
-            return std::log10(1.0f + position * 9.0f);
-        case Function::Exponential:
-            return position * position;
-        case Function::SCurve:
-            return (std::sin((position - 0.5f) * juce::MathConstants<float>::pi) + 1.0f) * 0.5f;
-        default:  // Linear
-            return position;
-    }
-}
-}  // namespace Fade
