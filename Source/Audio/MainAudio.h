@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Constants.h"
 #include "AudioClip.h"
 using NodeID = juce::AudioProcessorGraph::NodeID;
 

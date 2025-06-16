@@ -1,5 +1,4 @@
 #include "Waveform.h"
-#include "../Audio/MainAudio.h"
 
 Waveform::Waveform(const uint16_t boxWidth, juce::ValueTree& parentTree, const NodeID newAudioClipID) :
     audioThumbnailCache(5),
