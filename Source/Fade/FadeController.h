@@ -23,7 +23,7 @@ protected:
     void mouseMove(const juce::MouseEvent& event) override;
     bool hitTest(int x, int y) override;
 
-    float getFadeMultiplier(double timePosition, double totalLength) const;
+    float getFadeMultiplier(double timePositionSeconds, double totalLengthSeconds) const;
     bool hasFade() const;
 
 private:
@@ -35,15 +35,16 @@ private:
     void drawHandle(juce::Graphics& g, bool isFadeIn) const;
     bool isMouseOverHandle(const juce::Point<int>& mousePos, bool isFadeIn) const;
 
-    Fade::Data& getFadeData(const bool isFadeIn) { return fadeData[isFadeIn ? 0 : 1]; }
-    const Fade::Data& getFadeData(const bool isFadeIn) const { return fadeData[isFadeIn ? 0 : 1]; }
+    Fade::Data& getFadeData(const bool isFadeIn) { return isFadeIn ? fadeIn : fadeOut; }
+    const Fade::Data& getFadeData(const bool isFadeIn) const { return isFadeIn ? fadeIn : fadeOut; }
 
     juce::ValueTree& tree;
     NodeID audioClipID;
-    std::array<Fade::Data, 2> fadeData;  // [0] = fade in, [1] = fade out
+    Fade::Data fadeIn, fadeOut;
     juce::Optional<bool> draggingHandle;
     uint16_t currentBoxWidth{TrackPlayerConstants::startBoxWidth};
     const int handleSize{8};
+    const int mouseInteractionDistance = 10;
     float audioLengthSeconds{0.0f};
 
     friend class Waveform;

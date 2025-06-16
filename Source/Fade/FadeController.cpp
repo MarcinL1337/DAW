@@ -21,9 +21,9 @@ void FadeController::updateForNewBoxWidth(const uint16_t newBoxWidth)
 void FadeController::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colour(0xff4A90E2).withAlpha(0.4f));
-    g.fillPath(fadeData[0].Path);
+    g.fillPath(fadeIn.Path);
     g.setColour(juce::Colour(0xff7B68EE).withAlpha(0.4f));
-    g.fillPath(fadeData[1].Path);
+    g.fillPath(fadeOut.Path);
 
     drawHandle(g, true);
     drawHandle(g, false);
@@ -93,10 +93,10 @@ void FadeController::notifyAudioProcessor()
 {
     juce::Array<juce::var> fadeInfo;
     fadeInfo.add(static_cast<int>(audioClipID.uid));
-    fadeInfo.add(fadeData[0].lengthSeconds);
-    fadeInfo.add(static_cast<int>(fadeData[0].function));
-    fadeInfo.add(fadeData[1].lengthSeconds);
-    fadeInfo.add(static_cast<int>(fadeData[1].function));
+    fadeInfo.add(fadeIn.lengthSeconds);
+    fadeInfo.add(static_cast<int>(fadeIn.function));
+    fadeInfo.add(fadeOut.lengthSeconds);
+    fadeInfo.add(static_cast<int>(fadeOut.function));
 
     tree.setProperty(ValueTreeIDs::audioClipFadeChanged, fadeInfo, nullptr);
     tree.setProperty(ValueTreeIDs::audioClipFadeChanged, ValueTreeConstants::doNothing, nullptr);
@@ -105,7 +105,9 @@ void FadeController::notifyAudioProcessor()
 void FadeController::rebuildPaths()
 {
     const int w = getWidth(), h = getHeight();
-    for(int i = 0; i < 2; ++i) fadeData[i].Path = buildFadePath(i == 0, w, h);
+    constexpr bool isFadeIn = true;
+    fadeIn.Path = buildFadePath(isFadeIn == true, w, h);
+    fadeOut.Path = buildFadePath(isFadeIn == false, w, h);
 }
 
 bool FadeController::hitTest(const int x, const int y)
@@ -130,12 +132,12 @@ void FadeController::drawHandle(juce::Graphics& g, const bool isFadeIn) const
     g.setColour(juce::Colours::white);
     g.fillRect(bounds);
     g.setColour(juce::Colours::black);
-    g.drawRect(bounds, 1);  // handleBorderThickness = 1
+    g.drawRect(bounds, 1);
 }
 
 bool FadeController::isMouseOverHandle(const juce::Point<int>& mousePos, const bool isFadeIn) const
 {
-    return mousePos.getDistanceFrom(getHandlePosition(isFadeIn)) < 10;  // mouseInteractionDistance = 10
+    return mousePos.getDistanceFrom(getHandlePosition(isFadeIn)) < mouseInteractionDistance;
 }
 
 juce::Path FadeController::buildFadePath(const bool isFadeIn, const int width, const int height)
@@ -159,9 +161,9 @@ juce::Path FadeController::buildFadePath(const bool isFadeIn, const int width, c
     return path;
 }
 
-float FadeController::getFadeMultiplier(const double timePosition, const double totalLength) const
+float FadeController::getFadeMultiplier(const double timePositionSeconds, const double totalLengthSeconds) const
 {
-    return Fade::getFadeMultiplier(timePosition, totalLength, fadeData[0], fadeData[1]);
+    return Fade::getFadeMultiplier(timePositionSeconds, totalLengthSeconds, fadeIn, fadeOut);
 }
 
-bool FadeController::hasFade() const { return fadeData[0].lengthSeconds > 0.0f || fadeData[1].lengthSeconds > 0.0f; }
+bool FadeController::hasFade() const { return fadeIn.lengthSeconds > 0.0f || fadeOut.lengthSeconds > 0.0f; }
