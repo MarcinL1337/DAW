@@ -28,7 +28,7 @@ void Timeline::paint(juce::Graphics& g)
 
 void Timeline::drawLineOnTimeline(juce::Graphics& g, const uint32_t lineNumber) const
 {
-    auto heightScale = lineNumber % 5 ? 0.66f : 0.5f;
+    const auto heightScale = lineNumber % 5 ? 0.66f : 0.5f;
     g.drawLine(currentTrackGuiBoxWidth * lineNumber,
                getHeight(),
                currentTrackGuiBoxWidth * lineNumber,
@@ -48,8 +48,7 @@ void Timeline::resized()
 
 void Timeline::mouseDown(const juce::MouseEvent& event)
 {
-    lastMousePosition = event.getPosition();
-    if(timeBar.getBounds().contains(lastMousePosition) and event.mods.isLeftButtonDown())
+    if(event.mods.isLeftButtonDown())
     {
         isCurrentlyDraggingTimeBar = true;
         tree.setProperty(ValueTreeIDs::isCurrentlyDraggingTimeBar, true, nullptr);
@@ -72,13 +71,8 @@ void Timeline::mouseDrag(const juce::MouseEvent& event)
     // TODO: add screen moving right/left when dragging to borders
     if(isCurrentlyDraggingTimeBar)
     {
-        timeBarXOffset = juce::jlimit(-TrackPlayerConstants::timeBarBoxSize / 2.0f,
-                                      static_cast<float>(getWidth()),
-                                      static_cast<float>(timeBarXOffset + event.getPosition().x - lastMousePosition.x));
-        timeBarTimeInSeconds = (static_cast<float>(timeBarXOffset) + TrackPlayerConstants::timeBarBoxSize / 2.0f) /
-                               getWidth() * currentNumOfSeconds;
+        timeBarTimeInSeconds = juce::jlimit(0.0f, 1.0f, static_cast<float>(event.x / getWidth())) * currentNumOfSeconds;
         tree.setProperty(ValueTreeIDs::timeBarTime, timeBarTimeInSeconds, nullptr);
-        lastMousePosition = event.getPosition();
         resized();
     }
 }
@@ -87,9 +81,13 @@ void Timeline::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier
 {
     if(static_cast<int>(tree[property]) == ValueTreeConstants::doNothing)
         return;
-    if(property == ValueTreeIDs::timeBarTime && !isCurrentlyDraggingTimeBar)
+    if(property == ValueTreeIDs::timeBarTime)
     {
         timeBarTimeInSeconds = tree[timeBarTime];
         resized();
     }
 }
+
+void Timeline::mouseMove(const juce::MouseEvent& event) { setMouseCursor(juce::MouseCursor::LeftRightResizeCursor); }
+
+bool Timeline::hitTest(const int x, const int y) { return timeBar.getBounds().contains(juce::Point(x, y)); }
