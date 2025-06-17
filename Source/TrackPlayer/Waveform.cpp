@@ -42,7 +42,7 @@ void Waveform::paint(juce::Graphics& g)
 
 void Waveform::resized()
 {
-    const float offsetPixels = offsetSeconds * currentTrackGuiBoxWidth;
+    const double offsetPixels = offsetSeconds * currentTrackGuiBoxWidth;
     const auto waveformLengthInPixels{audioThumbnail.getTotalLength() * currentTrackGuiBoxWidth};
     setBounds(offsetPixels, 0, std::ceil(waveformLengthInPixels), getHeight());
 }
@@ -58,8 +58,8 @@ void Waveform::changeBoxHeight(const uint16_t newBoxHeight) { currentTrackGuiBox
 void Waveform::setOffsetSeconds(const double newOffsetSeconds)
 {
     offsetSeconds = newOffsetSeconds;
-    const float offsetPixels = offsetSeconds * currentTrackGuiBoxWidth;
-    const auto waveformLengthInPixels{audioThumbnail.getTotalLength() * currentTrackGuiBoxWidth};
+    const double offsetPixels = offsetSeconds * currentTrackGuiBoxWidth;
+    const auto waveformLengthInPixels{audioThumbnail.getTotalLength() * static_cast<double>(currentTrackGuiBoxWidth)};
     if(waveformLengthInPixels + offsetPixels > getWidth())
     {
         tree.setProperty(
