@@ -71,7 +71,7 @@ void Timeline::mouseDrag(const juce::MouseEvent& event)
     // TODO: add screen moving right/left when dragging to borders
     if(isCurrentlyDraggingTimeBar)
     {
-        timeBarTimeInSeconds = juce::jlimit(0.0f, 1.0f, static_cast<float>(event.x / getWidth())) * currentNumOfSeconds;
+        timeBarTimeInSeconds = juce::jlimit(0.0f, 1.0f, static_cast<float>(event.x) / getWidth()) * currentNumOfSeconds;
         tree.setProperty(ValueTreeIDs::timeBarTime, timeBarTimeInSeconds, nullptr);
         resized();
     }
