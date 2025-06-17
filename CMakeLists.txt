@@ -51,6 +51,8 @@ set(SourceFiles
         Source/Toolbar/MainToolbar.h
         Source/Toolbar/MainToolbar.cpp
 
+        Source/TrackPlayer/ClipSplitBar.h
+        Source/TrackPlayer/ClipSplitBar.cpp
         Source/TrackPlayer/TrackGuiManager.h
         Source/TrackPlayer/TrackGuiManager.cpp
         Source/TrackPlayer/Timeline.h
@@ -115,6 +117,7 @@ juce_add_binary_data(BinaryData SOURCES
         Assets/ToolbarImages/replayButton.png
         Assets/ToolbarImages/stopButton.png
         Assets/ToolbarImages/followModeButton.png
+        Assets/ToolbarImages/split.png
 )
 
 # JUCE libraries to bring into our project
