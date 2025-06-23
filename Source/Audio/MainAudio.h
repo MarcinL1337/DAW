@@ -1,7 +1,9 @@
 #pragma once
 
+#include <cassert>
 #include "../Constants.h"
 #include "AudioClip.h"
+
 using NodeID = juce::AudioProcessorGraph::NodeID;
 
 class MainAudio final : public juce::AudioPlayHead,

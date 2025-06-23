@@ -19,6 +19,7 @@ public:
     ~TrackGuiManager() override = default;
 
     uint16_t getCurrentNumberOfTracks() const { return trackGuiVector.size(); }
+    uint16_t getCurrentTrackGuiBoxWidth() const { return currentTrackGuiBoxWidth; }
 
     void setFollowMode(const PlayheadFollowConstants::Mode mode) { followMode = mode; }
     PlayheadFollowConstants::Mode getFollowMode() const { return followMode; }

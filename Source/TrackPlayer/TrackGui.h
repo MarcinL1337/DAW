@@ -2,11 +2,13 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "../Constants.h"
+#include "ClipSplitBar.h"
 #include "Waveform.h"
 
 class TrackGuiManager;
 
-class TrackGui final : public juce::Component
+class TrackGui final : public juce::Component,
+                       public juce::ValueTree::Listener
 {
 public:
     explicit TrackGui(uint16_t boxWidth, int numOfSeconds, juce::ValueTree& parentTree);
@@ -33,6 +35,11 @@ private:
     void paint(juce::Graphics& g) override;
     void resized() override;
     void mouseDown(const juce::MouseEvent& event) override;
+    void mouseMove(const juce::MouseEvent& event) override;
+    void mouseEnter(const juce::MouseEvent& event) override;
+    void mouseExit(const juce::MouseEvent& event) override;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
 
     void makeNewWaveformFromAudioFilePath(const juce::String& newAudioFilePath, NodeID newAudioClipID);
     static juce::PopupMenu initPopUpMenuForTrack();
@@ -44,6 +51,10 @@ private:
     void handleClipCopy(const Waveform& clipWaveform);
     void handleClipCut(const Waveform& clipWaveform);
     void handleClipPaste(const float clickOffset);
+    void handleClipSplit(const juce::MouseEvent& event);
+
+    void handleLeftMouseClick(const juce::MouseEvent& event);
+    void handleRightMouseClick(const juce::MouseEvent& event);
 
     enum popUpMenuOptions
     {
@@ -57,6 +68,9 @@ private:
     };
 
     inline static bool isAnyWaveformCopied{false};
+    inline static bool isClipSplitActive{false};
+    static ClipSplitBar clipSplitBar;
+
     std::vector<std::unique_ptr<Waveform>> waveforms{};
     juce::ValueTree& tree;
 
