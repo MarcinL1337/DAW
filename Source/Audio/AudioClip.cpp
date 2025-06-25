@@ -84,6 +84,31 @@ void AudioClip::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&
             juce::dsp::AudioBlock<float> block(buffer);
             gainProcessor.process(juce::dsp::ProcessContextReplacing(block));
             panProcessor.process(juce::dsp::ProcessContextReplacing(block));
+
+            applyFadeToBuffer(buffer, localPositionSamples);
         }
     }
+}
+
+void AudioClip::applyFadeToBuffer(juce::AudioBuffer<float>& buffer, const int64_t localPositionSamples) const
+{
+    const auto totalLengthSeconds = static_cast<double>(reader->lengthInSamples) / fileSampleRate;
+
+    for(int sample = 0; sample < buffer.getNumSamples(); ++sample)
+    {
+        const auto globalSample = localPositionSamples + sample;
+        const auto timePositionSeconds = static_cast<double>(globalSample) / fileSampleRate;
+
+        const float fadeMultiplier =
+            Fade::getFadeMultiplier(timePositionSeconds, totalLengthSeconds, fadeData[0], fadeData[1]);
+
+        for(int channel = 0; channel < buffer.getNumChannels(); ++channel)
+            buffer.getWritePointer(channel)[sample] *= fadeMultiplier;
+    }
+}
+
+void AudioClip::setFadeData(const Fade::Data& fadeIn, const Fade::Data& fadeOut)
+{
+    fadeData[0] = fadeIn;
+    fadeData[1] = fadeOut;
 }

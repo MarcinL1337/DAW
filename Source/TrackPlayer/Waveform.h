@@ -3,6 +3,7 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "../Constants.h"
+#include "../Fade/FadeController.h"
 
 using NodeID = juce::AudioProcessorGraph::NodeID;
 
@@ -24,6 +25,7 @@ public:
 
 private:
     void paint(juce::Graphics& g) override;
+    void drawWaveformWithFade(juce::Graphics& g, const juce::Rectangle<int>& bounds);
     void resized() override;
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
@@ -41,4 +43,6 @@ private:
 
     double offsetSeconds{0.0};
     NodeID audioClipID;
+
+    std::unique_ptr<FadeController> fadeController;
 };

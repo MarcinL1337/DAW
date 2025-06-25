@@ -66,6 +66,8 @@ inline static const juce::Identifier setSelectedTrack{"setSelectedTrack"};
 inline static const juce::Identifier deleteAudioClip{"deleteAudioClip"};
 inline static const juce::Identifier copyAudioClip{"copyAudioClip"};
 inline static const juce::Identifier pasteAudioClip{"pasteAudioClip"};
+
+inline static const juce::Identifier audioClipFadeChanged{"audioClipFadeChanged"};
 }  // namespace ValueTreeIDs
 
 namespace PlayheadFollowConstants
