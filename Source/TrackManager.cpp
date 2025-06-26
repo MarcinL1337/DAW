@@ -182,3 +182,18 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         }
     }
 }
+
+bool TrackManager::changeTrackOrder(const int fromIndex, const int toIndex)
+{
+    if(fromIndex < 0 || fromIndex >= static_cast<int>(tracks.size()) || toIndex < 0 ||
+       toIndex >= static_cast<int>(tracks.size()) || fromIndex == toIndex)
+        return false;
+
+    auto trackToMove = std::move(tracks[fromIndex]);
+    tracks.erase(tracks.begin() + fromIndex);
+    tracks.insert(tracks.begin() + toIndex, std::move(trackToMove));
+
+    // Update GUI
+
+    return true;
+}
