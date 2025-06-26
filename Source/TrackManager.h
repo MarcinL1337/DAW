@@ -21,12 +21,12 @@ public:
     void removeTrack(int trackIndex);
     int duplicateTrack(int trackIndex);
     int createTrackFromJson(const nlohmann::json& trackJson);
-    bool changeTrackOrder(int trackIndex, int newPosition);  // to be implemented
+    bool changeTrackOrder(int fromIndex, int toIndex);
 
     NodeID addAudioClipToTrack(int trackIndex, const juce::File& file) const;
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
-    bool removeAudioClipFromTrack(const int trackIndex, const NodeID clipId) const;
-    bool copyAudioClip(const int trackIndex, const NodeID clipId);
+    bool removeAudioClipFromTrack( int trackIndex, NodeID clipId) const;
+    bool copyAudioClip( int trackIndex, NodeID clipId);
     bool moveAudioClipBetweenTracks(int sourceTrackIndex, int destTrackIndex, NodeID clipId);  // to be implemented
 
     bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
