@@ -36,6 +36,8 @@ public:
     void removeTrack(const int trackToBeDeletedIndex);
     void setTrackProperties(const int trackIndex, const float gainValue);
 
+    void reorderSliderValues(int fromIndex, int toIndex);
+
 private:
     void paint(juce::Graphics& g) override;
     void resized() override;

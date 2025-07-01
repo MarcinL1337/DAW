@@ -73,6 +73,28 @@ void TrackPlayerSideMenu::valueTreePropertyChanged(juce::ValueTree&, const juce:
         currentSelectedTrack = tree[ValueTreeIDs::setSelectedTrack];
         repaint();
     }
+    else if(property == ValueTreeIDs::reorderTracks)
+    {
+        const int fromIndex = tree[ValueTreeIDs::reorderTracks][0];
+        const int toIndex = tree[ValueTreeIDs::reorderTracks][1];
+
+        auto trackControlToMove = std::move(trackControlsVector[fromIndex]);
+        trackControlsVector.erase(trackControlsVector.begin() + fromIndex);
+        trackControlsVector.insert(trackControlsVector.begin() + toIndex, std::move(trackControlToMove));
+
+        for(int i = 0; i < trackControlsVector.size(); ++i)
+        {
+            auto currentTrackButtonsArea = getCurrentTrackButtonsArea(i);
+            auto currentTrackNameArea = getCurrentTrackNameArea(i);
+
+            setupRecordButton(trackControlsVector[i].recordButton, currentTrackButtonsArea, i);
+            setupSoloButton(trackControlsVector[i].soloButton, currentTrackButtonsArea, i);
+            setupMuteButton(trackControlsVector[i].muteButton, currentTrackButtonsArea, i);
+            setupTrackNameLabel(trackControlsVector[i].trackNameLabel, currentTrackNameArea);
+        }
+
+        repaint();
+    }
 }
 
 void TrackPlayerSideMenu::mouseDown(const juce::MouseEvent& event)
@@ -105,6 +127,8 @@ void TrackPlayerSideMenu::mouseUp(const juce::MouseEvent& event)
     if(draggedTrackIndex == -1)
         return;
 
+    trackControlsVector[draggedTrackIndex].setAlpha(1.0f);
+
     if(dropTargetTrackIndex != -1 && dropTargetTrackIndex != draggedTrackIndex)
     {
         juce::Array<juce::var> reorderInfo;
@@ -112,9 +136,10 @@ void TrackPlayerSideMenu::mouseUp(const juce::MouseEvent& event)
         reorderInfo.add(dropTargetTrackIndex);
         tree.setProperty(ValueTreeIDs::reorderTracks, reorderInfo, nullptr);
         tree.setProperty(ValueTreeIDs::reorderTracks, ValueTreeConstants::doNothing, nullptr);
+
+        tree.setProperty(ValueTreeIDs::setSelectedTrack, dropTargetTrackIndex, nullptr);
     }
 
-    trackControlsVector[draggedTrackIndex].setAlpha(1.0f);
     draggedTrackIndex = -1;
     dropTargetTrackIndex = -1;
     isDragging = false;

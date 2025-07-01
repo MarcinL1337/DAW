@@ -1,8 +1,9 @@
 #include "TrackManager.h"
 #include <algorithm>
 
-TrackManager::TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef, SideMenu& sideMenuRef) :
-    trackGuiManager{trackGuiManagerRef}, mainAudio{mainAudioRef}, sideMenu{sideMenuRef}, tree{trackGuiManagerRef.tree}
+TrackManager::TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef,
+                           SideMenu& sideMenuRef) : trackGuiManager{trackGuiManagerRef}, mainAudio{mainAudioRef},
+                                                    sideMenu{sideMenuRef}, tree{trackGuiManagerRef.tree}
 {
     trackGuiManagerRef.addKeyListener(this);
     tree.addListener(this);
@@ -181,19 +182,19 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
             currentlyCopiedClipFilePath = std::nullopt;
         }
     }
+    else if(property == ValueTreeIDs::reorderTracks)
+    {
+        const int fromIndex = tree[ValueTreeIDs::reorderTracks][0];
+        const int toIndex = tree[ValueTreeIDs::reorderTracks][1];
+
+        changeTrackOrder(fromIndex, toIndex);
+    }
 }
 
-bool TrackManager::changeTrackOrder(const int fromIndex, const int toIndex)
+// TODO: maybe this shouldn't be in this class. Add this to TrackManager refactor
+void TrackManager::changeTrackOrder(const int fromIndex, const int toIndex)
 {
-    if(fromIndex < 0 || fromIndex >= static_cast<int>(tracks.size()) || toIndex < 0 ||
-       toIndex >= static_cast<int>(tracks.size()) || fromIndex == toIndex)
-        return false;
-
     auto trackToMove = std::move(tracks[fromIndex]);
     tracks.erase(tracks.begin() + fromIndex);
     tracks.insert(tracks.begin() + toIndex, std::move(trackToMove));
-
-    // Update GUI
-
-    return true;
 }
