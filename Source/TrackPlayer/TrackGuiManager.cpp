@@ -2,10 +2,11 @@
 
 #include <random>
 
-TrackGuiManager::TrackGuiManager(juce::ValueTree& parentTree) : tree{parentTree},
-                                                                timeline{currentNumOfSeconds, parentTree},
-                                                                trackPlayerSideMenu{parentTree},
-                                                                trackGuiComponent{parentTree}
+TrackGuiManager::TrackGuiManager(juce::ValueTree& parentTree) :
+    tree{parentTree},
+    timeline{currentNumOfSeconds, parentTree},
+    trackPlayerSideMenu{parentTree},
+    trackGuiComponent{parentTree}
 {
     setWantsKeyboardFocus(true);
     addAndMakeVisible(trackPlayerViewport);
@@ -41,12 +42,12 @@ void TrackGuiManager::resized()
     trackPlayerSideMenu.setBounds(0, timeline.getHeight(), trackPlayerSideMenu.getWidth(), sideMenuHeight);
 
     trackPlayerViewport.setBounds(getLocalBounds()
-        .removeFromRight(getWidth() - trackPlayerSideMenu.getWidth())
-        .removeFromBottom(getHeight() - timeline.getHeight()));
+                                      .removeFromRight(getWidth() - trackPlayerSideMenu.getWidth())
+                                      .removeFromBottom(getHeight() - timeline.getHeight()));
     timelineViewport.setBounds(getLocalBounds()
-        .removeFromRight(getWidth() - trackPlayerSideMenu.getWidth())
-        .removeFromTop(timeline.getHeight())
-        .withWidth(trackPlayerViewport.getViewWidth()));
+                                   .removeFromRight(getWidth() - trackPlayerSideMenu.getWidth())
+                                   .removeFromTop(timeline.getHeight())
+                                   .withWidth(trackPlayerViewport.getViewWidth()));
     trackPlayerSideMenuViewport.setBounds(0,
                                           timeline.getHeight(),
                                           trackPlayerSideMenu.getWidth(),
@@ -100,10 +101,7 @@ void TrackGuiManager::removeTrack(const int trackIndex)
 
     for(size_t i = trackIndex; i < trackGuiVector.size(); ++i)
         trackGuiVector[i]->setBounds(
-            0,
-            i * currentTrackGuiBoxHeight,
-            trackGuiComponent.getWidth(),
-            currentTrackGuiBoxHeight);
+            0, i * currentTrackGuiBoxHeight, trackGuiComponent.getWidth(), currentTrackGuiBoxHeight);
 
     trackPlayerSideMenu.removeTrackControls(trackIndex);
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
@@ -135,7 +133,10 @@ void TrackGuiManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Ide
         const int newZoomPercentage{tree[ValueTreeIDs::trackPlayerZoomPercentage]};
         changeTrackGuiBoxWidthAndPropagate(newZoomPercentage);
     }
-    else if(property == ValueTreeIDs::timeBarTime) { updatePlayheadFollowing(); }
+    else if(property == ValueTreeIDs::timeBarTime)
+    {
+        updatePlayheadFollowing();
+    }
     else if(property == ValueTreeIDs::followModeChanged)
     {
         setFollowMode(

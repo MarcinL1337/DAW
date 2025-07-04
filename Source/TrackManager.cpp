@@ -1,9 +1,8 @@
 #include "TrackManager.h"
 #include <algorithm>
 
-TrackManager::TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef,
-                           SideMenu& sideMenuRef) : trackGuiManager{trackGuiManagerRef}, mainAudio{mainAudioRef},
-                                                    sideMenu{sideMenuRef}, tree{trackGuiManagerRef.tree}
+TrackManager::TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef, SideMenu& sideMenuRef) :
+    trackGuiManager{trackGuiManagerRef}, mainAudio{mainAudioRef}, sideMenu{sideMenuRef}, tree{trackGuiManagerRef.tree}
 {
     trackGuiManagerRef.addKeyListener(this);
     tree.addListener(this);
@@ -186,7 +185,6 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
     {
         const int fromIndex = tree[ValueTreeIDs::reorderTracks][0];
         const int toIndex = tree[ValueTreeIDs::reorderTracks][1];
-
         changeTrackOrder(fromIndex, toIndex);
     }
 }

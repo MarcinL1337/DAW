@@ -45,20 +45,19 @@ private:
     void mouseUp(const juce::MouseEvent& event) override;
 
     void setupRecordButton(const std::unique_ptr<juce::TextButton>& recordButton, juce::Rectangle<int>& buttonArea,
-                           uint16_t currentRow);
+                           const uint16_t currentRow);
     void setupSoloButton(const std::unique_ptr<juce::TextButton>& soloButton, juce::Rectangle<int>& buttonArea,
-                         uint16_t currentRow);
+                         const uint16_t currentRow);
     void setupMuteButton(const std::unique_ptr<juce::TextButton>& muteButton, juce::Rectangle<int>& buttonArea,
-                         uint16_t currentRow);
+                         const uint16_t currentRow);
     void setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel, juce::Rectangle<int>& trackNameArea);
 
-    juce::Rectangle<int> getCurrentTrackButtonsArea(uint16_t currentRow) const;
-    juce::Rectangle<int> getCurrentTrackNameArea(uint16_t currentRow) const;
+    juce::Rectangle<int> getCurrentTrackButtonsArea(const uint16_t currentRow) const;
+    juce::Rectangle<int> getCurrentTrackNameArea(const uint16_t currentRow) const;
 
-    void resizeAllTrackButtons(int newBoxHeight);
+    void resizeAllTrackButtons(const int newBoxHeight);
 
     int getTrackIndexFromMousePosition(juce::Point<int> position) const;
-    juce::Rectangle<int> getTrackBounds(int trackIndex) const;
 
     juce::ValueTree& tree;
 
@@ -72,7 +71,6 @@ private:
 
     int draggedTrackIndex{-1};
     int dropTargetTrackIndex{-1};
-    int lastDropTargetTrackIndex{-1};
     bool isDragging{false};
     juce::Point<int> currentDragPosition;
     static constexpr float dragScaleFactor{0.9f};

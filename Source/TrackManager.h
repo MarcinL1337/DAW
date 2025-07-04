@@ -24,8 +24,8 @@ public:
 
     NodeID addAudioClipToTrack(int trackIndex, const juce::File& file) const;
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
-    bool removeAudioClipFromTrack( int trackIndex, NodeID clipId) const;
-    bool copyAudioClip( int trackIndex, NodeID clipId);
+    bool removeAudioClipFromTrack(const int trackIndex, const NodeID clipId) const;
+    bool copyAudioClip(const int trackIndex, const NodeID clipId);
     bool moveAudioClipBetweenTracks(int sourceTrackIndex, int destTrackIndex, NodeID clipId);  // to be implemented
 
     bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;

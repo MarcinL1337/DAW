@@ -9,26 +9,13 @@ TrackPlayerSideMenu::TrackPlayerSideMenu(juce::ValueTree& parentTree) : tree{par
 
 void TrackPlayerSideMenu::paint(juce::Graphics& g)
 {
-    if(currentSelectedTrack != ValueTreeConstants::noTrackSelected)
-    {
-        g.setColour(juce::Colours::darkgrey);
-        g.fillRect(0, currentSelectedTrack * currentTrackGuiBoxHeight, getWidth(), currentTrackGuiBoxHeight);
-    }
+    g.setColour(juce::Colours::darkgrey);
+    g.fillRect(0, currentSelectedTrack * currentTrackGuiBoxHeight, getWidth(), currentTrackGuiBoxHeight);
 
     g.setColour(juce::Colours::whitesmoke);
     for(auto i{0u}; i < getCurrentNumberOfTracks() + 1; ++i)
     {
         g.drawLine(0, i * currentTrackGuiBoxHeight, getWidth(), i * currentTrackGuiBoxHeight, 0.75);
-    }
-
-    if(draggedTrackIndex != -1 && dropTargetTrackIndex != -1)
-    {
-        g.setColour(juce::Colour(0, 200, 180).withAlpha(0.3f));
-        const auto targetBounds = getTrackBounds(dropTargetTrackIndex);
-        g.fillRect(targetBounds);
-
-        g.setColour(juce::Colour(0, 200, 180));
-        g.drawRect(targetBounds, 2);
     }
 }
 
@@ -37,27 +24,22 @@ void TrackPlayerSideMenu::paintOverChildren(juce::Graphics& g)
     if(!isDragging)
         return;
 
-    const auto trackBounds = getTrackBounds(draggedTrackIndex);
-    auto dragBounds = trackBounds.withSizeKeepingCentre(static_cast<int>(trackBounds.getWidth() * dragScaleFactor),
-                                                        static_cast<int>(trackBounds.getHeight() * dragScaleFactor));
-    dragBounds.setCentre(currentDragPosition.x, currentDragPosition.y);
+    juce::Rectangle dragBounds = {0,
+                                  0,
+                                  static_cast<int>(getWidth() * dragScaleFactor),
+                                  static_cast<int>(currentTrackGuiBoxHeight * dragScaleFactor)};
+    dragBounds.setCentre(currentDragPosition);
     dragBounds = dragBounds.constrainedWithin(getLocalBounds());
 
-    g.setColour(juce::Colours::black.withAlpha(0.7f));
+    g.setColour(juce::Colours::black.withAlpha(0.65f));
     g.fillRoundedRectangle(dragBounds.toFloat(), 5.0f);
     g.setColour(juce::Colours::white.withAlpha(0.8f));
     g.drawRoundedRectangle(dragBounds.toFloat(), 5.0f, 2.0f);
-    g.setColour(juce::Colours::white);
-    g.setFont(14.0f);
+
     g.drawText(
         trackControlsVector[draggedTrackIndex].trackNameLabel->getText(),
         dragBounds,
         juce::Justification::centred);
-}
-
-juce::Rectangle<int> TrackPlayerSideMenu::getTrackBounds(const int trackIndex) const
-{
-    return juce::Rectangle<int>(0, trackIndex * currentTrackGuiBoxHeight, getWidth(), currentTrackGuiBoxHeight);
 }
 
 void TrackPlayerSideMenu::resized()
@@ -106,38 +88,35 @@ void TrackPlayerSideMenu::mouseDown(const juce::MouseEvent& event)
         return;
 
     draggedTrackIndex = getTrackIndexFromMousePosition(event.getEventRelativeTo(this).getPosition());
-    if(draggedTrackIndex != -1)
+    if(draggedTrackIndex != ValueTreeConstants::noTrackSelected)
     {
         tree.setProperty(ValueTreeIDs::setSelectedTrack, draggedTrackIndex, nullptr);
         trackControlsVector[draggedTrackIndex].setAlpha(0.7f);
-        lastDropTargetTrackIndex = draggedTrackIndex;
     }
 }
 
 void TrackPlayerSideMenu::mouseDrag(const juce::MouseEvent& event)
 {
-    if(draggedTrackIndex != -1 && event.mouseWasDraggedSinceMouseDown())
+    if(draggedTrackIndex != ValueTreeConstants::noTrackSelected && event.mouseWasDraggedSinceMouseDown())
     {
         if(isDragging == false)
         {
-            tree.setProperty(ValueTreeIDs::setSelectedTrack, ValueTreeConstants::noTrackSelected, nullptr);
             isDragging = true;
             trackControlsVector[draggedTrackIndex].setAlpha(0.3f);
         }
         currentDragPosition = event.getEventRelativeTo(this).getPosition();
         dropTargetTrackIndex = getTrackIndexFromMousePosition(currentDragPosition);
 
-        if(dropTargetTrackIndex != -1 && dropTargetTrackIndex != lastDropTargetTrackIndex &&
-           dropTargetTrackIndex != draggedTrackIndex)
+        if(dropTargetTrackIndex != ValueTreeConstants::noTrackSelected && dropTargetTrackIndex != draggedTrackIndex)
         {
             juce::Array<juce::var> reorderInfo;
             reorderInfo.add(draggedTrackIndex);
             reorderInfo.add(dropTargetTrackIndex);
             tree.setProperty(ValueTreeIDs::reorderTracks, reorderInfo, nullptr);
             tree.setProperty(ValueTreeIDs::reorderTracks, ValueTreeConstants::doNothing, nullptr);
+            tree.setProperty(ValueTreeIDs::setSelectedTrack, dropTargetTrackIndex, nullptr);
 
             draggedTrackIndex = dropTargetTrackIndex;
-            lastDropTargetTrackIndex = dropTargetTrackIndex;
         }
 
         repaint();
@@ -146,15 +125,13 @@ void TrackPlayerSideMenu::mouseDrag(const juce::MouseEvent& event)
 
 void TrackPlayerSideMenu::mouseUp(const juce::MouseEvent& event)
 {
-    if(draggedTrackIndex == -1)
+    if(draggedTrackIndex == ValueTreeConstants::noTrackSelected)
         return;
 
     trackControlsVector[draggedTrackIndex].setAlpha(1.0f);
-    tree.setProperty(ValueTreeIDs::setSelectedTrack, draggedTrackIndex, nullptr);
 
-    draggedTrackIndex = -1;
-    dropTargetTrackIndex = -1;
-    lastDropTargetTrackIndex = -1;
+    draggedTrackIndex = ValueTreeConstants::noTrackSelected;
+    dropTargetTrackIndex = ValueTreeConstants::noTrackSelected;
     isDragging = false;
 
     repaint();
@@ -163,7 +140,7 @@ void TrackPlayerSideMenu::mouseUp(const juce::MouseEvent& event)
 int TrackPlayerSideMenu::getTrackIndexFromMousePosition(const juce::Point<int> position) const
 {
     const int trackIdx = position.y / currentTrackGuiBoxHeight;
-    return trackIdx < getCurrentNumberOfTracks() ? trackIdx : -1;
+    return trackIdx < getCurrentNumberOfTracks() ? trackIdx : ValueTreeConstants::noTrackSelected;
 }
 
 void TrackPlayerSideMenu::resizeAllTrackButtons(const int newBoxHeight)
@@ -177,16 +154,16 @@ void TrackPlayerSideMenu::resizeAllTrackButtons(const int newBoxHeight)
             getWidth() / 2, currentRow * currentTrackGuiBoxHeight, getWidth() / 2, currentTrackGuiBoxHeight};
 
         recordButton->setBounds(currentTrackButtonsArea.removeFromRight(trackButtonsSize)
-            .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
-            .reduced(buttonMargin));
+                                    .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
+                                    .reduced(buttonMargin));
 
         soloButton->setBounds(currentTrackButtonsArea.removeFromRight(trackButtonsSize)
-            .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
-            .reduced(buttonMargin));
+                                  .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
+                                  .reduced(buttonMargin));
 
         muteButton->setBounds(currentTrackButtonsArea.removeFromRight(trackButtonsSize)
-            .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
-            .reduced(buttonMargin));
+                                  .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
+                                  .reduced(buttonMargin));
 
         currentRow++;
     }
@@ -223,8 +200,8 @@ void TrackPlayerSideMenu::setupRecordButton(const std::unique_ptr<juce::TextButt
                                             juce::Rectangle<int>& buttonArea, const uint16_t currentRow)
 {
     recordButton->setBounds(buttonArea.removeFromRight(trackButtonsSize)
-        .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
-        .reduced(buttonMargin));
+                                .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
+                                .reduced(buttonMargin));
     recordButton->onClick = [this, currentRow]()
     {
         std::cout << "Recording[" << currentRow + 1 << "]" << std::endl;
@@ -236,8 +213,8 @@ void TrackPlayerSideMenu::setupSoloButton(const std::unique_ptr<juce::TextButton
                                           juce::Rectangle<int>& buttonArea, const uint16_t currentRow)
 {
     soloButton->setBounds(buttonArea.removeFromRight(trackButtonsSize)
-        .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
-        .reduced(buttonMargin));
+                              .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
+                              .reduced(buttonMargin));
     soloButton->onClick = [this, currentRow, soloButtonPtr = soloButton.get()]()
     {
         tree.setProperty(ValueTreeIDs::soloButtonClicked, ValueTreeConstants::doNothing, nullptr);
@@ -252,8 +229,8 @@ void TrackPlayerSideMenu::setupMuteButton(const std::unique_ptr<juce::TextButton
                                           juce::Rectangle<int>& buttonArea, const uint16_t currentRow)
 {
     muteButton->setBounds(buttonArea.removeFromRight(trackButtonsSize)
-        .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
-        .reduced(buttonMargin));
+                              .withSizeKeepingCentre(trackButtonsSize, trackButtonsSize)
+                              .reduced(buttonMargin));
     muteButton->onClick = [this, currentRow, muteButtonPtr = muteButton.get()]()
     {
         tree.setProperty(ValueTreeIDs::muteButtonClicked, ValueTreeConstants::doNothing, nullptr);
