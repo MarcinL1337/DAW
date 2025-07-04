@@ -50,5 +50,5 @@ private:
     juce::ValueTree& tree;
     std::vector<std::unique_ptr<AudioTrack>> tracks;
     std::optional<juce::File> currentlyCopiedClipFilePath{std::nullopt};
-    const juce::File tempClipsFolder{"D:/DAWProject/Assets/Audio/TemporarySplitClips"};
+    const juce::File tempClipsFolder{"../../../Assets/Audio/TemporarySplitClips"};
 };

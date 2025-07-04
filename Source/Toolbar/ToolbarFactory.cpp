@@ -234,7 +234,8 @@ void ToolbarFactory::followModeButtonClicked() const
                        });
 }
 
-// TURN OFF isClipSplitActive WHEN CLICKING ANYTHING!!!!!
+// TODO: think about handling clicking outside of tracks region when isClipSplitActive == true.
+// Eg. Should it be turned off in that case or should other actions be restricted etc.
 void ToolbarFactory::clipSplitButtonClicked()
 {
     isClipSplitActive = not isClipSplitActive;

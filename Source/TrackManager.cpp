@@ -91,21 +91,20 @@ void TrackManager::handleWriteToFile(juce::AudioFormatReader& reader, const juce
                                      const juce::File& destFile, const int numOfSamplesToWrite,
                                      const int readerOffsetInSamples)
 {
-    const auto sampleRate = reader.sampleRate;
-    const auto numChannels = reader.numChannels;
-    const auto bitsPerSample = reader.bitsPerSample;
-    const auto metadata = reader.metadataValues;
-
-    juce::AudioBuffer<float> buffer(static_cast<int>(numChannels), numOfSamplesToWrite);
+    // TODO: Think about reserving memory for split clip in chunks, not all at once as below
+    juce::AudioBuffer<float> buffer(static_cast<int>(reader.numChannels), numOfSamplesToWrite);
     reader.read(&buffer, 0, numOfSamplesToWrite, readerOffsetInSamples, true, true);
 
     auto outputStream = destFile.createOutputStream();
     assert(outputStream);
     const auto fileExtension = destFile.getFileExtension();
-    auto* writer =
-        formatManager.findFormatForFileExtension(fileExtension)
-            ->createWriterFor(
-                outputStream.release(), sampleRate, numChannels, static_cast<int>(bitsPerSample), metadata, 0);
+    auto* writer = formatManager.findFormatForFileExtension(fileExtension)
+                       ->createWriterFor(outputStream.release(),
+                                         reader.sampleRate,
+                                         reader.numChannels,
+                                         static_cast<int>(reader.bitsPerSample),
+                                         reader.metadataValues,
+                                         0);
     assert(writer);
 
     const std::unique_ptr<juce::AudioFormatWriter> firstFormatWriter(writer);
