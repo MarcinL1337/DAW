@@ -1,7 +1,7 @@
 #include "TrackPlayerSideMenu.h"
 #include "../TrackManager.h"
 
-TrackPlayerSideMenu::TrackPlayerSideMenu(juce::ValueTree& parentTree) : tree(parentTree)
+TrackPlayerSideMenu::TrackPlayerSideMenu(juce::ValueTree& parentTree) : tree{parentTree}
 {
     tree.addListener(this);
     addMouseListener(this, true);
@@ -9,8 +9,11 @@ TrackPlayerSideMenu::TrackPlayerSideMenu(juce::ValueTree& parentTree) : tree(par
 
 void TrackPlayerSideMenu::paint(juce::Graphics& g)
 {
-    g.setColour(juce::Colours::darkgrey);
-    g.fillRect(0, currentSelectedTrack * currentTrackGuiBoxHeight, getWidth(), currentTrackGuiBoxHeight);
+    if(currentSelectedTrack != ValueTreeConstants::noTrackSelected)
+    {
+        g.setColour(juce::Colours::darkgrey);
+        g.fillRect(0, currentSelectedTrack * currentTrackGuiBoxHeight, getWidth(), currentTrackGuiBoxHeight);
+    }
 
     g.setColour(juce::Colours::whitesmoke);
     for(auto i{0u}; i < getCurrentNumberOfTracks() + 1; ++i)
@@ -107,6 +110,7 @@ void TrackPlayerSideMenu::mouseDown(const juce::MouseEvent& event)
     {
         tree.setProperty(ValueTreeIDs::setSelectedTrack, draggedTrackIndex, nullptr);
         trackControlsVector[draggedTrackIndex].setAlpha(0.7f);
+        lastDropTargetTrackIndex = draggedTrackIndex;
     }
 }
 
@@ -114,10 +118,28 @@ void TrackPlayerSideMenu::mouseDrag(const juce::MouseEvent& event)
 {
     if(draggedTrackIndex != -1 && event.mouseWasDraggedSinceMouseDown())
     {
-        isDragging = true;
-        trackControlsVector[draggedTrackIndex].setAlpha(0.3f);
+        if(isDragging == false)
+        {
+            tree.setProperty(ValueTreeIDs::setSelectedTrack, ValueTreeConstants::noTrackSelected, nullptr);
+            isDragging = true;
+            trackControlsVector[draggedTrackIndex].setAlpha(0.3f);
+        }
         currentDragPosition = event.getEventRelativeTo(this).getPosition();
         dropTargetTrackIndex = getTrackIndexFromMousePosition(currentDragPosition);
+
+        if(dropTargetTrackIndex != -1 && dropTargetTrackIndex != lastDropTargetTrackIndex &&
+           dropTargetTrackIndex != draggedTrackIndex)
+        {
+            juce::Array<juce::var> reorderInfo;
+            reorderInfo.add(draggedTrackIndex);
+            reorderInfo.add(dropTargetTrackIndex);
+            tree.setProperty(ValueTreeIDs::reorderTracks, reorderInfo, nullptr);
+            tree.setProperty(ValueTreeIDs::reorderTracks, ValueTreeConstants::doNothing, nullptr);
+
+            draggedTrackIndex = dropTargetTrackIndex;
+            lastDropTargetTrackIndex = dropTargetTrackIndex;
+        }
+
         repaint();
     }
 }
@@ -128,20 +150,11 @@ void TrackPlayerSideMenu::mouseUp(const juce::MouseEvent& event)
         return;
 
     trackControlsVector[draggedTrackIndex].setAlpha(1.0f);
-
-    if(dropTargetTrackIndex != -1 && dropTargetTrackIndex != draggedTrackIndex)
-    {
-        juce::Array<juce::var> reorderInfo;
-        reorderInfo.add(draggedTrackIndex);
-        reorderInfo.add(dropTargetTrackIndex);
-        tree.setProperty(ValueTreeIDs::reorderTracks, reorderInfo, nullptr);
-        tree.setProperty(ValueTreeIDs::reorderTracks, ValueTreeConstants::doNothing, nullptr);
-
-        tree.setProperty(ValueTreeIDs::setSelectedTrack, dropTargetTrackIndex, nullptr);
-    }
+    tree.setProperty(ValueTreeIDs::setSelectedTrack, draggedTrackIndex, nullptr);
 
     draggedTrackIndex = -1;
     dropTargetTrackIndex = -1;
+    lastDropTargetTrackIndex = -1;
     isDragging = false;
 
     repaint();

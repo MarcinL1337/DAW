@@ -72,6 +72,7 @@ private:
 
     int draggedTrackIndex{-1};
     int dropTargetTrackIndex{-1};
+    int lastDropTargetTrackIndex{-1};
     bool isDragging{false};
     juce::Point<int> currentDragPosition;
     static constexpr float dragScaleFactor{0.9f};
