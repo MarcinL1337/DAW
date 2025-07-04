@@ -184,9 +184,6 @@ void SideMenu::reorderSliderValues(const int fromIndex, const int toIndex)
     sliderValuesPerTrack.erase(sliderValuesPerTrack.begin() + fromIndex);
     sliderValuesPerTrack.insert(sliderValuesPerTrack.begin() + toIndex, sliderValuesToMove);
 
-    if(currentTrackIndex == fromIndex) { currentTrackIndex = toIndex; }
-    else if(fromIndex < currentTrackIndex && toIndex >= currentTrackIndex) { currentTrackIndex--; }
-    else if(fromIndex > currentTrackIndex && toIndex <= currentTrackIndex) { currentTrackIndex++; }
-
+    currentTrackIndex = toIndex;
     displaySliderValuesForCurrentTrack();
 }
