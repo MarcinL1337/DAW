@@ -68,6 +68,8 @@ inline static const juce::Identifier deleteAudioClip{"deleteAudioClip"};
 inline static const juce::Identifier copyAudioClip{"copyAudioClip"};
 inline static const juce::Identifier pasteAudioClip{"pasteAudioClip"};
 
+inline static const juce::Identifier audioClipFadeChanged{"audioClipFadeChanged"};
+
 inline static const juce::Identifier reorderTracks{"reorderTracks"};
 }  // namespace ValueTreeIDs
 
