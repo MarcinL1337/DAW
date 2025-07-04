@@ -63,7 +63,7 @@ private:
 
     juce::File audioFile;
 
-    std::array<Fade::Data, 2> fadeData;  // [0] = fade in, [1] = fade out
+    Fade::Data fadeIn, fadeOut;
 
     void applyFadeToBuffer(juce::AudioBuffer<float>& buffer, int64_t localPositionSamples) const;
 

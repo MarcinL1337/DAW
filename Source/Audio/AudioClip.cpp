@@ -99,8 +99,7 @@ void AudioClip::applyFadeToBuffer(juce::AudioBuffer<float>& buffer, const int64_
         const auto globalSample = localPositionSamples + sample;
         const auto timePositionSeconds = static_cast<double>(globalSample) / fileSampleRate;
 
-        const float fadeMultiplier =
-            Fade::getFadeMultiplier(timePositionSeconds, totalLengthSeconds, fadeData[0], fadeData[1]);
+        const float fadeMultiplier = Fade::getFadeMultiplier(timePositionSeconds, totalLengthSeconds, fadeIn, fadeOut);
 
         for(int channel = 0; channel < buffer.getNumChannels(); ++channel)
             buffer.getWritePointer(channel)[sample] *= fadeMultiplier;
@@ -109,6 +108,6 @@ void AudioClip::applyFadeToBuffer(juce::AudioBuffer<float>& buffer, const int64_
 
 void AudioClip::setFadeData(const Fade::Data& fadeIn, const Fade::Data& fadeOut)
 {
-    fadeData[0] = fadeIn;
-    fadeData[1] = fadeOut;
+    this->fadeIn = fadeIn;
+    this->fadeOut = fadeOut;
 }
