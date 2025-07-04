@@ -184,6 +184,16 @@ void MainAudio::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifie
             play();
         }
     }
+    else if(property == ValueTreeIDs::audioClipFadeChanged)
+    {
+        const auto fadeInfo = tree[ValueTreeIDs::audioClipFadeChanged];
+        const NodeID clipID{static_cast<uint32_t>(static_cast<int>(fadeInfo[0]))};
+
+        const Fade::Data fadeIn{fadeInfo[1], static_cast<Fade::Function>(static_cast<int>(fadeInfo[2]))};
+        const Fade::Data fadeOut{fadeInfo[3], static_cast<Fade::Function>(static_cast<int>(fadeInfo[4]))};
+
+        setFadeOfAudioClip(clipID, fadeIn, fadeOut);
+    }
 }
 
 void MainAudio::timerCallback()
@@ -204,4 +214,9 @@ double MainAudio::getAudioClipOffsetInSeconds(const NodeID nodeID) const
 {
     const auto offsetSamples = dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->getOffset();
     return static_cast<double>(offsetSamples) / getSampleRate();
+}
+
+void MainAudio::setFadeOfAudioClip(const NodeID nodeID, const Fade::Data& fadeIn, const Fade::Data& fadeOut) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setFadeData(fadeIn, fadeOut);
 }
