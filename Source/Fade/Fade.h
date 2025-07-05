@@ -1,4 +1,5 @@
 #pragma once
+#include <nlohmann/json.hpp>
 
 namespace Fade
 {
@@ -52,4 +53,21 @@ inline float getFadeMultiplier(const double timePositionSeconds, const double to
     }
     return 1.0f;
 }
+
+inline nlohmann::json fadeDataToJson(const Data& fadeData)
+{
+    nlohmann::json j;
+    j["lengthSeconds"] = fadeData.lengthSeconds;
+    j["function"] = fadeData.function;
+    return j;
+}
+
+inline Data fadeDataFromJson(const nlohmann::json& j)
+{
+    Data fadeData;
+    fadeData.lengthSeconds = j.value("lengthSeconds", 0.0f);
+    fadeData.function = static_cast<Function>(j.value("function", static_cast<int>(Function::Linear)));
+    return fadeData;
+}
+
 }  // namespace Fade

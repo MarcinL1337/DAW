@@ -44,6 +44,7 @@ private:
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
     void setSoloOfAudioClip(NodeID nodeID, bool solo) const;
     void setMuteOfAudioClip(NodeID nodeID, bool mute) const;
+    std::pair<Fade::Data, Fade::Data> getAudioClipFadeData(NodeID nodeID) const;
 
     juce::ValueTree& tree;
 

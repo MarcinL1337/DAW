@@ -40,6 +40,18 @@ int TrackManager::createTrackFromJson(const nlohmann::json& trackJson)
         {
             const NodeID clipId = addAudioClipToTrack(newTrackIndex, audioFile);
             setOffsetOfAudioClipInSeconds(clipId, clipJson["offsetSeconds"]);
+
+            const auto fadeInData = Fade::fadeDataFromJson(clipJson["fadeIn"]);
+            const auto fadeOutData = Fade::fadeDataFromJson(clipJson["fadeOut"]);
+
+            juce::Array<juce::var> fadeInfo{static_cast<int>(clipId.uid),
+                                            fadeInData.lengthSeconds,
+                                            static_cast<int>(fadeInData.function),
+                                            fadeOutData.lengthSeconds,
+                                            static_cast<int>(fadeOutData.function)};
+
+            tree.setProperty(ValueTreeIDs::audioClipFadeChanged, fadeInfo, nullptr);
+            tree.setProperty(ValueTreeIDs::audioClipFadeChanged, ValueTreeConstants::doNothing, nullptr);
         }
     }
 

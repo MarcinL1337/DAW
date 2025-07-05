@@ -87,8 +87,12 @@ nlohmann::json AudioTrack::toJson() const
     {
         auto clipPath = mainAudio.getAudioClipPath(clipId);
         auto offset = mainAudio.getAudioClipOffsetInSeconds(clipId);
+        auto [fadeIn, fadeOut] = mainAudio.getAudioClipFadeData(clipId);
 
-        j["audioClips"].push_back({{"path", clipPath.getFullPathName().toStdString()}, {"offsetSeconds", offset}});
+        j["audioClips"].push_back({{"path", clipPath.getFullPathName().toStdString()},
+                                   {"offsetSeconds", offset},
+                                   {"fadeIn", fadeDataToJson(fadeIn)},
+                                   {"fadeOut", fadeDataToJson(fadeOut)}});
     }
     return j;
 }

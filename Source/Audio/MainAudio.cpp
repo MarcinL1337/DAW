@@ -220,3 +220,9 @@ void MainAudio::setFadeOfAudioClip(const NodeID nodeID, const Fade::Data& fadeIn
 {
     dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setFadeData(fadeIn, fadeOut);
 }
+
+std::pair<Fade::Data, Fade::Data> MainAudio::getAudioClipFadeData(const NodeID nodeID) const
+{
+    const auto* audioClip = dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor());
+    return audioClip->getFadeData();
+}

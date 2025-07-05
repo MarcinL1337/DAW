@@ -6,10 +6,12 @@
 
 using NodeID = juce::AudioProcessorGraph::NodeID;
 
-class FadeController final : public juce::Component
+class FadeController final : public juce::Component,
+                             public juce::ValueTree::Listener
 {
 public:
     explicit FadeController(juce::ValueTree& parentTree, NodeID audioClipID);
+    ~FadeController() override;
 
     void updateForNewAudioLength(float audioLengthSeconds);
     void updateForNewBoxWidth(uint16_t newBoxWidth);
@@ -25,6 +27,9 @@ protected:
 
     float getFadeMultiplier(double timePositionSeconds, double totalLengthSeconds) const;
     bool hasFade() const;
+
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
 
 private:
     juce::Path buildFadePath(bool isFadeIn, int width, int height);
