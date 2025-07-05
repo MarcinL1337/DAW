@@ -22,7 +22,7 @@ private:
     void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
     bool perform(const InvocationInfo& info) override;
 
-    void openFileButtonClicked();
+    void addAudioFileButtonClicked();
 
     std::unique_ptr<juce::MenuBarComponent> menuBarComponent;
     juce::ApplicationCommandManager commandManager;
@@ -50,6 +50,7 @@ private:
         openFile,
         saveFile,
         saveAsFile,
+        addAudioFile,
         // Edit
         undo,
         redo,

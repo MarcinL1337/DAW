@@ -34,6 +34,7 @@ juce::PopupMenu Menu::getMenuForIndex(const int index, [[maybe_unused]] const ju
             options.addCommandItem(&commandManager, openFile);
             options.addCommandItem(&commandManager, saveFile);
             options.addCommandItem(&commandManager, saveAsFile);
+            options.addCommandItem(&commandManager, addAudioFile);
             break;
         case edit:
             options.addCommandItem(&commandManager, undo);
@@ -58,7 +59,8 @@ juce::ApplicationCommandTarget* Menu::getNextCommandTarget() { return findFirstT
 
 void Menu::getAllCommands(juce::Array<juce::CommandID>& c)
 {
-    const juce::Array<juce::CommandID> allCommands{newFile, openFile, saveFile, saveAsFile, undo, redo, view1, help1};
+    const juce::Array<juce::CommandID> allCommands{
+        newFile, openFile, saveFile, saveAsFile, addAudioFile, undo, redo, view1, help1};
     c.addArray(allCommands);
 }
 
@@ -81,6 +83,10 @@ void Menu::getCommandInfo(const juce::CommandID commandID, juce::ApplicationComm
         case saveAsFile:
             result.setInfo("SaveAsFile", "Saves as a specified file", "File", 0);
             result.addDefaultKeypress('s', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier);
+            break;
+        case addAudioFile:
+            result.setInfo("AddAudioFile", "Adds audio file to new track", "File", 0);
+            result.addDefaultKeypress('a', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier);
             break;
         case undo:
             result.setInfo("Undo", "Undo a recent change", "Edit", 0);
@@ -109,11 +115,13 @@ bool Menu::perform(const InvocationInfo& info)
         case newFile:
             break;
         case openFile:
-            openFileButtonClicked();
             break;
         case saveFile:
             break;
         case saveAsFile:
+            break;
+        case addAudioFile:
+            addAudioFileButtonClicked();
             break;
         case undo:
             break;
@@ -129,12 +137,11 @@ bool Menu::perform(const InvocationInfo& info)
     return true;
 }
 
-void Menu::openFileButtonClicked()
+void Menu::addAudioFileButtonClicked()
 {
-    const auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles |
-                                    juce::FileBrowserComponent::canSelectDirectories;
-    // TODO: when choosing to open the same file twice, the value in the ValueTree stays the same, meaning no update is
-    // propagated which results in not adding the file for the second time. Fix it.
+    constexpr auto folderChooserFlags = juce::FileBrowserComponent::openMode |
+                                        juce::FileBrowserComponent::canSelectFiles |
+                                        juce::FileBrowserComponent::canSelectDirectories;
     fileChooser.launchAsync(folderChooserFlags,
                             [this](const juce::FileChooser& chooser)
                             {
