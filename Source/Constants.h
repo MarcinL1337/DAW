@@ -35,6 +35,7 @@ constexpr float sideMenuWidthRatio{0.15f};
 namespace ValueTreeConstants
 {
 constexpr int doNothing{0x42abcdef};
+constexpr int noTrackSelected{-1};
 }  // namespace ValueTreeConstants
 
 namespace ValueTreeIDs
@@ -68,6 +69,8 @@ inline static const juce::Identifier copyAudioClip{"copyAudioClip"};
 inline static const juce::Identifier pasteAudioClip{"pasteAudioClip"};
 
 inline static const juce::Identifier audioClipFadeChanged{"audioClipFadeChanged"};
+
+inline static const juce::Identifier reorderTracks{"reorderTracks"};
 }  // namespace ValueTreeIDs
 
 namespace PlayheadFollowConstants

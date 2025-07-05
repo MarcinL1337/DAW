@@ -21,7 +21,6 @@ public:
     void removeTrack(int trackIndex);
     int duplicateTrack(int trackIndex);
     int createTrackFromJson(const nlohmann::json& trackJson);
-    bool changeTrackOrder(int trackIndex, int newPosition);  // to be implemented
 
     NodeID addAudioClipToTrack(int trackIndex, const juce::File& file) const;
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
@@ -45,4 +44,6 @@ private:
     juce::ValueTree& tree;
     std::vector<std::unique_ptr<AudioTrack>> tracks;
     std::optional<juce::File> currentlyCopiedClipFilePath{std::nullopt};
+
+    void changeTrackOrder(int fromIndex, int toIndex);
 };
