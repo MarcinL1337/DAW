@@ -180,7 +180,7 @@ void SideMenu::setTrackProperties(const int trackIndex, const float gainValue)
 
 void SideMenu::reorderSliderValues(const int fromIndex, const int toIndex)
 {
-    const auto sliderValuesToMove = sliderValuesPerTrack[fromIndex];
+    const auto sliderValuesToMove = std::move(sliderValuesPerTrack[fromIndex]);
     sliderValuesPerTrack.erase(sliderValuesPerTrack.begin() + fromIndex);
     sliderValuesPerTrack.insert(sliderValuesPerTrack.begin() + toIndex, sliderValuesToMove);
 

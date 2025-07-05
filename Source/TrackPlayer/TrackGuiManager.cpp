@@ -224,8 +224,5 @@ void TrackGuiManager::reorderTrackGuis(const int fromIndex, const int toIndex)
     trackGuiVector.insert(trackGuiVector.begin() + toIndex, std::move(trackToMove));
 
     for(size_t i = 0; i < trackGuiVector.size(); ++i)
-        trackGuiVector[i]->setBounds(0,
-                                     i * currentTrackGuiBoxHeight,
-                                     trackGuiComponent.getWidth(),
-                                     currentTrackGuiBoxHeight);
+        trackGuiVector[i]->setTopLeftPosition(0, i * currentTrackGuiBoxHeight);
 }

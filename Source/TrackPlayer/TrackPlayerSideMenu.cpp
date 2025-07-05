@@ -99,7 +99,7 @@ void TrackPlayerSideMenu::mouseDrag(const juce::MouseEvent& event)
 {
     if(draggedTrackIndex != ValueTreeConstants::noTrackSelected && event.mouseWasDraggedSinceMouseDown())
     {
-        if(isDragging == false)
+        if(not isDragging)
         {
             isDragging = true;
             trackControlsVector[draggedTrackIndex].setAlpha(0.3f);
@@ -109,9 +109,7 @@ void TrackPlayerSideMenu::mouseDrag(const juce::MouseEvent& event)
 
         if(dropTargetTrackIndex != ValueTreeConstants::noTrackSelected && dropTargetTrackIndex != draggedTrackIndex)
         {
-            juce::Array<juce::var> reorderInfo;
-            reorderInfo.add(draggedTrackIndex);
-            reorderInfo.add(dropTargetTrackIndex);
+            const juce::Array<juce::var> reorderInfo{draggedTrackIndex, dropTargetTrackIndex};
             tree.setProperty(ValueTreeIDs::reorderTracks, reorderInfo, nullptr);
             tree.setProperty(ValueTreeIDs::reorderTracks, ValueTreeConstants::doNothing, nullptr);
             tree.setProperty(ValueTreeIDs::setSelectedTrack, dropTargetTrackIndex, nullptr);
@@ -139,7 +137,7 @@ void TrackPlayerSideMenu::mouseUp(const juce::MouseEvent& event)
 
 int TrackPlayerSideMenu::getTrackIndexFromMousePosition(const juce::Point<int> position) const
 {
-    const int trackIdx = position.y / currentTrackGuiBoxHeight;
+    const int trackIdx = (position.y >= 0 ? position.y : 0) / currentTrackGuiBoxHeight;
     return trackIdx < getCurrentNumberOfTracks() ? trackIdx : ValueTreeConstants::noTrackSelected;
 }
 
