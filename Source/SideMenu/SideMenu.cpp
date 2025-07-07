@@ -145,7 +145,8 @@ void SideMenu::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier
 
 void SideMenu::displaySliderValuesForCurrentTrack()
 {
-    if(currentTrackIndex != TrackPlayerConstants::noTrackChosen)
+    const bool isVisible = currentTrackIndex != TrackPlayerConstants::noTrackChosen;
+    if(isVisible)
     {
         auto& [newGainValue, newFaderValue, newDelayValue, newReverbValue, newBassBoostValue] =
             sliderValuesPerTrack.at(currentTrackIndex);
@@ -155,6 +156,11 @@ void SideMenu::displaySliderValuesForCurrentTrack()
         delaySlider.setValue(newDelayValue);
         reverbSlider.setValue(newReverbValue);
         bassBoostSlider.setValue(newBassBoostValue);
+    }
+    for(auto& sliderSetting: sliderSettings)
+    {
+        sliderSetting.slider.setVisible(isVisible);
+        sliderSetting.sliderLabel.setVisible(isVisible);
     }
 }
 
@@ -186,4 +192,12 @@ void SideMenu::reorderSliderValues(const int fromIndex, const int toIndex)
 
     currentTrackIndex = toIndex;
     displaySliderValuesForCurrentTrack();
+}
+
+void SideMenu::clearAllTracks()
+{
+    sliderValuesPerTrack.clear();
+    currentTrackIndex = TrackPlayerConstants::noTrackChosen;
+    displaySliderValuesForCurrentTrack();
+    resized();
 }

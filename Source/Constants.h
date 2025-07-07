@@ -35,7 +35,6 @@ constexpr float sideMenuWidthRatio{0.15f};
 namespace ValueTreeConstants
 {
 constexpr int doNothing{0x42abcdef};
-constexpr int noTrackSelected{-1};
 }  // namespace ValueTreeConstants
 
 namespace ValueTreeIDs

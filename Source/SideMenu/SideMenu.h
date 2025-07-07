@@ -37,6 +37,7 @@ public:
     void setTrackProperties(const int trackIndex, const float gainValue);
 
     void reorderSliderValues(int fromIndex, int toIndex);
+    void clearAllTracks();
 
 private:
     void paint(juce::Graphics& g) override;

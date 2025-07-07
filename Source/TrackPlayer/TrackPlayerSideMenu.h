@@ -33,6 +33,7 @@ public:
     void removeTrackControls(int trackIndex);
     void addTrackControls();
     void updateTrackButtonStates(int trackIndex, bool muted, bool soloed) const;
+    void clearAllTracks();
 
     uint16_t getCurrentNumberOfTracks() const { return currentNumberOfTracks; }
     void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }
@@ -63,14 +64,14 @@ private:
 
     std::vector<trackControls> trackControlsVector{};
 
-    int currentSelectedTrack{0};
+    int currentSelectedTrack{TrackPlayerConstants::noTrackChosen};
     uint16_t currentNumberOfTracks{0u};
     uint16_t trackButtonsSize{};
     uint16_t buttonMargin{};
     uint16_t currentTrackGuiBoxHeight{TrackPlayerConstants::startBoxHeight};
 
-    int draggedTrackIndex{-1};
-    int dropTargetTrackIndex{-1};
+    int draggedTrackIndex{TrackPlayerConstants::noTrackChosen};
+    int dropTargetTrackIndex{TrackPlayerConstants::noTrackChosen};
     bool isDragging{false};
     juce::Point<int> currentDragPosition;
     static constexpr float dragScaleFactor{0.9f};
