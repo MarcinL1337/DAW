@@ -78,7 +78,7 @@ void TrackPlayerSideMenu::valueTreePropertyChanged(juce::ValueTree&, const juce:
             setupRecordButton(trackControlsVector[i].recordButton, currentTrackButtonsArea, i);
             setupSoloButton(trackControlsVector[i].soloButton, currentTrackButtonsArea, i);
             setupMuteButton(trackControlsVector[i].muteButton, currentTrackButtonsArea, i);
-            setupTrackNameLabel(trackControlsVector[i].trackNameLabel, currentTrackNameArea);
+            setupTrackNameLabel(trackControlsVector[i].trackNameLabel, currentTrackNameArea, i);
         }
 
         repaint();
@@ -182,7 +182,7 @@ void TrackPlayerSideMenu::addTrackControls()
     setupRecordButton(recordButton, currentTrackButtonsArea, currentRow);
     setupSoloButton(soloButton, currentTrackButtonsArea, currentRow);
     setupMuteButton(muteButton, currentTrackButtonsArea, currentRow);
-    setupTrackNameLabel(trackNameLabel, currentTrackNameArea);
+    setupTrackNameLabel(trackNameLabel, currentTrackNameArea, currentRow);
 
     trackControlsVector.push_back(
         {std::move(recordButton), std::move(soloButton), std::move(muteButton), std::move(trackNameLabel)});
@@ -241,10 +241,17 @@ void TrackPlayerSideMenu::setupMuteButton(const std::unique_ptr<juce::TextButton
 }
 
 void TrackPlayerSideMenu::setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel,
-                                              juce::Rectangle<int>& trackNameArea)
+                                              juce::Rectangle<int>& trackNameArea, const uint16_t currentRow)
 {
     trackNameLabel->setBounds(trackNameArea.removeFromRight(0.9 * trackNameArea.getWidth()));
     trackNameLabel->setEditable(false, true, false);
+
+    trackNameLabel->onTextChange = [this, currentRow, labelPtr = trackNameLabel.get()]()
+    {
+        const juce::Array<juce::var> nameInfo{currentRow, labelPtr->getText()};
+        tree.setProperty(ValueTreeIDs::trackNameChanged, nameInfo, nullptr);
+        tree.setProperty(ValueTreeIDs::trackNameChanged, ValueTreeConstants::doNothing, nullptr);
+    };
 }
 
 juce::Rectangle<int> TrackPlayerSideMenu::getCurrentTrackButtonsArea(const uint16_t currentRow) const
@@ -273,7 +280,7 @@ void TrackPlayerSideMenu::removeTrackControls(int trackIndex)
         setupRecordButton(recordButton, currentTrackButtonsArea, trackIndex);
         setupSoloButton(soloButton, currentTrackButtonsArea, trackIndex);
         setupMuteButton(muteButton, currentTrackButtonsArea, trackIndex);
-        setupTrackNameLabel(trackNameLabel, currentTrackNameArea);
+        setupTrackNameLabel(trackNameLabel, currentTrackNameArea, trackIndex);
     }
     decrementCurrentNumberOfTracks();
 }
@@ -289,6 +296,12 @@ void TrackPlayerSideMenu::clearAllTracks()
 {
     trackControlsVector.clear();
     currentNumberOfTracks = 0;
-    currentSelectedTrack = TrackPlayerConstants::noTrackChosen;
+    tree.setProperty(ValueTreeIDs::setSelectedTrack, TrackPlayerConstants::noTrackChosen, nullptr);
     repaint();
+}
+
+void TrackPlayerSideMenu::updateTrackName(const int trackIndex, const juce::String& name) const
+{
+    assert(trackIndex >= 0 && trackIndex < trackControlsVector.size());
+    trackControlsVector[trackIndex].trackNameLabel->setText(name, juce::dontSendNotification);
 }

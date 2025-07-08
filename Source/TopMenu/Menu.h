@@ -1,13 +1,14 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include "../ProjectFilesManager.h"
 
 class Menu final : public juce::Component,
                    public juce::ApplicationCommandTarget,
                    public juce::MenuBarModel
 {
 public:
-    Menu(const juce::ValueTree& parentTree);
+    Menu(ProjectFilesManager& projectManagerRef);
     ~Menu() override;
 
 private:
@@ -22,16 +23,9 @@ private:
     void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
     bool perform(const InvocationInfo& info) override;
 
-    void addAudioFileButtonClicked();
-
+    ProjectFilesManager& projectManager;
     std::unique_ptr<juce::MenuBarComponent> menuBarComponent;
     juce::ApplicationCommandManager commandManager;
-    juce::ValueTree tree;
-
-    std::string fileChooserDialogText{"Choose an audio file to open"};
-    juce::File fileChooserStartDirectory{juce::File::getSpecialLocation(juce::File::userMusicDirectory)};
-    std::string fileChooserValidFileExtensions{"*.wav;*.mp3"};
-    juce::FileChooser fileChooser{fileChooserDialogText, fileChooserStartDirectory, fileChooserValidFileExtensions};
 
     juce::StringArray menuBarNames{"File", "Edit", "View", "Help"};
 

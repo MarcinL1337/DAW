@@ -84,6 +84,9 @@ set(SourceFiles
         Source/Fade/Fade.h
         Source/Fade/FadeController.h
         Source/Fade/FadeController.cpp
+
+        Source/ProjectFilesManager.h
+        Source/ProjectFilesManager.cpp
 )
 
 juce_add_gui_app(${PROJECT_NAME}

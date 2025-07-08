@@ -1,8 +1,9 @@
 #include "Menu.h"
+#include "../MainComponent.h"
 
 #include "../Constants.h"
 
-Menu::Menu(const juce::ValueTree& parentTree) : tree{parentTree}
+Menu::Menu(ProjectFilesManager& projectManagerRef) : projectManager{projectManagerRef}
 {
     menuBarComponent = std::make_unique<juce::MenuBarComponent>(this);
     addAndMakeVisible(menuBarComponent.get());
@@ -113,15 +114,19 @@ bool Menu::perform(const InvocationInfo& info)
     switch(info.commandID)
     {
         case newFile:
+            projectManager.createNewProject();
             break;
         case openFile:
+            projectManager.openProject();
             break;
         case saveFile:
+            projectManager.saveProject();
             break;
         case saveAsFile:
+            projectManager.saveAsProject();
             break;
         case addAudioFile:
-            addAudioFileButtonClicked();
+            projectManager.addAudioFile();
             break;
         case undo:
             break;
@@ -135,22 +140,4 @@ bool Menu::perform(const InvocationInfo& info)
             return false;
     }
     return true;
-}
-
-void Menu::addAudioFileButtonClicked()
-{
-    constexpr auto folderChooserFlags = juce::FileBrowserComponent::openMode |
-                                        juce::FileBrowserComponent::canSelectFiles |
-                                        juce::FileBrowserComponent::canSelectDirectories;
-    fileChooser.launchAsync(folderChooserFlags,
-                            [this](const juce::FileChooser& chooser)
-                            {
-                                auto selectedFileFullPath{chooser.getResult().getFullPathName()};
-                                if(selectedFileFullPath.isNotEmpty())
-                                {
-                                    tree.setProperty(
-                                        ValueTreeIDs::newAudioFile, ValueTreeConstants::doNothing, nullptr);
-                                    tree.setProperty(ValueTreeIDs::newAudioFile, selectedFileFullPath, nullptr);
-                                }
-                            });
 }

@@ -74,13 +74,18 @@ void AudioTrack::setProperty(const AudioClipProperty property, const float float
     }
 }
 
+void AudioTrack::setProperty(const juce::String& stringValue) { properties.name = stringValue; }
+
 TrackProperties AudioTrack::getProperties() const { return properties; }
 
 nlohmann::json AudioTrack::toJson() const
 {
     nlohmann::json j;
-    j["properties"] = {
-        {"gain", properties.gain}, {"pan", properties.pan}, {"mute", properties.mute}, {"solo", properties.solo}};
+    j["properties"] = {{"gain", properties.gain},
+                       {"pan", properties.pan},
+                       {"mute", properties.mute},
+                       {"solo", properties.solo},
+                       {"name", properties.name.toStdString()}};
 
     j["audioClips"] = nlohmann::json::array();
     for(const auto& clipId: audioClips)
@@ -89,7 +94,7 @@ nlohmann::json AudioTrack::toJson() const
         auto offset = mainAudio.getAudioClipOffsetInSeconds(clipId);
         auto [fadeIn, fadeOut] = mainAudio.getAudioClipFadeData(clipId);
 
-        j["audioClips"].push_back({{"path", clipPath.getFullPathName().toStdString()},
+        j["audioClips"].push_back({{"path", clipPath.getFileName().toStdString()},
                                    {"offsetSeconds", offset},
                                    {"fadeIn", fadeDataToJson(fadeIn)},
                                    {"fadeOut", fadeDataToJson(fadeOut)}});

@@ -34,6 +34,7 @@ public:
     void addTrackControls();
     void updateTrackButtonStates(int trackIndex, bool muted, bool soloed) const;
     void clearAllTracks();
+    void updateTrackName(int trackIndex, const juce::String& name) const;
 
     uint16_t getCurrentNumberOfTracks() const { return currentNumberOfTracks; }
     void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }
@@ -51,7 +52,8 @@ private:
                          const uint16_t currentRow);
     void setupMuteButton(const std::unique_ptr<juce::TextButton>& muteButton, juce::Rectangle<int>& buttonArea,
                          const uint16_t currentRow);
-    void setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel, juce::Rectangle<int>& trackNameArea);
+    void setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel, juce::Rectangle<int>& trackNameArea,
+                             const uint16_t currentRow);
 
     juce::Rectangle<int> getCurrentTrackButtonsArea(const uint16_t currentRow) const;
     juce::Rectangle<int> getCurrentTrackNameArea(const uint16_t currentRow) const;

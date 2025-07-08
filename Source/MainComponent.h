@@ -18,7 +18,6 @@ public:
     void paint(juce::Graphics&) override;
     void resized() override;
     void flexBoxInit();
-    void addTestTracks();
 
 private:
     juce::Identifier treeType{"mainComponentValueTree"};
@@ -30,6 +29,7 @@ private:
     TrackGuiManager trackPlayer;
     TrackManager trackManager;
     SideMenu sideMenu;
+    ProjectFilesManager projectFilesManager;
 
     juce::FlexBox topLevelFlexBox{};
     juce::FlexBox mainContentFlexBox{};

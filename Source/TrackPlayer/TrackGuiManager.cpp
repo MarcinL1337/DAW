@@ -231,5 +231,9 @@ void TrackGuiManager::clearAllTracks()
 {
     trackGuiVector.clear();
     trackPlayerSideMenu.clearAllTracks();
-    resized();
+}
+
+void TrackGuiManager::setTrackName(const int trackIndex, const juce::String& name) const
+{
+    trackPlayerSideMenu.updateTrackName(trackIndex, name);
 }

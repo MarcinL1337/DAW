@@ -55,6 +55,7 @@ inline static const juce::Identifier trackFaderChanged{"trackFaderChanged"};
 inline static const juce::Identifier trackDelayChanged{"trackDelayChanged"};
 inline static const juce::Identifier trackReverbChanged{"trackReverbChanged"};
 inline static const juce::Identifier trackBassBoostChanged{"trackBassBoostChanged"};
+inline static const juce::Identifier trackNameChanged{"trackNameChanged"};
 
 inline static const juce::Identifier trackPlayerZoomPercentage{"trackPlayerZoomPercentage"};
 inline static const juce::Identifier numOfSecondsChanged{"numOfSecondsChanged"};

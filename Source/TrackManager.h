@@ -21,6 +21,7 @@ public:
     void removeTrack(int trackIndex);
     int duplicateTrack(int trackIndex);
     int createTrackFromJson(const nlohmann::json& trackJson);
+    void clearAllTracks();
 
     NodeID addAudioClipToTrack(int trackIndex, const juce::File& file) const;
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
@@ -32,10 +33,13 @@ public:
 
     void setTrackProperty(int trackIndex, AudioClipProperty property, bool boolValue) const;
     void setTrackProperty(int trackIndex, AudioClipProperty property, float floatValue) const;
+    void setTrackProperty(int trackIndex, juce::String stringValue) const;
     TrackProperties getTrackProperties(int trackIndex) const;
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
+
+    nlohmann::json exportTracksToJson() const;
 
 private:
     TrackGuiManager& trackGuiManager;

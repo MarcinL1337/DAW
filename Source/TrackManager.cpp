@@ -66,6 +66,9 @@ int TrackManager::createTrackFromJson(const nlohmann::json& trackJson)
     setTrackProperty(newTrackIndex, AudioClipProperty::MUTE, isMuted);
     setTrackProperty(newTrackIndex, AudioClipProperty::SOLO, isSoloed);
 
+    const juce::String name = trackJson["properties"]["name"].get<std::string>();
+    trackGuiManager.setTrackName(newTrackIndex, name);
+
     return newTrackIndex;
 }
 
@@ -119,6 +122,12 @@ void TrackManager::setTrackProperty(const int trackIndex, const AudioClipPropert
     tracks[trackIndex]->setProperty(property, floatValue);
 }
 
+void TrackManager::setTrackProperty(const int trackIndex, juce::String stringValue) const
+{
+    assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
+    tracks[trackIndex]->setProperty(stringValue);
+}
+
 TrackProperties TrackManager::getTrackProperties(const int trackIndex) const
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
@@ -129,14 +138,7 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
 {
     if(static_cast<int>(tree[property]) == ValueTreeConstants::doNothing)
         return;
-    if(property == ValueTreeIDs::newAudioFile)
-    {
-        const juce::var newAudioFilePath = tree[ValueTreeIDs::newAudioFile];
-
-        const auto index = addTrack();
-        addAudioClipToTrack(index, juce::File(newAudioFilePath));
-    }
-    else if(property == ValueTreeIDs::soloButtonClicked)
+    if(property == ValueTreeIDs::soloButtonClicked)
     {
         const int trackIndex = tree[ValueTreeIDs::soloButtonClicked];
         const bool soloValue = getTrackProperties(trackIndex).solo;
@@ -153,6 +155,12 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const int trackIndex = tree[ValueTreeIDs::trackGainChanged][0];
         const float gainValue = tree[ValueTreeIDs::trackGainChanged][1];
         setTrackProperty(trackIndex, AudioClipProperty::GAIN, gainValue);
+    }
+    else if(property == ValueTreeIDs::trackNameChanged)
+    {
+        const int trackIndex = tree[ValueTreeIDs::trackNameChanged][0];
+        const juce::String nameValue = tree[ValueTreeIDs::trackNameChanged][1];
+        setTrackProperty(trackIndex, nameValue);
     }
     else if(property == ValueTreeIDs::deleteTrackGui)
     {
@@ -207,4 +215,23 @@ void TrackManager::changeTrackOrder(const int fromIndex, const int toIndex)
     auto trackToMove = std::move(tracks[fromIndex]);
     tracks.erase(tracks.begin() + fromIndex);
     tracks.insert(tracks.begin() + toIndex, std::move(trackToMove));
+}
+
+nlohmann::json TrackManager::exportTracksToJson() const
+{
+    nlohmann::json projectJson;
+    projectJson["tracks"] = nlohmann::json::array();
+    for(const auto& track: tracks) { projectJson["tracks"].push_back(track->toJson()); }
+    return projectJson;
+}
+
+void TrackManager::clearAllTracks()
+{
+    if(tracks.empty())
+        return;
+
+    trackGuiManager.clearAllTracks();
+    sideMenu.clearAllTracks();
+
+    tracks.clear();
 }
