@@ -22,6 +22,7 @@ Waveform::Waveform(const juce::String& newAudioFilePath, const uint16_t boxWidth
     audioThumbnail.setSource(new juce::FileInputSource(newAudioFile));
     setOffsetSeconds(0);
     fadeController->updateForNewAudioLength(static_cast<float>(audioThumbnail.getTotalLength()));
+    fadeController->updateForNewBoxWidth(currentTrackGuiBoxWidth);
     addAndMakeVisible(fadeController.get());
 }
 
