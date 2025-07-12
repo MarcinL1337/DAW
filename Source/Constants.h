@@ -35,7 +35,6 @@ constexpr float sideMenuWidthRatio{0.15f};
 namespace ValueTreeConstants
 {
 constexpr int doNothing{0x42abcdef};
-constexpr int noTrackSelected{-1};
 }  // namespace ValueTreeConstants
 
 namespace ValueTreeIDs
@@ -56,6 +55,7 @@ inline static const juce::Identifier trackFaderChanged{"trackFaderChanged"};
 inline static const juce::Identifier trackDelayChanged{"trackDelayChanged"};
 inline static const juce::Identifier trackReverbChanged{"trackReverbChanged"};
 inline static const juce::Identifier trackBassBoostChanged{"trackBassBoostChanged"};
+inline static const juce::Identifier trackNameChanged{"trackNameChanged"};
 
 inline static const juce::Identifier trackPlayerZoomPercentage{"trackPlayerZoomPercentage"};
 inline static const juce::Identifier numOfSecondsChanged{"numOfSecondsChanged"};

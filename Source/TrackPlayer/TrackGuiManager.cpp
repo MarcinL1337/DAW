@@ -226,3 +226,14 @@ void TrackGuiManager::reorderTrackGuis(const int fromIndex, const int toIndex)
     for(size_t i = 0; i < trackGuiVector.size(); ++i)
         trackGuiVector[i]->setTopLeftPosition(0, i * currentTrackGuiBoxHeight);
 }
+
+void TrackGuiManager::clearAllTracks()
+{
+    trackGuiVector.clear();
+    trackPlayerSideMenu.clearAllTracks();
+}
+
+void TrackGuiManager::setTrackName(const int trackIndex, const juce::String& name) const
+{
+    trackPlayerSideMenu.updateTrackName(trackIndex, name);
+}

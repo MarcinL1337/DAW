@@ -19,6 +19,7 @@ struct TrackProperties
     float pan{0.0f};
     bool mute{false};
     bool solo{false};
+    juce::String name{"Track"};
 };
 
 class AudioTrack
@@ -33,6 +34,7 @@ public:
 
     void setProperty(AudioClipProperty property, bool boolValue);
     void setProperty(AudioClipProperty property, float floatValue);
+    void setProperty(const juce::String& stringValue);
 
     TrackProperties getProperties() const;
 
