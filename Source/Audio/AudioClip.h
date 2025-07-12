@@ -1,6 +1,7 @@
 #pragma once
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_dsp/juce_dsp.h>
+#include "../Fade/Fade.h"
 
 class MainAudio;
 
@@ -22,6 +23,7 @@ public:
     void setSolo(const bool shouldSolo) { solo = shouldSolo; }
     bool isMuted() const { return mute; }
     bool isSoloed() const { return solo; }
+    void setFadeData(const Fade::Data& fadeIn, const Fade::Data& fadeOut);
 
     // AudioProcessor
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;
@@ -60,5 +62,10 @@ private:
     bool solo{false};
 
     juce::File audioFile;
+
+    Fade::Data fadeIn, fadeOut;
+
+    void applyFadeToBuffer(juce::AudioBuffer<float>& buffer, int64_t localPositionSamples) const;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioClip)
 };

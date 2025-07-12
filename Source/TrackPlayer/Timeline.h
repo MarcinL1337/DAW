@@ -14,6 +14,9 @@ public:
     void changeBoxWidth(const uint16_t newBoxWidth) { currentTrackGuiBoxWidth = newBoxWidth; }
     void changeNumOfSeconds(const int newNumOfSeconds) { currentNumOfSeconds = newNumOfSeconds; }
 
+protected:
+    bool hitTest(int x, int y) override;
+
 private:
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -21,6 +24,7 @@ private:
 
     void mouseDown(const juce::MouseEvent& event) override;
     void mouseDrag(const juce::MouseEvent& event) override;
+    void mouseMove(const juce::MouseEvent& event) override;
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
     void mouseUp(const juce::MouseEvent& event) override;
@@ -32,7 +36,6 @@ private:
 
     int timeBarXOffset{0};
     int currentNumOfSeconds;
-    juce::Point<int> lastMousePosition{};
     bool isCurrentlyDraggingTimeBar{false};
     float timeBarTimeInSeconds{0.0f};
     uint16_t currentTrackGuiBoxWidth{TrackPlayerConstants::startBoxWidth};

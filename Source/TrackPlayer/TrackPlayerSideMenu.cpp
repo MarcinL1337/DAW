@@ -1,7 +1,11 @@
 #include "TrackPlayerSideMenu.h"
 #include "../TrackManager.h"
 
-TrackPlayerSideMenu::TrackPlayerSideMenu(juce::ValueTree& parentTree) : tree(parentTree) { tree.addListener(this); }
+TrackPlayerSideMenu::TrackPlayerSideMenu(juce::ValueTree& parentTree) : tree{parentTree}
+{
+    tree.addListener(this);
+    addMouseListener(this, true);
+}
 
 void TrackPlayerSideMenu::paint(juce::Graphics& g)
 {
@@ -13,6 +17,29 @@ void TrackPlayerSideMenu::paint(juce::Graphics& g)
     {
         g.drawLine(0, i * currentTrackGuiBoxHeight, getWidth(), i * currentTrackGuiBoxHeight, 0.75);
     }
+}
+
+void TrackPlayerSideMenu::paintOverChildren(juce::Graphics& g)
+{
+    if(!isDragging)
+        return;
+
+    juce::Rectangle dragBounds = {0,
+                                  0,
+                                  static_cast<int>(getWidth() * dragScaleFactor),
+                                  static_cast<int>(currentTrackGuiBoxHeight * dragScaleFactor)};
+    dragBounds.setCentre(currentDragPosition);
+    dragBounds = dragBounds.constrainedWithin(getLocalBounds());
+
+    g.setColour(juce::Colours::black.withAlpha(0.65f));
+    g.fillRoundedRectangle(dragBounds.toFloat(), 5.0f);
+    g.setColour(juce::Colours::white.withAlpha(0.8f));
+    g.drawRoundedRectangle(dragBounds.toFloat(), 5.0f, 2.0f);
+
+    g.drawText(
+        trackControlsVector[draggedTrackIndex].trackNameLabel->getText(),
+        dragBounds,
+        juce::Justification::centred);
 }
 
 void TrackPlayerSideMenu::resized()
@@ -31,18 +58,87 @@ void TrackPlayerSideMenu::valueTreePropertyChanged(juce::ValueTree&, const juce:
         currentSelectedTrack = tree[ValueTreeIDs::setSelectedTrack];
         repaint();
     }
+    else if(property == ValueTreeIDs::reorderTracks)
+    {
+        const int fromIndex = tree[ValueTreeIDs::reorderTracks][0];
+        const int toIndex = tree[ValueTreeIDs::reorderTracks][1];
+
+        auto trackControlToMove = std::move(trackControlsVector[fromIndex]);
+        trackControlsVector.erase(trackControlsVector.begin() + fromIndex);
+        trackControlsVector.insert(trackControlsVector.begin() + toIndex, std::move(trackControlToMove));
+
+        for(int i = 0; i < trackControlsVector.size(); ++i)
+        {
+            auto currentTrackButtonsArea = getCurrentTrackButtonsArea(i);
+            auto currentTrackNameArea = getCurrentTrackNameArea(i);
+
+            setupRecordButton(trackControlsVector[i].recordButton, currentTrackButtonsArea, i);
+            setupSoloButton(trackControlsVector[i].soloButton, currentTrackButtonsArea, i);
+            setupMuteButton(trackControlsVector[i].muteButton, currentTrackButtonsArea, i);
+            setupTrackNameLabel(trackControlsVector[i].trackNameLabel, currentTrackNameArea);
+        }
+
+        repaint();
+    }
 }
 
 void TrackPlayerSideMenu::mouseDown(const juce::MouseEvent& event)
 {
-    if(event.mods.isLeftButtonDown())
+    if(not event.mods.isLeftButtonDown())
+        return;
+
+    draggedTrackIndex = getTrackIndexFromMousePosition(event.getEventRelativeTo(this).getPosition());
+    if(draggedTrackIndex != ValueTreeConstants::noTrackSelected)
     {
-        const int trackIndexClicked = event.getMouseDownY() / currentTrackGuiBoxHeight;
-        if(trackIndexClicked < getCurrentNumberOfTracks())
-        {
-            tree.setProperty(ValueTreeIDs::setSelectedTrack, trackIndexClicked, nullptr);
-        }
+        tree.setProperty(ValueTreeIDs::setSelectedTrack, draggedTrackIndex, nullptr);
+        trackControlsVector[draggedTrackIndex].setAlpha(0.7f);
     }
+}
+
+void TrackPlayerSideMenu::mouseDrag(const juce::MouseEvent& event)
+{
+    if(draggedTrackIndex != ValueTreeConstants::noTrackSelected && event.mouseWasDraggedSinceMouseDown())
+    {
+        if(not isDragging)
+        {
+            isDragging = true;
+            trackControlsVector[draggedTrackIndex].setAlpha(0.3f);
+        }
+        currentDragPosition = event.getEventRelativeTo(this).getPosition();
+        dropTargetTrackIndex = getTrackIndexFromMousePosition(currentDragPosition);
+
+        if(dropTargetTrackIndex != ValueTreeConstants::noTrackSelected && dropTargetTrackIndex != draggedTrackIndex)
+        {
+            const juce::Array<juce::var> reorderInfo{draggedTrackIndex, dropTargetTrackIndex};
+            tree.setProperty(ValueTreeIDs::reorderTracks, reorderInfo, nullptr);
+            tree.setProperty(ValueTreeIDs::reorderTracks, ValueTreeConstants::doNothing, nullptr);
+            tree.setProperty(ValueTreeIDs::setSelectedTrack, dropTargetTrackIndex, nullptr);
+
+            draggedTrackIndex = dropTargetTrackIndex;
+        }
+
+        repaint();
+    }
+}
+
+void TrackPlayerSideMenu::mouseUp(const juce::MouseEvent& event)
+{
+    if(draggedTrackIndex == ValueTreeConstants::noTrackSelected)
+        return;
+
+    trackControlsVector[draggedTrackIndex].setAlpha(1.0f);
+
+    draggedTrackIndex = ValueTreeConstants::noTrackSelected;
+    dropTargetTrackIndex = ValueTreeConstants::noTrackSelected;
+    isDragging = false;
+
+    repaint();
+}
+
+int TrackPlayerSideMenu::getTrackIndexFromMousePosition(const juce::Point<int> position) const
+{
+    const int trackIdx = (position.y >= 0 ? position.y : 0) / currentTrackGuiBoxHeight;
+    return trackIdx < getCurrentNumberOfTracks() ? trackIdx : ValueTreeConstants::noTrackSelected;
 }
 
 void TrackPlayerSideMenu::resizeAllTrackButtons(const int newBoxHeight)

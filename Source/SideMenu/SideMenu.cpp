@@ -135,6 +135,12 @@ void SideMenu::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier
         displaySliderValuesForCurrentTrack();
         tree.setProperty(ValueTreeIDs::setSelectedTrack, currentTrackIndex, nullptr);
     }
+    else if(property == ValueTreeIDs::reorderTracks)
+    {
+        const int fromIndex = tree[ValueTreeIDs::reorderTracks][0];
+        const int toIndex = tree[ValueTreeIDs::reorderTracks][1];
+        reorderSliderValues(fromIndex, toIndex);
+    }
 }
 
 void SideMenu::displaySliderValuesForCurrentTrack()
@@ -170,4 +176,14 @@ void SideMenu::removeTrack(const int trackToBeDeletedIndex)
 void SideMenu::setTrackProperties(const int trackIndex, const float gainValue)
 {
     sliderValuesPerTrack.at(trackIndex).gainValue = gainValue;
+}
+
+void SideMenu::reorderSliderValues(const int fromIndex, const int toIndex)
+{
+    const auto sliderValuesToMove = std::move(sliderValuesPerTrack[fromIndex]);
+    sliderValuesPerTrack.erase(sliderValuesPerTrack.begin() + fromIndex);
+    sliderValuesPerTrack.insert(sliderValuesPerTrack.begin() + toIndex, sliderValuesToMove);
+
+    currentTrackIndex = toIndex;
+    displaySliderValuesForCurrentTrack();
 }

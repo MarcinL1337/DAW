@@ -142,6 +142,12 @@ void TrackGuiManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Ide
         setFollowMode(
             static_cast<PlayheadFollowConstants::Mode>(static_cast<int>(tree[ValueTreeIDs::followModeChanged])));
     }
+    else if(property == ValueTreeIDs::reorderTracks)
+    {
+        const int fromIndex = tree[ValueTreeIDs::reorderTracks][0];
+        const int toIndex = tree[ValueTreeIDs::reorderTracks][1];
+        reorderTrackGuis(fromIndex, toIndex);
+    }
 }
 
 void TrackGuiManager::addWaveformToTrackGui(const juce::String& newAudioFilePath, const int trackIndex,
@@ -209,4 +215,14 @@ void TrackGuiManager::updatePlayheadFollowing()
         default:
             std::unreachable();
     }
+}
+
+void TrackGuiManager::reorderTrackGuis(const int fromIndex, const int toIndex)
+{
+    auto trackToMove = std::move(trackGuiVector[fromIndex]);
+    trackGuiVector.erase(trackGuiVector.begin() + fromIndex);
+    trackGuiVector.insert(trackGuiVector.begin() + toIndex, std::move(trackToMove));
+
+    for(size_t i = 0; i < trackGuiVector.size(); ++i)
+        trackGuiVector[i]->setTopLeftPosition(0, i * currentTrackGuiBoxHeight);
 }
