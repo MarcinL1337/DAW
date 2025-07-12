@@ -25,6 +25,7 @@ public:
 
     juce::File getAudioClipPath(NodeID nodeID) const;
     double getAudioClipOffsetInSeconds(NodeID nodeID) const;
+    void setFadeOfAudioClip(NodeID nodeID, const Fade::Data& fadeIn, const Fade::Data& fadeOut) const;
 
 private:
     void audioProcessorGraphInit();

@@ -17,5 +17,5 @@ ZoomSlider::ZoomSlider()
 
 double ZoomSlider::snapValue(const double attemptedValue, DragMode dragMode)
 {
-    return juce::roundToIntAccurate(attemptedValue / 25.0f) * 25.0f;
+    return juce::roundToIntAccurate(attemptedValue / 5.0f) * 5.0f;
 }
