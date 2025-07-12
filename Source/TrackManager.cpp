@@ -6,10 +6,21 @@ TrackManager::TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainA
 {
     trackGuiManagerRef.addKeyListener(this);
     tree.addListener(this);
-    assert(tempClipsFolder.createDirectory() == juce::Result::ok());
+    handleSplitClipsDirCreation();
 }
 
 TrackManager::~TrackManager() { assert(tempClipsFolder.deleteRecursively()); }
+
+void TrackManager::handleSplitClipsDirCreation() const
+{
+    if(tempClipsFolder.exists())
+    {
+        assert(tempClipsFolder.deleteRecursively());
+    }
+
+    const auto result = tempClipsFolder.createDirectory();
+    assert(result.wasOk());
+}
 
 int TrackManager::addTrack()
 {
@@ -111,6 +122,21 @@ void TrackManager::handleWriteToFile(juce::AudioFormatReader& reader, const juce
     firstFormatWriter->writeFromAudioSampleBuffer(buffer, 0, numOfSamplesToWrite);
 }
 
+void TrackManager::chooseNewNamesForSplitFiles(juce::String& firstFile, juce::String& secondFile,
+                                               const juce::String& extension) const
+{
+    auto suffix{1u};
+    while(tempClipsFolder.getChildFile(juce::StringRef(firstFile)).existsAsFile() or
+          tempClipsFolder.getChildFile(juce::StringRef(secondFile)).existsAsFile())
+    {
+        firstFile = firstFile.replaceFirstOccurrenceOf(extension, "");
+        firstFile += "(" + juce::String(suffix) + ")" + extension;
+        secondFile = secondFile.replaceFirstOccurrenceOf(extension, "");
+        secondFile += "(" + juce::String(suffix) + ")" + extension;
+        suffix++;
+    }
+}
+
 void TrackManager::addNewAudioClipsBySplit(const int trackIndex, const juce::File& fileToBeSplit,
                                            const float waveformSplitRatio, const double splitClipOffset) const
 {
@@ -127,8 +153,14 @@ void TrackManager::addNewAudioClipsBySplit(const int trackIndex, const juce::Fil
     const auto splitFileExtension =
         fileToBeSplit.getFileExtension() == ".mp3" ? ".wav" : fileToBeSplit.getFileExtension();
 
-    const juce::String firstDestFileName{fileToBeSplit.getFileNameWithoutExtension() + "_part1" + splitFileExtension};
-    const juce::String secondDestFileName{fileToBeSplit.getFileNameWithoutExtension() + "_part2" + splitFileExtension};
+    juce::String firstDestFileName{fileToBeSplit.getFileNameWithoutExtension() + "_part1" + splitFileExtension};
+    juce::String secondDestFileName{fileToBeSplit.getFileNameWithoutExtension() + "_part2" + splitFileExtension};
+
+    if(tempClipsFolder.getChildFile(juce::StringRef(firstDestFileName)).existsAsFile() or
+       tempClipsFolder.getChildFile(juce::StringRef(secondDestFileName)).existsAsFile())
+    {
+        chooseNewNamesForSplitFiles(firstDestFileName, secondDestFileName, splitFileExtension);
+    }
 
     const juce::File firstDestFile{tempClipsFolder.getFullPathName() + "/" + firstDestFileName};
     const juce::File secondDestFile{tempClipsFolder.getFullPathName() + "/" + secondDestFileName};

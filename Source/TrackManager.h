@@ -44,6 +44,10 @@ public:
                                   const juce::Identifier& property) override;
 
 private:
+    void chooseNewNamesForSplitFiles(juce::String& firstFile, juce::String& secondFile,
+                                     const juce::String& extension) const;
+    void handleSplitClipsDirCreation() const;
+
     TrackGuiManager& trackGuiManager;
     MainAudio& mainAudio;
     SideMenu& sideMenu;
