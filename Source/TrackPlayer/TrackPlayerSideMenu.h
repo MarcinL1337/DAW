@@ -9,6 +9,14 @@ struct trackControls
     std::unique_ptr<juce::TextButton> soloButton;
     std::unique_ptr<juce::TextButton> muteButton;
     std::unique_ptr<juce::Label> trackNameLabel;
+
+    void setAlpha(const float alpha) const
+    {
+        recordButton->setAlpha(alpha);
+        soloButton->setAlpha(alpha);
+        muteButton->setAlpha(alpha);
+        trackNameLabel->setAlpha(alpha);
+    }
 };
 
 class TrackPlayerSideMenu final : public juce::Component,
@@ -20,6 +28,7 @@ public:
 
     void paint(juce::Graphics& g) override;
     void resized() override;
+    void paintOverChildren(juce::Graphics& g) override;
 
     void removeTrackControls(int trackIndex);
     void addTrackControls();
@@ -32,6 +41,8 @@ public:
 private:
     void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property) override;
     void mouseDown(const juce::MouseEvent& event) override;
+    void mouseDrag(const juce::MouseEvent& event) override;
+    void mouseUp(const juce::MouseEvent& event) override;
 
     void setupRecordButton(const std::unique_ptr<juce::TextButton>& recordButton, juce::Rectangle<int>& buttonArea,
                            const uint16_t currentRow);
@@ -46,6 +57,8 @@ private:
 
     void resizeAllTrackButtons(const int newBoxHeight);
 
+    int getTrackIndexFromMousePosition(juce::Point<int> position) const;
+
     juce::ValueTree& tree;
 
     std::vector<trackControls> trackControlsVector{};
@@ -55,4 +68,10 @@ private:
     uint16_t trackButtonsSize{};
     uint16_t buttonMargin{};
     uint16_t currentTrackGuiBoxHeight{TrackPlayerConstants::startBoxHeight};
+
+    int draggedTrackIndex{-1};
+    int dropTargetTrackIndex{-1};
+    bool isDragging{false};
+    juce::Point<int> currentDragPosition;
+    static constexpr float dragScaleFactor{0.9f};
 };

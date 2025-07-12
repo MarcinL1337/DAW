@@ -181,4 +181,18 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
             currentlyCopiedClipFilePath = std::nullopt;
         }
     }
+    else if(property == ValueTreeIDs::reorderTracks)
+    {
+        const int fromIndex = tree[ValueTreeIDs::reorderTracks][0];
+        const int toIndex = tree[ValueTreeIDs::reorderTracks][1];
+        changeTrackOrder(fromIndex, toIndex);
+    }
+}
+
+// TODO: maybe this shouldn't be in this class. Add this to TrackManager refactor
+void TrackManager::changeTrackOrder(const int fromIndex, const int toIndex)
+{
+    auto trackToMove = std::move(tracks[fromIndex]);
+    tracks.erase(tracks.begin() + fromIndex);
+    tracks.insert(tracks.begin() + toIndex, std::move(trackToMove));
 }
