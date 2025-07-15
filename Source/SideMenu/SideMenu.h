@@ -8,7 +8,6 @@ struct SliderSettings
     juce::Slider& slider;
     int minValue;
     int maxValue;
-    float initialValue;
     int valuesDecimalPoint;
     std::string textValueSuffix;
     juce::Label& sliderLabel;
@@ -18,10 +17,13 @@ struct SliderSettings
 struct SliderValues
 {
     double gainValue;
-    double faderValue;
-    double delayValue;
-    double reverbValue;
-    double bassBoostValue;
+    double panValue;
+    double roomSizeValue;
+    double dampingValue;
+    double wetLevelValue;
+    double dryLevelValue;
+    double reverbWidthValue;
+    double reverbFreezeValue;
 };
 
 class SideMenu final : public juce::Component,
@@ -36,8 +38,6 @@ public:
     void removeTrack(const int trackToBeDeletedIndex);
     void setTrackProperties(const int trackIndex, const float gainValue);
 
-    void reorderSliderValues(int fromIndex, int toIndex);
-
 private:
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -45,23 +45,39 @@ private:
     void valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property) override;
 
     void positionTrackPropertiesSliders() const;
+    void positionReverbButtonAndSliders();
     void initTrackPropertiesSliders();
+    void initReverbSliders();
+    void initReverbButton();
+    void initZoomSlider();
 
     void positionZoomSlider();
     void displaySliderValuesForCurrentTrack();
     void chooseNewTrackToBeSelected(const int deletedTrackIndex);
+    void reorderSliderValues(int fromIndex, int toIndex);
 
     juce::Slider gainSlider;
     juce::Label gainLabel;
-    juce::Slider faderSlider;
-    juce::Label faderLabel;
-    juce::Slider delaySlider;
-    juce::Label delayLabel;
-    juce::Slider reverbSlider;
-    juce::Label reverbLabel;
-    juce::Slider bassBoostSlider;
-    juce::Label bassBoostLabel;
+    juce::Slider panSlider;
+    juce::Label panLabel;
+    juce::Slider roomSizeSlider;
+    juce::Label roomSizeLabel;
+    juce::Slider dampingSlider;
+    juce::Label dampingLabel;
+    juce::Slider wetLevelSlider;
+    juce::Label wetLevelLabel;
+    juce::Slider dryLevelSlider;
+    juce::Label dryLevelLabel;
+    juce::Slider reverbWidthSlider;
+    juce::Label reverbWidthLabel;
+    juce::Slider reverbFreezeSlider;
+    juce::Label reverbFreezeLabel;
 
+    juce::ToggleButton reverbButton;
+    juce::Label reverbButtonLabel;
+    bool isReverbOn{false};
+
+    std::vector<SliderSettings> reverbSliderSettings{};
     std::vector<SliderSettings> sliderSettings{};
     std::vector<SliderValues> sliderValuesPerTrack{};
 
