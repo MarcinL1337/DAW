@@ -50,6 +50,8 @@ private:
     void initReverbSliders();
     void initReverbButton();
     void initZoomSlider();
+    void initReverbFlexItems();
+    void initRunTimeVariables();
 
     void positionZoomSlider();
     void displaySliderValuesForCurrentTrack();
@@ -82,11 +84,29 @@ private:
     std::vector<SliderValues> sliderValuesPerTrack{};
 
     int currentTrackIndex{0};
-    const uint8_t paddingBetweenSliders{100u};
-    const uint8_t sliderHeight{40u};
+    uint8_t paddingBetweenSliders{};
+    uint8_t sliderHeight{};
 
     ZoomSlider zoomSlider{};
-    const int zoomSliderHeight{60};
+    int zoomSliderHeight{};
 
     juce::ValueTree& tree;
+
+    int reverbSlidersFlexBoxHeight{};
+    inline static bool areReverbFlexItemsInitialized{false};
+    juce::FlexBox reverbSliders{juce::FlexBox::Direction::column,
+                                juce::FlexBox::Wrap::noWrap,
+                                juce::FlexBox::AlignContent::spaceBetween,
+                                juce::FlexBox::AlignItems::stretch,
+                                juce::FlexBox::JustifyContent::spaceBetween};
+    juce::FlexBox reverbSlidersFirstRow{juce::FlexBox::Direction::row,
+                                        juce::FlexBox::Wrap::noWrap,
+                                        juce::FlexBox::AlignContent::spaceBetween,
+                                        juce::FlexBox::AlignItems::stretch,
+                                        juce::FlexBox::JustifyContent::spaceBetween};
+    juce::FlexBox reverbSlidersSecondRow{juce::FlexBox::Direction::row,
+                                         juce::FlexBox::Wrap::noWrap,
+                                         juce::FlexBox::AlignContent::spaceBetween,
+                                         juce::FlexBox::AlignItems::stretch,
+                                         juce::FlexBox::JustifyContent::spaceBetween};
 };

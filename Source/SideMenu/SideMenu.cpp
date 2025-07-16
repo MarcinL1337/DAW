@@ -8,6 +8,12 @@ SideMenu::SideMenu(juce::ValueTree& parentTree) : tree{parentTree}
     initReverbSliders();
     initZoomSlider();
     tree.addListener(this);
+    juce::Timer::callAfterDelay(1,
+                                [this]()
+                                {
+                                    initReverbFlexItems();
+                                    initRunTimeVariables();
+                                });
 }
 
 void SideMenu::paint(juce::Graphics& g)
@@ -21,6 +27,14 @@ void SideMenu::resized()
     positionTrackPropertiesSliders();
     positionReverbButtonAndSliders();
     positionZoomSlider();
+}
+
+void SideMenu::initRunTimeVariables()
+{
+    paddingBetweenSliders = static_cast<uint8_t>(getHeight() / 13);
+    sliderHeight = static_cast<uint8_t>(paddingBetweenSliders / 2.5f);
+    zoomSliderHeight = sliderHeight * 1.5f;
+    resized();
 }
 
 void SideMenu::initReverbButton()
@@ -103,45 +117,49 @@ void SideMenu::positionTrackPropertiesSliders() const
     }
 }
 
+void SideMenu::initReverbFlexItems()
+{
+    if(not areReverbFlexItemsInitialized)
+    {
+        const juce::FlexItem roomSizeItem{roomSizeSlider};
+        const juce::FlexItem dampingItem{dampingSlider};
+        const juce::FlexItem wetLevelItem{wetLevelSlider};
+        reverbSlidersFirstRow.items.add(roomSizeItem.withWidth(getWidth() * 0.3f).withMinHeight(100));
+        reverbSlidersFirstRow.items.add(dampingItem.withWidth(getWidth() * 0.3f).withMinHeight(100));
+        reverbSlidersFirstRow.items.add(wetLevelItem.withWidth(getWidth() * 0.3f).withMinHeight(100));
+
+        const juce::FlexItem dryLevelItem{dryLevelSlider};
+        const juce::FlexItem reverbWidthItem{reverbWidthSlider};
+        const juce::FlexItem reverbFreezeItem{reverbFreezeSlider};
+        reverbSlidersSecondRow.items.add(dryLevelItem.withWidth(getWidth() * 0.3f).withMinHeight(100));
+        reverbSlidersSecondRow.items.add(reverbWidthItem.withWidth(getWidth() * 0.3f).withMinHeight(100));
+        reverbSlidersSecondRow.items.add(reverbFreezeItem.withWidth(getWidth() * 0.3f).withMinHeight(100));
+
+        reverbSliders.items.add(reverbSlidersFirstRow);
+        reverbSliders.items.add(reverbSlidersSecondRow);
+        reverbSlidersFlexBoxHeight = static_cast<int>(0.11 * getHeight());
+        areReverbFlexItemsInitialized = true;
+    }
+}
+
 void SideMenu::positionReverbButtonAndSliders()
 {
-    auto currentY{panSlider.getY() + paddingBetweenSliders};
+    const auto currentY{panSlider.getY() + paddingBetweenSliders};
     reverbButton.setSize(30, 30);
     reverbButton.setCentrePosition(getWidth() * 0.5, currentY);
-    currentY += paddingBetweenSliders;
 
-    // TODO: refactor this
     if(isReverbOn)
     {
-        roomSizeSlider.setSize(getWidth() * 0.3, 2 * sliderHeight);
-        roomSizeSlider.setCentrePosition(getWidth() * 0.167, currentY);
-        roomSizeSlider.setVisible(true);
-
-        dampingSlider.setSize(getWidth() * 0.3, 2 * sliderHeight);
-        dampingSlider.setCentrePosition(getWidth() * 0.5, currentY);
-        dampingSlider.setVisible(true);
-
-        wetLevelSlider.setSize(getWidth() * 0.3, 2 * sliderHeight);
-        wetLevelSlider.setCentrePosition(getWidth() * 0.833, currentY);
-        wetLevelSlider.setVisible(true);
-
-        currentY += 1.5 * paddingBetweenSliders;
-
-        dryLevelSlider.setSize(getWidth() * 0.3, 2 * sliderHeight);
-        dryLevelSlider.setCentrePosition(getWidth() * 0.167, currentY);
-        dryLevelSlider.setVisible(true);
-
-        reverbWidthSlider.setSize(getWidth() * 0.3, 2 * sliderHeight);
-        reverbWidthSlider.setCentrePosition(getWidth() * 0.5, currentY);
-        reverbWidthSlider.setVisible(true);
-
-        reverbFreezeSlider.setSize(getWidth() * 0.3, 2 * sliderHeight);
-        reverbFreezeSlider.setCentrePosition(getWidth() * 0.833, currentY);
-        reverbFreezeSlider.setVisible(true);
+        for(const auto& sliderSetting: reverbSliderSettings) { sliderSetting.slider.setVisible(true); }
+        const juce::Rectangle area{
+            0, reverbButton.getY() + reverbButton.getHeight() * 2, getWidth(), reverbSlidersFlexBoxHeight};
+        reverbSliders.performLayout(area);
     }
     else
     {
         for(const auto& sliderSetting: reverbSliderSettings) { sliderSetting.slider.setVisible(false); }
+        const juce::Rectangle emptyArea{0, 0, 0, 0};
+        reverbSliders.performLayout(emptyArea);
     }
 }
 
