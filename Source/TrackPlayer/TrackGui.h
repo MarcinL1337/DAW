@@ -6,7 +6,8 @@
 
 class TrackGuiManager;
 
-class TrackGui final : public juce::Component
+class TrackGui final : public juce::Component,
+                       public juce::DragAndDropTarget
 {
 public:
     explicit TrackGui(uint16_t boxWidth, int numOfSeconds, juce::ValueTree& parentTree);
@@ -44,6 +45,11 @@ private:
     void handleClipCopy(const Waveform& clipWaveform);
     void handleClipCut(const Waveform& clipWaveform);
     void handleClipPaste(const float clickOffset);
+
+    bool isInterestedInDragSource(const SourceDetails& dragSourceDetails) override;
+    void itemDropped(const SourceDetails& dragSourceDetails) override;
+    void itemDragEnter(const SourceDetails& dragSourceDetails) override;
+    void itemDragExit(const SourceDetails& dragSourceDetails) override;
 
     enum popUpMenuOptions
     {

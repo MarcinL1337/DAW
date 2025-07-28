@@ -8,7 +8,7 @@ Waveform::Waveform(const uint16_t boxWidth, juce::ValueTree& parentTree, const N
     audioClipID{newAudioClipID}
 {
     audioThumbnail.addChangeListener(this);
-    setInterceptsMouseClicks(false, true);
+    setInterceptsMouseClicks(true, true);
     fadeController = std::make_unique<FadeController>(tree, audioClipID);
 }
 
@@ -96,4 +96,19 @@ void Waveform::setOffsetSeconds(const double newOffsetSeconds)
             ValueTreeIDs::numOfSecondsChanged, std::ceil(audioThumbnail.getTotalLength()) + offsetSeconds, nullptr);
     }
     resized();
+}
+
+void Waveform::mouseDrag(const juce::MouseEvent& event)
+{
+    if(event.getDistanceFromDragStart() > 5)
+    {
+        if(auto* dragContainer = juce::DragAndDropContainer::findParentDragContainerFor(this))
+        {
+            juce::var dragDescription;
+            dragDescription.append(static_cast<int>(audioClipID.uid));
+            dragDescription.append("waveform");
+            dragDescription.append(offsetSeconds);
+            dragContainer->startDragging(dragDescription, this);
+        }
+    }
 }

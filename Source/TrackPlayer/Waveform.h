@@ -23,6 +23,8 @@ public:
     void setOffsetSeconds(double newOffsetSeconds);
     double getOffsetSeconds() const { return offsetSeconds; }
 
+    void mouseDrag(const juce::MouseEvent& event) override;
+
 private:
     void paint(juce::Graphics& g) override;
     void drawWaveformWithFade(juce::Graphics& g, const juce::Rectangle<int>& bounds);

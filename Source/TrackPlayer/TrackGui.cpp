@@ -200,3 +200,47 @@ void TrackGui::handleClipPaste(const float clickOffset)
     tree.setProperty(ValueTreeIDs::pasteAudioClip, pasteInfo, nullptr);
     isAnyWaveformCopied = false;
 }
+
+bool TrackGui::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
+{
+    return dragSourceDetails.description.size() >= 2 && dragSourceDetails.description[1] == "waveform";
+}
+
+void TrackGui::itemDropped(const SourceDetails& dragSourceDetails)
+{
+    // if (!isInterestedInDragSource(dragSourceDetails))
+    //     return;
+    //
+    // int audioClipUid = dragSourceDetails.description[0];
+    // NodeID audioClipID{static_cast<uint32_t>(audioClipUid)};
+    // double originalOffset = dragSourceDetails.description[2];
+    //
+    // // Oblicz nową pozycję na podstawie drop position
+    // float newOffsetSeconds = dragSourceDetails.localPosition.x / static_cast<float>(currentBoxWidth);
+    //
+    // // Wyślij informację o przeniesieniu przez ValueTree
+    // const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
+    // const int targetTrackIndex = std::distance(
+    //     trackPlayer->trackGuiVector.begin(),
+    //     std::ranges::find_if(trackPlayer->trackGuiVector,
+    //         [this](auto& trackGui) { return this == trackGui.get(); }));
+    //
+    // juce::Array<juce::var> moveInfo{
+    //     static_cast<int>(audioClipID.uid),
+    //     targetTrackIndex,
+    //     newOffsetSeconds
+    // };
+    //
+    // tree.setProperty(ValueTreeIDs::moveAudioClip, moveInfo, nullptr);
+    // tree.setProperty(ValueTreeIDs::moveAudioClip, ValueTreeConstants::doNothing, nullptr);
+}
+
+void TrackGui::itemDragEnter(const SourceDetails& dragSourceDetails)
+{
+    if(isInterestedInDragSource(dragSourceDetails))
+    {
+        repaint();
+    }
+}
+
+void TrackGui::itemDragExit(const SourceDetails& dragSourceDetails) { repaint(); }
