@@ -42,9 +42,9 @@ void SideMenu::initReverbButton()
     addAndMakeVisible(reverbButton);
     reverbButton.onClick = [this]()
     {
-        isReverbOn = !isReverbOn;
+        toggleReverbStateInCurrentTrack();
         positionReverbButtonAndSliders();
-        const juce::Array<juce::var> trackIndexAndNewReverbValue{currentTrackIndex, isReverbOn};
+        const juce::Array<juce::var> trackIndexAndNewReverbValue{currentTrackIndex, isReverbOnInCurrentTrack()};
         tree.setProperty(ValueTreeIDs::trackReverbChanged, trackIndexAndNewReverbValue, nullptr);
     };
     addAndMakeVisible(reverbButtonLabel);
@@ -62,7 +62,7 @@ void SideMenu::initZoomSlider()
 void SideMenu::initTrackPropertiesSliders()
 {
     sliderSettings.push_back(SliderSettings{gainSlider, -40, 40, 1, " dB", gainLabel, "Gain"});
-    sliderSettings.push_back(SliderSettings{panSlider, -1, 1, 1, "", panLabel, "Panner"});
+    sliderSettings.push_back(SliderSettings{panSlider, -1, 1, 2, "", panLabel, "Panner"});
 
     for(auto& sliderSetting: sliderSettings)
     {
@@ -108,7 +108,7 @@ void SideMenu::initReverbSliders()
 void SideMenu::positionTrackPropertiesSliders() const
 {
     uint16_t currentY{50u};
-    const auto widthPercentage = sliderValuesPerTrack.empty() ? 0.0 : 0.95;
+    const auto widthPercentage = controlsValuesPerTrack.empty() ? 0.0 : 0.95;
     for(auto& sliderSetting: sliderSettings)
     {
         sliderSetting.slider.setSize(getWidth() * widthPercentage, sliderHeight);
@@ -137,7 +137,7 @@ void SideMenu::initReverbFlexItems()
 
         reverbSliders.items.add(reverbSlidersFirstRow);
         reverbSliders.items.add(reverbSlidersSecondRow);
-        reverbSlidersFlexBoxHeight = static_cast<int>(0.11 * getHeight());
+        reverbSlidersFlexBoxHeight = static_cast<int>(0.14 * getHeight());
         areReverbFlexItemsInitialized = true;
     }
 }
@@ -148,7 +148,7 @@ void SideMenu::positionReverbButtonAndSliders()
     reverbButton.setSize(30, 30);
     reverbButton.setCentrePosition(getWidth() * 0.5, currentY);
 
-    if(isReverbOn)
+    if(isReverbOnInCurrentTrack())
     {
         for(const auto& sliderSetting: reverbSliderSettings) { sliderSetting.slider.setVisible(true); }
         const juce::Rectangle area{
@@ -176,49 +176,50 @@ void SideMenu::sliderValueChanged(juce::Slider* changedSlider)
     }
     else if(changedSlider == &gainSlider)
     {
-        sliderValuesPerTrack.at(currentTrackIndex).gainValue = gainSlider.getValue();
+        controlsValuesPerTrack.at(currentTrackIndex).gainValue = gainSlider.getValue();
         const juce::Array<juce::var> trackIndexAndNewSliderValue{currentTrackIndex, gainSlider.getValue()};
         tree.setProperty(ValueTreeIDs::trackGainChanged, trackIndexAndNewSliderValue, nullptr);
     }
     else if(changedSlider == &panSlider)
     {
-        sliderValuesPerTrack.at(currentTrackIndex).panValue = panSlider.getValue();
+        panSlider.setTextValueSuffix(panSlider.getValue() < 0 ? " L" : " R");
+        controlsValuesPerTrack.at(currentTrackIndex).panValue = panSlider.getValue();
         const juce::Array<juce::var> trackIndexAndNewSliderValue{currentTrackIndex, panSlider.getValue()};
         tree.setProperty(ValueTreeIDs::trackPanChanged, trackIndexAndNewSliderValue, nullptr);
     }
     else if(changedSlider == &roomSizeSlider)
     {
-        sliderValuesPerTrack.at(currentTrackIndex).roomSizeValue = roomSizeSlider.getValue();
+        controlsValuesPerTrack.at(currentTrackIndex).roomSizeValue = roomSizeSlider.getValue();
         const juce::Array<juce::var> trackIndexAndNewSliderValue{currentTrackIndex, roomSizeSlider.getValue()};
         tree.setProperty(ValueTreeIDs::trackRoomSizeChanged, trackIndexAndNewSliderValue, nullptr);
     }
     else if(changedSlider == &dampingSlider)
     {
-        sliderValuesPerTrack.at(currentTrackIndex).dampingValue = dampingSlider.getValue();
+        controlsValuesPerTrack.at(currentTrackIndex).dampingValue = dampingSlider.getValue();
         const juce::Array<juce::var> trackIndexAndNewSliderValue{currentTrackIndex, dampingSlider.getValue()};
         tree.setProperty(ValueTreeIDs::trackDampChanged, trackIndexAndNewSliderValue, nullptr);
     }
     else if(changedSlider == &wetLevelSlider)
     {
-        sliderValuesPerTrack.at(currentTrackIndex).wetLevelValue = wetLevelSlider.getValue();
+        controlsValuesPerTrack.at(currentTrackIndex).wetLevelValue = wetLevelSlider.getValue();
         const juce::Array<juce::var> trackIndexAndNewSliderValue{currentTrackIndex, wetLevelSlider.getValue()};
         tree.setProperty(ValueTreeIDs::trackWetLevelChanged, trackIndexAndNewSliderValue, nullptr);
     }
     else if(changedSlider == &dryLevelSlider)
     {
-        sliderValuesPerTrack.at(currentTrackIndex).dryLevelValue = dryLevelSlider.getValue();
+        controlsValuesPerTrack.at(currentTrackIndex).dryLevelValue = dryLevelSlider.getValue();
         const juce::Array<juce::var> trackIndexAndNewSliderValue{currentTrackIndex, dryLevelSlider.getValue()};
         tree.setProperty(ValueTreeIDs::trackDryLevelChanged, trackIndexAndNewSliderValue, nullptr);
     }
     else if(changedSlider == &reverbWidthSlider)
     {
-        sliderValuesPerTrack.at(currentTrackIndex).reverbWidthValue = reverbWidthSlider.getValue();
+        controlsValuesPerTrack.at(currentTrackIndex).reverbWidthValue = reverbWidthSlider.getValue();
         const juce::Array<juce::var> trackIndexAndNewSliderValue{currentTrackIndex, reverbWidthSlider.getValue()};
         tree.setProperty(ValueTreeIDs::trackWidthChanged, trackIndexAndNewSliderValue, nullptr);
     }
     else if(changedSlider == &reverbFreezeSlider)
     {
-        sliderValuesPerTrack.at(currentTrackIndex).reverbFreezeValue = reverbFreezeSlider.getValue();
+        controlsValuesPerTrack.at(currentTrackIndex).reverbFreezeValue = reverbFreezeSlider.getValue();
         const juce::Array<juce::var> trackIndexAndNewSliderValue{currentTrackIndex, reverbFreezeSlider.getValue()};
         tree.setProperty(ValueTreeIDs::trackFreezeChanged, trackIndexAndNewSliderValue, nullptr);
     }
@@ -226,7 +227,7 @@ void SideMenu::sliderValueChanged(juce::Slider* changedSlider)
 
 void SideMenu::chooseNewTrackToBeSelected(const int deletedTrackIndex)
 {
-    if(not sliderValuesPerTrack.empty())
+    if(not controlsValuesPerTrack.empty())
     {
         if(deletedTrackIndex < currentTrackIndex)
         {
@@ -234,7 +235,7 @@ void SideMenu::chooseNewTrackToBeSelected(const int deletedTrackIndex)
         }
         else if(deletedTrackIndex == currentTrackIndex)
         {
-            currentTrackIndex = deletedTrackIndex % sliderValuesPerTrack.size();
+            currentTrackIndex = deletedTrackIndex % controlsValuesPerTrack.size();
         }
     }
     else
@@ -258,7 +259,7 @@ void SideMenu::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier
     }
     else if(property == ValueTreeIDs::duplicateTrackGui)
     {
-        currentTrackIndex = sliderValuesPerTrack.size() - 1;
+        currentTrackIndex = controlsValuesPerTrack.size() - 1;
         displaySliderValuesForCurrentTrack();
         tree.setProperty(ValueTreeIDs::setSelectedTrack, currentTrackIndex, nullptr);
     }
@@ -276,28 +277,32 @@ void SideMenu::displaySliderValuesForCurrentTrack()
     {
         auto& [newGainValue,
                newFaderValue,
+               newReverbState,
                newRoomSizeValue,
                newDampValue,
                newWetLevelValue,
                newDryLevelValue,
                newWidthValue,
-               newFreezeValue] = sliderValuesPerTrack.at(currentTrackIndex);
+               newFreezeValue] = controlsValuesPerTrack.at(currentTrackIndex);
 
         gainSlider.setValue(newGainValue);
         panSlider.setValue(newFaderValue);
+        reverbButton.setToggleState(newReverbState, juce::NotificationType::dontSendNotification);
         roomSizeSlider.setValue(newRoomSizeValue);
         dampingSlider.setValue(newDampValue);
         wetLevelSlider.setValue(newWetLevelValue);
         dryLevelSlider.setValue(newDryLevelValue);
         reverbWidthSlider.setValue(newWidthValue);
         reverbFreezeSlider.setValue(newFreezeValue);
+
+        positionReverbButtonAndSliders();
     }
 }
 
 void SideMenu::addTrack()
 {
-    sliderValuesPerTrack.push_back(SliderValues{0.0f, 0.0f, 50, 50, 33, 40, 100, 0});
-    currentTrackIndex = sliderValuesPerTrack.size() - 1;
+    controlsValuesPerTrack.push_back(ControlsValues{0.0f, 0.0f, false, 50, 50, 33, 40, 100, 0});
+    currentTrackIndex = controlsValuesPerTrack.size() - 1;
     displaySliderValuesForCurrentTrack();
     tree.setProperty(ValueTreeIDs::setSelectedTrack, currentTrackIndex, nullptr);
     resized();
@@ -305,20 +310,20 @@ void SideMenu::addTrack()
 
 void SideMenu::removeTrack(const int trackToBeDeletedIndex)
 {
-    sliderValuesPerTrack.erase(sliderValuesPerTrack.begin() + trackToBeDeletedIndex);
+    controlsValuesPerTrack.erase(controlsValuesPerTrack.begin() + trackToBeDeletedIndex);
     chooseNewTrackToBeSelected(trackToBeDeletedIndex);
 }
 
 void SideMenu::setTrackProperties(const int trackIndex, const float gainValue)
 {
-    sliderValuesPerTrack.at(trackIndex).gainValue = gainValue;
+    controlsValuesPerTrack.at(trackIndex).gainValue = gainValue;
 }
 
 void SideMenu::reorderSliderValues(const int fromIndex, const int toIndex)
 {
-    const auto sliderValuesToMove = std::move(sliderValuesPerTrack[fromIndex]);
-    sliderValuesPerTrack.erase(sliderValuesPerTrack.begin() + fromIndex);
-    sliderValuesPerTrack.insert(sliderValuesPerTrack.begin() + toIndex, sliderValuesToMove);
+    const auto sliderValuesToMove = std::move(controlsValuesPerTrack[fromIndex]);
+    controlsValuesPerTrack.erase(controlsValuesPerTrack.begin() + fromIndex);
+    controlsValuesPerTrack.insert(controlsValuesPerTrack.begin() + toIndex, sliderValuesToMove);
 
     currentTrackIndex = toIndex;
     displaySliderValuesForCurrentTrack();

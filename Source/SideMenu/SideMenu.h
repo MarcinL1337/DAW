@@ -14,10 +14,11 @@ struct SliderSettings
     std::string labelText;
 };
 
-struct SliderValues
+struct ControlsValues
 {
     double gainValue;
     double panValue;
+    bool reverbState;
     double roomSizeValue;
     double dampingValue;
     double wetLevelValue;
@@ -58,6 +59,13 @@ private:
     void chooseNewTrackToBeSelected(const int deletedTrackIndex);
     void reorderSliderValues(int fromIndex, int toIndex);
 
+    bool isReverbOnInCurrentTrack() const { return controlsValuesPerTrack.at(currentTrackIndex).reverbState; }
+    void toggleReverbStateInCurrentTrack()
+    {
+        controlsValuesPerTrack.at(currentTrackIndex).reverbState =
+            not controlsValuesPerTrack.at(currentTrackIndex).reverbState;
+    }
+
     juce::Slider gainSlider;
     juce::Label gainLabel;
     juce::Slider panSlider;
@@ -77,11 +85,10 @@ private:
 
     juce::ToggleButton reverbButton;
     juce::Label reverbButtonLabel;
-    bool isReverbOn{false};
 
     std::vector<SliderSettings> reverbSliderSettings{};
     std::vector<SliderSettings> sliderSettings{};
-    std::vector<SliderValues> sliderValuesPerTrack{};
+    std::vector<ControlsValues> controlsValuesPerTrack{};
 
     int currentTrackIndex{0};
     uint8_t paddingBetweenSliders{};
@@ -94,6 +101,7 @@ private:
 
     int reverbSlidersFlexBoxHeight{};
     inline static bool areReverbFlexItemsInitialized{false};
+
     juce::FlexBox reverbSliders{juce::FlexBox::Direction::column,
                                 juce::FlexBox::Wrap::noWrap,
                                 juce::FlexBox::AlignContent::spaceBetween,
