@@ -72,6 +72,10 @@ inline static const juce::Identifier deleteAudioClip{"deleteAudioClip"};
 inline static const juce::Identifier copyAudioClip{"copyAudioClip"};
 inline static const juce::Identifier pasteAudioClip{"pasteAudioClip"};
 
+inline static const juce::Identifier splitAudioClip{"splitAudioClip"};
+inline static const juce::Identifier toggleSplitAudioClipMode{"toggleSplitAudioClipMode"};
+inline static const juce::Identifier splitSecondsChanged{"splitSecondsChanged"};
+
 inline static const juce::Identifier audioClipFadeChanged{"audioClipFadeChanged"};
 
 inline static const juce::Identifier reorderTracks{"reorderTracks"};

@@ -1,8 +1,7 @@
 #include "ToolbarFactory.h"
 #include "../Constants.h"
 
-ToolbarFactory::ToolbarFactory(juce::ValueTree& valueTree) : tree(valueTree)
-{ initPlayheadFollowMode(); }
+ToolbarFactory::ToolbarFactory(juce::ValueTree& parentTree) : tree(parentTree) { initPlayheadFollowMode(); }
 
 void ToolbarFactory::initPlayheadFollowMode() const
 {
@@ -21,6 +20,7 @@ void ToolbarFactory::getAllToolbarItemIds(juce::Array<int>& ids)
                                           playPause,
                                           stop,
                                           startRecording,
+                                          clipSplit,
                                           followMode};
     ids.addArray(toolbarButtons);
 }
@@ -40,6 +40,9 @@ void ToolbarFactory::getDefaultItemSet(juce::Array<int>& ids)
                                                  startRecording,
                                                  separatorBarId,
                                                  stop,
+                                                 separatorBarId,
+                                                 separatorBarId,
+                                                 clipSplit,
                                                  flexibleSpacerId,
                                                  followMode,
                                                  REPEAT7(spacerId)};
@@ -74,8 +77,12 @@ juce::ToolbarItemComponent* ToolbarFactory::createItem(const int itemId)
             stopButton = createButtonFromImage(stop, "Stop");
             stopButton->addListener(this);
             return stopButton;
+        case clipSplit:
+            clipSplitButton = createButtonFromImage(clipSplit, "Clip split");
+            clipSplitButton->addListener(this);
+            return clipSplitButton;
         case followMode:
-            followModeButton = createButtonFromImage(itemId, "Follow mode");
+            followModeButton = createButtonFromImage(followMode, "Follow mode");
             followModeButton->addListener(this);
             return followModeButton;
         default:
@@ -115,6 +122,10 @@ juce::ToolbarButton* ToolbarFactory::createButtonFromImage(int itemId,
             png = BinaryData::stopButton_png;
             pngSize.emplace(BinaryData::stopButton_pngSize);
             break;
+        case clipSplit:
+            png = BinaryData::split_png;
+            pngSize.emplace(BinaryData::split_pngSize);
+            break;
         case followMode:
             png = BinaryData::followModeButton_png;
             pngSize.emplace(BinaryData::followModeButton_pngSize);
@@ -129,7 +140,7 @@ juce::ToolbarButton* ToolbarFactory::createButtonFromImage(int itemId,
         itemId, "juce!", juce::Drawable::createFromImageData(png.value(), pngSize.value()), {});
 }
 
-void ToolbarFactory::temporaryButtonsFunction(const juce::String buttonName)
+void ToolbarFactory::temporaryButtonsFunction(const juce::String& buttonName) const
 {
     juce::DialogWindow* dialogWindow;
     juce::DialogWindow::LaunchOptions launchOptions;
@@ -157,41 +168,45 @@ void ToolbarFactory::buttonClicked(juce::Button* button)
     {
         previousButtonClicked();
     }
-    if(button == nextButton)
+    else if(button == nextButton)
     {
         nextButtonClicked();
     }
-    if(button == replayButton)
+    else if(button == replayButton)
     {
         replayButtonClicked();
     }
-    if(button == playPauseButton)
+    else if(button == playPauseButton)
     {
         playPauseButtonClicked();
     }
-    if(button == startRecordingButton)
+    else if(button == startRecordingButton)
     {
         startRecordingButtonClicked();
     }
-    if(button == stopButton)
+    else if(button == stopButton)
     {
         stopButtonClicked();
     }
-    if(button == followModeButton)
+    else if(button == followModeButton)
     {
         followModeButtonClicked();
     }
+    else if(button == clipSplitButton)
+    {
+        clipSplitButtonClicked();
+    }
 }
 
-void ToolbarFactory::previousButtonClicked() { temporaryButtonsFunction("previousButton"); }
-void ToolbarFactory::nextButtonClicked() { temporaryButtonsFunction("nextButton"); }
-void ToolbarFactory::replayButtonClicked() { temporaryButtonsFunction("replayButton"); }
+void ToolbarFactory::previousButtonClicked() const { temporaryButtonsFunction("previousButton"); }
+void ToolbarFactory::nextButtonClicked() const { temporaryButtonsFunction("nextButton"); }
+void ToolbarFactory::replayButtonClicked() const { temporaryButtonsFunction("replayButton"); }
 void ToolbarFactory::playPauseButtonClicked() const
 {
     tree.setProperty(ValueTreeIDs::playPauseButtonClicked, true, nullptr);
     tree.setProperty(ValueTreeIDs::playPauseButtonClicked, ValueTreeConstants::doNothing, nullptr);
 }
-void ToolbarFactory::startRecordingButtonClicked() { temporaryButtonsFunction("startRecordingButton"); }
+void ToolbarFactory::startRecordingButtonClicked() const { temporaryButtonsFunction("startRecordingButton"); }
 void ToolbarFactory::stopButtonClicked() const
 {
     tree.setProperty(ValueTreeIDs::stopButtonClicked, true, nullptr);
@@ -218,3 +233,21 @@ void ToolbarFactory::followModeButtonClicked() const
                            }
                        });
 }
+
+// TODO: think about handling clicking outside of tracks region when isClipSplitActive == true.
+// Eg. Should it be turned off in that case or should other actions be restricted etc.
+void ToolbarFactory::clipSplitButtonClicked()
+{
+    isClipSplitActive = not isClipSplitActive;
+    tree.setProperty(ValueTreeIDs::toggleSplitAudioClipMode, isClipSplitActive, nullptr);
+    if(isClipSplitActive)
+    {
+        clipSplitButton->setButtonText("Split");
+        clipSplitButton->setStyle(juce::Toolbar::ToolbarItemStyle::iconsWithText);
+    }
+    else
+    {
+        clipSplitButton->setStyle(juce::Toolbar::ToolbarItemStyle::iconsOnly);
+    }
+}
+
