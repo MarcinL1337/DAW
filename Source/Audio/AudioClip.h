@@ -17,6 +17,13 @@ public:
     void setGain(const float gainDb) { gainProcessor.setGainDecibels(gainDb); }
     float getGain() const { return gainProcessor.getGainDecibels(); }
     void setPan(const float pan) { panProcessor.setPan(juce::jlimit(-1.0f, 1.0f, pan)); }
+    void setReverb(const bool isReverbOn) { reverbProcessor.setEnabled(isReverbOn); }
+    void setRoomSize(const float newRoomSizeValue);
+    void setDamp(const float newDampValue);
+    void setWetLevel(const float newWetLevelValue);
+    void setDryLevel(const float newDryLevelValue);
+    void setWidth(const float newWidthValue);
+    void setFreeze(const float newFreezeValue);
     void setOffset(const int64_t newOffsetSamples) { offsetSamples = newOffsetSamples; }
     int64_t getOffset() const { return offsetSamples; }
     void setMute(const bool shouldMute) { mute = shouldMute; }
@@ -57,6 +64,7 @@ private:
 
     juce::dsp::Gain<float> gainProcessor;
     juce::dsp::Panner<float> panProcessor;
+    juce::dsp::Reverb reverbProcessor;
     int64_t offsetSamples{0};
     bool mute{false};
     bool solo{false};

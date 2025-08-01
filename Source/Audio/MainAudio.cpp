@@ -74,6 +74,35 @@ void MainAudio::setMuteOfAudioClip(const NodeID nodeID, const bool mute) const
     dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setMute(mute);
 }
 
+void MainAudio::setReverbOfAudioClip(NodeID nodeID, bool isReverbOn) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setReverb(isReverbOn);
+}
+void MainAudio::setRoomSizeOfAudioClip(const NodeID nodeID, const float newRoomSizeValue) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setRoomSize(newRoomSizeValue);
+}
+void MainAudio::setDampOfAudioClip(const NodeID nodeID, const float newDampValue) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setDamp(newDampValue);
+}
+void MainAudio::setWetLevelOfAudioClip(const NodeID nodeID, const float newWetLevelValue) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setWetLevel(newWetLevelValue);
+}
+void MainAudio::setDryLevelOfAudioClip(const NodeID nodeID, const float newDryLevelValue) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setDryLevel(newDryLevelValue);
+}
+void MainAudio::setWidthOfAudioClip(const NodeID nodeID, const float newWidthValue) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setWidth(newWidthValue);
+}
+void MainAudio::setFreezeOfAudioClip(const NodeID nodeID, const float newFreezeValue) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setFreeze(newFreezeValue);
+}
+
 void MainAudio::play()
 {
     juce::ScopedLock sl(lock);
