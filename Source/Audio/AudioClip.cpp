@@ -81,7 +81,10 @@ void AudioClip::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&
         {
             const int64_t positionDifference = std::abs(readerSource->getNextReadPosition() - localPositionSamples);
             if(const auto threshold = static_cast<int64_t>(0.1 * fileSampleRate); positionDifference > threshold)
+            {
                 readerSource->setNextReadPosition(localPositionSamples);
+                reverbProcessor.reset();
+            }
 
             resampler->getNextAudioBlock(juce::AudioSourceChannelInfo(&buffer, 0, buffer.getNumSamples()));
             juce::dsp::AudioBlock<float> block(buffer);
