@@ -5,7 +5,7 @@ ZoomSlider::ZoomSlider()
     setSliderStyle(LinearHorizontal);
     setTextBoxStyle(TextBoxBelow, true, 100, 20);
     setTextValueSuffix("%");
-    setRange(50, 400);
+    setRange(25, 500);
     setNumDecimalPlacesToDisplay(0);
     setValue(100);
 
@@ -15,7 +15,7 @@ ZoomSlider::ZoomSlider()
     zoomSliderLabel.setJustificationType(juce::Justification::centred);
 }
 
-double ZoomSlider::snapValue(double attemptedValue, DragMode dragMode)
+double ZoomSlider::snapValue(const double attemptedValue, DragMode dragMode)
 {
-    return juce::roundToIntAccurate(attemptedValue / 25.0f) * 25.0f;
+    return juce::roundToIntAccurate(attemptedValue / 5.0f) * 5.0f;
 }

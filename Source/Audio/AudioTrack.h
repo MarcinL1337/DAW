@@ -10,13 +10,36 @@ enum class AudioClipProperty
     MUTE,
     SOLO,
     GAIN,
-    PAN
+    PAN,
+    REVERB
+};
+
+enum class ReverbClipProperty
+{
+    ROOM_SIZE,
+    DAMP,
+    WET_LEVEL,
+    DRY_LEVEL,
+    WIDTH,
+    FREEZE
+};
+
+struct ReverbProperties
+{
+    float roomSize{0.5f};
+    float damp{0.5f};
+    float wetLevel{0.33f};
+    float dryLevel{0.4f};
+    float width{1.0f};
+    float freeze{0.0f};
 };
 
 struct TrackProperties
 {
     float gain{0.0f};
     float pan{0.0f};
+    ReverbProperties reverbProperties{};
+    bool reverb{false};
     bool mute{false};
     bool solo{false};
     juce::String name{"Track"};
@@ -35,6 +58,7 @@ public:
     void setProperty(AudioClipProperty property, bool boolValue);
     void setProperty(AudioClipProperty property, float floatValue);
     void setProperty(const juce::String& stringValue);
+    void setProperty(ReverbClipProperty property, float floatValue);
 
     TrackProperties getProperties() const;
 

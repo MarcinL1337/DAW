@@ -15,7 +15,7 @@ class TrackManager final : public juce::Component,
 {
 public:
     TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef, SideMenu& sideMenuRef);
-    ~TrackManager() override = default;
+    ~TrackManager() override;
 
     int addTrack();
     void removeTrack(int trackIndex);
@@ -26,7 +26,12 @@ public:
     NodeID addAudioClipToTrack(int trackIndex, const juce::File& file) const;
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
     bool removeAudioClipFromTrack(const int trackIndex, const NodeID clipId) const;
-    bool copyAudioClip(const int trackIndex, const NodeID clipId);
+    void splitAudioClip(const int trackIndex, const NodeID clipId, const float waveformSplitRatio) const;
+    void addNewAudioClipsBySplit(const int trackIndex, const juce::File& fileToBeSplit, const float waveformSplitRatio,
+                                 const double splitClipOffset) const;
+    static void handleWriteToFile(juce::AudioFormatReader& reader, const juce::AudioFormatManager& formatManager,
+                                  const juce::File& destFile, const int numOfSamplesToWrite,
+                                  const int readerOffsetInSamples);
     bool moveAudioClipBetweenTracks(int sourceTrackIndex, int destTrackIndex, NodeID clipId);  // to be implemented
 
     bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
@@ -34,6 +39,7 @@ public:
     void setTrackProperty(int trackIndex, AudioClipProperty property, bool boolValue) const;
     void setTrackProperty(int trackIndex, AudioClipProperty property, float floatValue) const;
     void setTrackProperty(int trackIndex, juce::String stringValue) const;
+    void setTrackProperty(int trackIndex, ReverbClipProperty property, float floatValue) const;
     TrackProperties getTrackProperties(int trackIndex) const;
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
@@ -42,12 +48,16 @@ public:
     nlohmann::json exportTracksToJson() const;
 
 private:
+    void changeTrackOrder(int fromIndex, int toIndex);
+    void chooseNewNamesForSplitFiles(juce::String& firstFile, juce::String& secondFile,
+                                     const juce::String& extension) const;
+    void handleSplitClipsDirCreation() const;
+
     TrackGuiManager& trackGuiManager;
     MainAudio& mainAudio;
     SideMenu& sideMenu;
     juce::ValueTree& tree;
     std::vector<std::unique_ptr<AudioTrack>> tracks;
     std::optional<juce::File> currentlyCopiedClipFilePath{std::nullopt};
-
-    void changeTrackOrder(int fromIndex, int toIndex);
+    const juce::File tempClipsFolder{"../../../Assets/Audio/TemporarySplitClips"};
 };

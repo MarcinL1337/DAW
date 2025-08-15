@@ -1,9 +1,13 @@
 #include "TrackGui.h"
 #include "TrackGuiManager.h"
 
+ClipSplitBar TrackGui::clipSplitBar;
+
 TrackGui::TrackGui(const uint16_t boxWidth, const int numOfSeconds, juce::ValueTree& parentTree) :
     tree{parentTree}, currentBoxWidth{boxWidth}, currentNumOfSeconds{numOfSeconds}
-{}
+{
+    tree.addListener(this);
+}
 
 void TrackGui::paint(juce::Graphics& g)
 {
@@ -34,23 +38,68 @@ void TrackGui::addNewAudioFile(const juce::String& newAudioFilePath, const NodeI
     makeNewWaveformFromAudioFilePath(newAudioFilePath, newAudioClipID);
 }
 
+void TrackGui::handleLeftMouseClick(const juce::MouseEvent& event)
+{
+    if(isClipSplitActive)
+    {
+        handleClipSplit(event);
+    }
+    triggerTrackGuiAction(ValueTreeIDs::setSelectedTrack);
+}
+
+void TrackGui::handleRightMouseClick(const juce::MouseEvent& event)
+{
+    for(const auto& waveform: waveforms)
+    {
+        if(waveform->getBoundsInParent().contains(event.mouseDownPosition.x, event.mouseDownPosition.y))
+        {
+            showPopUpMenuForClip(*waveform);
+            return;
+        }
+    }
+    showPopUpMenuForTrack(event.mouseDownPosition.x);
+}
+
+// TODO: track delete bug
 void TrackGui::mouseDown(const juce::MouseEvent& event)
 {
     if(event.mods.isRightButtonDown())
     {
-        for(const auto& waveform: waveforms)
-        {
-            if(waveform->getBoundsInParent().contains(event.mouseDownPosition.x, event.mouseDownPosition.y))
-            {
-                showPopUpMenuForClip(*waveform);
-                return;
-            }
-        }
-        showPopUpMenuForTrack(event.mouseDownPosition.x);
+        handleRightMouseClick(event);
     }
     if(event.mods.isLeftButtonDown())
     {
-        triggerTrackGuiAction(ValueTreeIDs::setSelectedTrack);
+        handleLeftMouseClick(event);
+    }
+}
+
+void TrackGui::mouseEnter(const juce::MouseEvent& event)
+{
+    if(isClipSplitActive)
+    {
+        addAndMakeVisible(&clipSplitBar);
+        clipSplitBar.setBounds(getLocalBounds());
+    }
+}
+
+void TrackGui::mouseExit(const juce::MouseEvent& event)
+{
+    if(isClipSplitActive)
+    {
+        removeChildComponent(&clipSplitBar);
+    }
+}
+
+void TrackGui::mouseMove(const juce::MouseEvent& event)
+{
+    if(isClipSplitActive)
+    {
+        const auto eventMouseX{event.mouseDownPosition.getX()};
+        clipSplitBar.setMouseXPosition(eventMouseX);
+        clipSplitBar.repaint();
+
+        const float newSplitSeconds{eventMouseX / currentBoxWidth};
+        tree.setProperty(ValueTreeIDs::splitSecondsChanged, newSplitSeconds, nullptr);
     }
 }
 
@@ -199,4 +248,42 @@ void TrackGui::handleClipPaste(const float clickOffset)
 
     tree.setProperty(ValueTreeIDs::pasteAudioClip, pasteInfo, nullptr);
     isAnyWaveformCopied = false;
+}
+
+void TrackGui::handleClipSplit(const juce::MouseEvent& event)
+{
+    const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
+    const auto currentTrackIndex = std::distance(
+        trackPlayer->trackGuiVector.begin(),
+        std::ranges::find_if(trackPlayer->trackGuiVector, [this](auto& trackGui) { return this == trackGui.get(); }));
+
+    for(const auto& waveform: waveforms)
+    {
+        if(waveform->getBoundsInParent().contains(event.mouseDownPosition.x, event.mouseDownPosition.y))
+        {
+            const auto waveformWidth = waveform->getBounds().getWidth();
+            const auto waveformOffset = waveform->getBounds().getX();
+            const float waveformSplit =
+                (event.mouseDownPosition.x - static_cast<float>(waveformOffset)) / static_cast<float>(waveformWidth);
+
+            const juce::Array<juce::var> splitClipInfo{
+                currentTrackIndex, static_cast<int>(waveform->getAudioClipID().uid), waveformSplit};
+
+            waveforms.erase(std::ranges::find_if(
+                waveforms, [&waveform](auto& waveformPtr) { return waveformPtr.get() == waveform.get(); }));
+            tree.setProperty(ValueTreeIDs::splitAudioClip, splitClipInfo, nullptr);
+
+            return;
+        }
+    }
+}
+
+void TrackGui::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
+{
+    if(static_cast<int>(tree[property]) == ValueTreeConstants::doNothing)
+        return;
+    if(property == ValueTreeIDs::toggleSplitAudioClipMode)
+    {
+        isClipSplitActive = tree[ValueTreeIDs::toggleSplitAudioClipMode];
+    }
 }
