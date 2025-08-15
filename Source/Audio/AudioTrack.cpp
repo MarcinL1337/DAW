@@ -52,6 +52,10 @@ void AudioTrack::setProperty(const AudioClipProperty property, const bool boolVa
             properties.solo = boolValue;
             for(const auto& clipId: audioClips) { mainAudio.setSoloOfAudioClip(clipId, boolValue); }
             break;
+        case AudioClipProperty::REVERB:
+            properties.reverb = boolValue;
+            for(const auto& clipId: audioClips) { mainAudio.setReverbOfAudioClip(clipId, boolValue); }
+            break;
         default:
             std::unreachable();
     }
@@ -68,6 +72,39 @@ void AudioTrack::setProperty(const AudioClipProperty property, const float float
         case AudioClipProperty::PAN:
             properties.pan = floatValue;
             for(const auto& clipId: audioClips) { mainAudio.setPanOfAudioClip(clipId, floatValue); }
+            break;
+        default:
+            std::unreachable();
+    }
+}
+
+void AudioTrack::setProperty(const ReverbClipProperty property, const float floatValue)
+{
+    switch(property)
+    {
+        case ReverbClipProperty::ROOM_SIZE:
+            properties.reverbProperties.roomSize = floatValue;
+            for(const auto& clipId: audioClips) { mainAudio.setRoomSizeOfAudioClip(clipId, floatValue); }
+            break;
+        case ReverbClipProperty::DAMP:
+            properties.reverbProperties.damp = floatValue;
+            for(const auto& clipId: audioClips) { mainAudio.setDampOfAudioClip(clipId, floatValue); }
+            break;
+        case ReverbClipProperty::WET_LEVEL:
+            properties.reverbProperties.wetLevel = floatValue;
+            for(const auto& clipId: audioClips) { mainAudio.setWetLevelOfAudioClip(clipId, floatValue); }
+            break;
+        case ReverbClipProperty::DRY_LEVEL:
+            properties.reverbProperties.dryLevel = floatValue;
+            for(const auto& clipId: audioClips) { mainAudio.setDryLevelOfAudioClip(clipId, floatValue); }
+            break;
+        case ReverbClipProperty::WIDTH:
+            properties.reverbProperties.width = floatValue;
+            for(const auto& clipId: audioClips) { mainAudio.setWidthOfAudioClip(clipId, floatValue); }
+            break;
+        case ReverbClipProperty::FREEZE:
+            properties.reverbProperties.freeze = floatValue;
+            for(const auto& clipId: audioClips) { mainAudio.setFreezeOfAudioClip(clipId, floatValue); }
             break;
         default:
             std::unreachable();

@@ -37,6 +37,7 @@ public:
 
     void setTrackProperty(int trackIndex, AudioClipProperty property, bool boolValue) const;
     void setTrackProperty(int trackIndex, AudioClipProperty property, float floatValue) const;
+    void setTrackProperty(int trackIndex, ReverbClipProperty property, float floatValue) const;
     TrackProperties getTrackProperties(int trackIndex) const;
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,

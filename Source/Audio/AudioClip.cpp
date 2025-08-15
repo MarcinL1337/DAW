@@ -1,7 +1,7 @@
 #include "AudioClip.h"
 #include "MainAudio.h"
 
-AudioClip::AudioClip(MainAudio& mainAudioRef):
+AudioClip::AudioClip(MainAudio& mainAudioRef) :
     AudioProcessor(BusesProperties()
                        .withInput("Input", juce::AudioChannelSet::stereo(), true)
                        .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
@@ -10,12 +10,14 @@ AudioClip::AudioClip(MainAudio& mainAudioRef):
     readerSource{nullptr}
 {
     formatManager.registerBasicFormats();
+    reverbProcessor.setEnabled(false);
 }
 
 void AudioClip::releaseResources()
 {
     gainProcessor.reset();
     panProcessor.reset();
+    reverbProcessor.reset();
 }
 
 bool AudioClip::loadFile(const juce::File& file)
@@ -40,6 +42,7 @@ void AudioClip::prepareToPlay(const double sampleRate, const int samplesPerBlock
         const juce::dsp::ProcessSpec spec{sampleRate, static_cast<uint32_t>(samplesPerBlock), reader->numChannels};
         gainProcessor.prepare(spec);
         panProcessor.prepare(spec);
+        reverbProcessor.prepare(spec);
     }
     isPrepared = resampler && reader;
 }
@@ -78,12 +81,16 @@ void AudioClip::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&
         {
             const int64_t positionDifference = std::abs(readerSource->getNextReadPosition() - localPositionSamples);
             if(const auto threshold = static_cast<int64_t>(0.1 * fileSampleRate); positionDifference > threshold)
+            {
                 readerSource->setNextReadPosition(localPositionSamples);
+                reverbProcessor.reset();
+            }
 
             resampler->getNextAudioBlock(juce::AudioSourceChannelInfo(&buffer, 0, buffer.getNumSamples()));
             juce::dsp::AudioBlock<float> block(buffer);
             gainProcessor.process(juce::dsp::ProcessContextReplacing(block));
             panProcessor.process(juce::dsp::ProcessContextReplacing(block));
+            reverbProcessor.process(juce::dsp::ProcessContextReplacing(block));
 
             applyFadeToBuffer(buffer, localPositionSamples);
         }
@@ -111,3 +118,46 @@ void AudioClip::setFadeData(const Fade::Data& fadeIn, const Fade::Data& fadeOut)
     this->fadeIn = fadeIn;
     this->fadeOut = fadeOut;
 }
+
+void AudioClip::setRoomSize(const float newRoomSizeValue)
+{
+    auto newParams{reverbProcessor.getParameters()};
+    newParams.roomSize = newRoomSizeValue / 100.0f;
+    reverbProcessor.setParameters(newParams);
+}
+
+void AudioClip::setDamp(const float newDampValue)
+{
+    auto newParams{reverbProcessor.getParameters()};
+    newParams.damping = newDampValue / 100.0f;
+    reverbProcessor.setParameters(newParams);
+}
+
+void AudioClip::setWetLevel(const float newWetLevelValue)
+{
+    auto newParams{reverbProcessor.getParameters()};
+    newParams.wetLevel = newWetLevelValue / 100.0f;
+    reverbProcessor.setParameters(newParams);
+}
+
+void AudioClip::setDryLevel(const float newDryLevelValue)
+{
+    auto newParams{reverbProcessor.getParameters()};
+    newParams.dryLevel = newDryLevelValue / 100.0f;
+    reverbProcessor.setParameters(newParams);
+}
+
+void AudioClip::setWidth(const float newWidthValue)
+{
+    auto newParams{reverbProcessor.getParameters()};
+    newParams.width = newWidthValue / 100.0f;
+    reverbProcessor.setParameters(newParams);
+}
+
+void AudioClip::setFreeze(const float newFreezeValue)
+{
+    auto newParams{reverbProcessor.getParameters()};
+    newParams.freezeMode = newFreezeValue / 100.0f;
+    reverbProcessor.setParameters(newParams);
+}
+
