@@ -1,14 +1,13 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
-#include "../ProjectFilesManager.h"
 
 class Menu final : public juce::Component,
                    public juce::ApplicationCommandTarget,
                    public juce::MenuBarModel
 {
 public:
-    Menu(ProjectFilesManager& projectManagerRef);
+    explicit Menu(juce::ValueTree& parentTree);
     ~Menu() override;
 
 private:
@@ -23,9 +22,9 @@ private:
     void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
     bool perform(const InvocationInfo& info) override;
 
-    ProjectFilesManager& projectManager;
     std::unique_ptr<juce::MenuBarComponent> menuBarComponent;
     juce::ApplicationCommandManager commandManager;
+    juce::ValueTree& tree;
 
     juce::StringArray menuBarNames{"File", "Edit", "View", "Help"};
 

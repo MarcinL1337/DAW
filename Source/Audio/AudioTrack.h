@@ -42,6 +42,7 @@ struct TrackProperties
     bool reverb{false};
     bool mute{false};
     bool solo{false};
+
     juce::String name{"Track"};
 };
 
@@ -57,8 +58,8 @@ public:
 
     void setProperty(AudioClipProperty property, bool boolValue);
     void setProperty(AudioClipProperty property, float floatValue);
-    void setProperty(const juce::String& stringValue);
     void setProperty(ReverbClipProperty property, float floatValue);
+    void setTrackName(const juce::String& stringValue);
 
     TrackProperties getProperties() const;
 

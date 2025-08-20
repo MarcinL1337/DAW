@@ -34,7 +34,7 @@ public:
     void addTrackControls();
     void updateTrackButtonStates(int trackIndex, bool muted, bool soloed) const;
     void clearAllTracks();
-    void updateTrackName(int trackIndex, const juce::String& name) const;
+    void setTrackName(int trackIndex, const juce::String& name) const;
 
     uint16_t getCurrentNumberOfTracks() const { return currentNumberOfTracks; }
     void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }

@@ -1,22 +1,21 @@
 #include "MainComponent.h"
 
 MainComponent::MainComponent() :
-    mainAudio(tree),
-    topLevelMenu(projectFilesManager),
-    mainToolbar(tree),
-    trackPlayer(tree),
-    trackManager(trackPlayer, mainAudio, sideMenu),
-    sideMenu(tree),
-    projectFilesManager{trackManager}
+    mainAudio{tree},
+    topLevelMenu{tree},
+    mainToolbar{tree},
+    trackPlayer{tree},
+    sideMenu{tree},
+    trackManager{trackPlayer, mainAudio, sideMenu},
+    projectFilesManager{tree}
 {
     // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
     setSize(getParentWidth(), getParentHeight());
     addAndMakeVisible(topLevelMenu);
     addAndMakeVisible(mainToolbar);
     addAndMakeVisible(trackPlayer);
-    addAndMakeVisible(trackManager);
-
     addAndMakeVisible(sideMenu);
+    addAndMakeVisible(trackManager);
     flexBoxInit();
 
     projectFilesManager.openTestProject();

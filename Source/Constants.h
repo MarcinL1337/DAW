@@ -79,6 +79,18 @@ inline static const juce::Identifier splitSecondsChanged{"splitSecondsChanged"};
 inline static const juce::Identifier audioClipFadeChanged{"audioClipFadeChanged"};
 
 inline static const juce::Identifier reorderTracks{"reorderTracks"};
+
+inline static const juce::Identifier createNewProject{"createNewProject"};
+inline static const juce::Identifier openProject{"openProject"};
+inline static const juce::Identifier saveProject{"saveProject"};
+inline static const juce::Identifier saveAsProject{"saveAsProject"};
+inline static const juce::Identifier addAudioFile{"addAudioFile"};
+
+inline static const juce::Identifier clearAllTracks{"clearAllTracks"};
+inline static const juce::Identifier tracksJsonExported{"tracksJsonExported"};
+inline static const juce::Identifier createTrackFromJson{"createTrackFromJson"};
+inline static const juce::Identifier exportTracksToJson{"exportTracksToJson"};
+inline static const juce::Identifier addAudioFileToNewTrack{"addAudioFileToNewTrack"};
 }  // namespace ValueTreeIDs
 
 namespace PlayheadFollowConstants

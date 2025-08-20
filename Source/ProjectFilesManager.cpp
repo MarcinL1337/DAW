@@ -1,10 +1,12 @@
 #include "ProjectFilesManager.h"
+#include "Constants.h"
 
-ProjectFilesManager::ProjectFilesManager(TrackManager& trackManagerRef) : trackManager{trackManagerRef} {}
+ProjectFilesManager::ProjectFilesManager(juce::ValueTree& parentTree) : tree{parentTree} { tree.addListener(this); }
 
 void ProjectFilesManager::createNewProject()
 {
-    trackManager.clearAllTracks();
+    tree.setProperty(ValueTreeIDs::clearAllTracks, true, nullptr);
+    tree.setProperty(ValueTreeIDs::clearAllTracks, ValueTreeConstants::doNothing, nullptr);
     currentProjectFile = juce::File{};
 }
 
@@ -25,7 +27,7 @@ void ProjectFilesManager::openProject()
 
 void ProjectFilesManager::saveProject()
 {
-    if(currentProjectFile != juce::File{})
+    if(currentProjectFile.existsAsFile())
         saveProjectToFile(currentProjectFile);
     else
         saveAsProject();
@@ -50,16 +52,20 @@ void ProjectFilesManager::saveProjectToFile(const juce::File& file) const
 {
     const juce::File projectDir = file.getParentDirectory();
     const juce::File audioDir = projectDir.getChildFile(file.getFileNameWithoutExtension() + audioDirSuffix);
-    if(!audioDir.exists()) [[maybe_unused]]
-        auto result = audioDir.createDirectory();
+    if(!audioDir.exists())
+    {
+        const auto result = audioDir.createDirectory();
+        assert(result.wasOk());
+    }
 
-    const auto projectJson = trackManager.exportTracksToJson();
-    [[maybe_unused]] auto result = file.replaceWithText(projectJson.dump(4));
+    tree.setProperty(ValueTreeIDs::exportTracksToJson, true, nullptr);
+    tree.setProperty(ValueTreeIDs::exportTracksToJson, ValueTreeConstants::doNothing, nullptr);
 }
 
 void ProjectFilesManager::loadProjectFromFile(const juce::File& file) const
 {
-    trackManager.clearAllTracks();
+    tree.setProperty(ValueTreeIDs::clearAllTracks, true, nullptr);
+    tree.setProperty(ValueTreeIDs::clearAllTracks, ValueTreeConstants::doNothing, nullptr);
 
     const auto jsonString = file.loadFileAsString();
     auto projectJson = nlohmann::json::parse(jsonString.toStdString());
@@ -75,13 +81,16 @@ void ProjectFilesManager::loadProjectFromFile(const juce::File& file) const
             juce::File audioFile = audioDir.getChildFile(clip["path"].get<std::string>());
             clip["path"] = audioFile.getFullPathName().toStdString();
         }
-        trackManager.createTrackFromJson(trackJson);
+
+        juce::String trackJsonString = trackJson.dump();
+        tree.setProperty(ValueTreeIDs::createTrackFromJson, trackJsonString, nullptr);
+        tree.setProperty(ValueTreeIDs::createTrackFromJson, ValueTreeConstants::doNothing, nullptr);
     }
 }
 
 void ProjectFilesManager::addAudioFile()
 {
-    if(not currentProjectFile.existsAsFile() or currentProjectFile == juce::File{})
+    if(not currentProjectFile.existsAsFile())
     {
         const auto options =
             juce::MessageBoxOptions()
@@ -115,16 +124,22 @@ void ProjectFilesManager::addAudioFile()
                 const juce::File audioDir =
                     currentProjectDir.getChildFile(currentProjectFile.getFileNameWithoutExtension() + audioDirSuffix);
 
-                if(!audioDir.exists()) [[maybe_unused]]
-                    auto result = audioDir.createDirectory();
+                if(!audioDir.exists())
+                {
+                    const auto result = audioDir.createDirectory();
+                    assert(result.wasOk());
+                }
 
                 const juce::File dstFile = audioDir.getChildFile(file.getFileNameWithoutExtension() +
                                                                  std::to_string(counter++) + file.getFileExtension());
-                if(!dstFile.existsAsFile()) [[maybe_unused]]
-                    auto result = file.copyFileTo(dstFile);
+                if(!dstFile.existsAsFile())
+                {
+                    const auto result = file.copyFileTo(dstFile);
+                    assert(result);
+                }
 
-                const auto index = trackManager.addTrack();
-                [[maybe_unused]] const auto nodeId = trackManager.addAudioClipToTrack(index, dstFile.getFullPathName());
+                tree.setProperty(ValueTreeIDs::addAudioFileToNewTrack, dstFile.getFullPathName(), nullptr);
+                tree.setProperty(ValueTreeIDs::addAudioFileToNewTrack, ValueTreeConstants::doNothing, nullptr);
                 saveProjectToFile(currentProjectFile);
             }
         });
@@ -137,4 +152,27 @@ void ProjectFilesManager::openTestProject()
     const juce::File projectFile = dawDir.getChildFile("Assets/test_project/test_project.json");
     loadProjectFromFile(projectFile);
     currentProjectFile = projectFile;
+}
+
+void ProjectFilesManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
+{
+    if(static_cast<int>(tree[property]) == ValueTreeConstants::doNothing)
+        return;
+
+    if(property == ValueTreeIDs::createNewProject)
+        createNewProject();
+    else if(property == ValueTreeIDs::openProject)
+        openProject();
+    else if(property == ValueTreeIDs::saveProject)
+        saveProject();
+    else if(property == ValueTreeIDs::saveAsProject)
+        saveAsProject();
+    else if(property == ValueTreeIDs::addAudioFile)
+        addAudioFile();
+    else if(property == ValueTreeIDs::tracksJsonExported)
+    {
+        const auto projectString = tree[ValueTreeIDs::tracksJsonExported].toString();
+        const auto result = currentProjectFile.replaceWithText(projectString);
+        assert(result);
+    }
 }

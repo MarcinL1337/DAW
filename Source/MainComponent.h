@@ -4,6 +4,7 @@
 
 #include "Audio/MainAudio.h"
 #include "Constants.h"
+#include "ProjectFilesManager.h"
 #include "SideMenu/SideMenu.h"
 #include "Toolbar/MainToolbar.h"
 #include "TopMenu/Menu.h"
@@ -27,8 +28,8 @@ private:
     Menu topLevelMenu;
     MainToolbar mainToolbar;
     TrackGuiManager trackPlayer;
-    TrackManager trackManager;
     SideMenu sideMenu;
+    TrackManager trackManager;
     ProjectFilesManager projectFilesManager;
 
     juce::FlexBox topLevelFlexBox{};

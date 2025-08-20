@@ -38,8 +38,8 @@ public:
 
     void setTrackProperty(int trackIndex, AudioClipProperty property, bool boolValue) const;
     void setTrackProperty(int trackIndex, AudioClipProperty property, float floatValue) const;
-    void setTrackProperty(int trackIndex, juce::String stringValue) const;
     void setTrackProperty(int trackIndex, ReverbClipProperty property, float floatValue) const;
+    void setTrackName(int trackIndex, juce::String stringValue) const;
     TrackProperties getTrackProperties(int trackIndex) const;
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
@@ -59,5 +59,6 @@ private:
     juce::ValueTree& tree;
     std::vector<std::unique_ptr<AudioTrack>> tracks;
     std::optional<juce::File> currentlyCopiedClipFilePath{std::nullopt};
-    const juce::File tempClipsFolder{"../../../Assets/Audio/TemporarySplitClips"};
+    const juce::File tempClipsFolder{
+        juce::File::getSpecialLocation(juce::File::tempDirectory).getChildFile("DAW_TemporarySplitClips")};
 };

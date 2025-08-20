@@ -39,8 +39,6 @@ public:
     void addTrack();
     void removeTrack(const int trackToBeDeletedIndex);
     void setTrackProperties(const int trackIndex, const float gainValue);
-
-    void reorderSliderValues(int fromIndex, int toIndex);
     void clearAllTracks();
 
 private:

@@ -1,9 +1,8 @@
 #include "Menu.h"
-#include "../MainComponent.h"
 
 #include "../Constants.h"
 
-Menu::Menu(ProjectFilesManager& projectManagerRef) : projectManager{projectManagerRef}
+Menu::Menu(juce::ValueTree& parentTree) : tree{parentTree}
 {
     menuBarComponent = std::make_unique<juce::MenuBarComponent>(this);
     addAndMakeVisible(menuBarComponent.get());
@@ -114,19 +113,24 @@ bool Menu::perform(const InvocationInfo& info)
     switch(info.commandID)
     {
         case newFile:
-            projectManager.createNewProject();
+            tree.setProperty(ValueTreeIDs::createNewProject, true, nullptr);
+            tree.setProperty(ValueTreeIDs::createNewProject, ValueTreeConstants::doNothing, nullptr);
             break;
         case openFile:
-            projectManager.openProject();
+            tree.setProperty(ValueTreeIDs::openProject, true, nullptr);
+            tree.setProperty(ValueTreeIDs::openProject, ValueTreeConstants::doNothing, nullptr);
             break;
         case saveFile:
-            projectManager.saveProject();
+            tree.setProperty(ValueTreeIDs::saveProject, true, nullptr);
+            tree.setProperty(ValueTreeIDs::saveProject, ValueTreeConstants::doNothing, nullptr);
             break;
         case saveAsFile:
-            projectManager.saveAsProject();
+            tree.setProperty(ValueTreeIDs::saveAsProject, true, nullptr);
+            tree.setProperty(ValueTreeIDs::saveAsProject, ValueTreeConstants::doNothing, nullptr);
             break;
         case addAudioFile:
-            projectManager.addAudioFile();
+            tree.setProperty(ValueTreeIDs::addAudioFile, true, nullptr);
+            tree.setProperty(ValueTreeIDs::addAudioFile, ValueTreeConstants::doNothing, nullptr);
             break;
         case undo:
             break;

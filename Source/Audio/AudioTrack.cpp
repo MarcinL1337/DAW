@@ -111,7 +111,7 @@ void AudioTrack::setProperty(const ReverbClipProperty property, const float floa
     }
 }
 
-void AudioTrack::setProperty(const juce::String& stringValue) { properties.name = stringValue; }
+void AudioTrack::setTrackName(const juce::String& stringValue) { properties.name = stringValue; }
 
 TrackProperties AudioTrack::getProperties() const { return properties; }
 

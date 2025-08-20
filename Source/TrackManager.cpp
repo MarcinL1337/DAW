@@ -33,9 +33,9 @@ int TrackManager::addTrack()
 void TrackManager::removeTrack(const int trackIndex)
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
-    tracks.erase(tracks.begin() + trackIndex);
     juce::Timer::callAfterDelay(1, [this, trackIndex]() { trackGuiManager.removeTrack(trackIndex); });
     sideMenu.removeTrack(trackIndex);
+    tracks.erase(tracks.begin() + trackIndex);
 }
 
 int TrackManager::duplicateTrack(const int trackIndex)
@@ -236,10 +236,10 @@ void TrackManager::setTrackProperty(const int trackIndex, const ReverbClipProper
     tracks[trackIndex]->setProperty(property, floatValue);
 }
 
-void TrackManager::setTrackProperty(const int trackIndex, juce::String stringValue) const
+void TrackManager::setTrackName(const int trackIndex, juce::String stringValue) const
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
-    tracks[trackIndex]->setProperty(stringValue);
+    tracks[trackIndex]->setTrackName(stringValue);
 }
 
 TrackProperties TrackManager::getTrackProperties(const int trackIndex) const
@@ -322,7 +322,7 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
     {
         const int trackIndex = tree[ValueTreeIDs::trackNameChanged][0];
         const juce::String nameValue = tree[ValueTreeIDs::trackNameChanged][1];
-        setTrackProperty(trackIndex, nameValue);
+        setTrackName(trackIndex, nameValue);
     }
     else if(property == ValueTreeIDs::deleteTrackGui)
     {
@@ -377,6 +377,29 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const int toIndex = tree[ValueTreeIDs::reorderTracks][1];
         changeTrackOrder(fromIndex, toIndex);
     }
+    else if(property == ValueTreeIDs::clearAllTracks)
+    {
+        clearAllTracks();
+    }
+    else if(property == ValueTreeIDs::createTrackFromJson)
+    {
+        const juce::String trackJsonString = tree[ValueTreeIDs::createTrackFromJson];
+        auto trackJson = nlohmann::json::parse(trackJsonString.toStdString());
+        createTrackFromJson(trackJson);
+    }
+    else if(property == ValueTreeIDs::exportTracksToJson)
+    {
+        const auto exported = exportTracksToJson();
+    }
+    else if(property == ValueTreeIDs::addAudioFileToNewTrack)
+    {
+        const juce::String audioFilePath = tree[ValueTreeIDs::addAudioFileToNewTrack];
+        if(const juce::File audioFile(audioFilePath); audioFile.existsAsFile())
+        {
+            const int newTrackIndex = addTrack();
+            std::ignore = addAudioClipToTrack(newTrackIndex, audioFile);
+        }
+    }
 }
 
 // TODO: maybe this shouldn't be in this class. Add this to TrackManager refactor
@@ -400,8 +423,8 @@ void TrackManager::clearAllTracks()
     if(tracks.empty())
         return;
 
+    // Poniższe wywołania powodują błąd 0xC00...005
     trackGuiManager.clearAllTracks();
     sideMenu.clearAllTracks();
-
     tracks.clear();
 }

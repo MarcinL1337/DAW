@@ -2,12 +2,10 @@
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <nlohmann/json.hpp>
 
-#include "TrackManager.h"
-
-class ProjectFilesManager final
+class ProjectFilesManager final : public juce::ValueTree::Listener
 {
 public:
-    explicit ProjectFilesManager(TrackManager& trackManagerRef);
+    explicit ProjectFilesManager(juce::ValueTree& parentTree);
 
     void createNewProject();
     void openProject();
@@ -19,8 +17,10 @@ public:
 private:
     void saveProjectToFile(const juce::File& file) const;
     void loadProjectFromFile(const juce::File& file) const;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
 
-    TrackManager& trackManager;
+    juce::ValueTree& tree;
     juce::File currentProjectFile{};
     static constexpr auto audioDirSuffix = "AudioFiles";
 

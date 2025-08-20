@@ -253,5 +253,6 @@ void MainAudio::setFadeOfAudioClip(const NodeID nodeID, const Fade::Data& fadeIn
 std::pair<Fade::Data, Fade::Data> MainAudio::getAudioClipFadeData(const NodeID nodeID) const
 {
     const auto* audioClip = dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor());
+    assert(audioClip);
     return audioClip->getFadeData();
 }

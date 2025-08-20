@@ -300,7 +300,7 @@ void TrackPlayerSideMenu::clearAllTracks()
     repaint();
 }
 
-void TrackPlayerSideMenu::updateTrackName(const int trackIndex, const juce::String& name) const
+void TrackPlayerSideMenu::setTrackName(const int trackIndex, const juce::String& name) const
 {
     assert(trackIndex >= 0 && trackIndex < trackControlsVector.size());
     trackControlsVector[trackIndex].trackNameLabel->setText(name, juce::dontSendNotification);

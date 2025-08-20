@@ -148,7 +148,7 @@ void SideMenu::positionReverbButtonAndSliders()
     reverbButton.setSize(30, 30);
     reverbButton.setCentrePosition(getWidth() * 0.5, currentY);
 
-    if(isReverbOnInCurrentTrack())
+    if(currentTrackIndex != TrackPlayerConstants::noTrackChosen and isReverbOnInCurrentTrack())
     {
         for(const auto& sliderSetting: reverbSliderSettings) { sliderSetting.slider.setVisible(true); }
         const juce::Rectangle area{
@@ -338,8 +338,7 @@ void SideMenu::reorderSliderValues(const int fromIndex, const int toIndex)
 
 void SideMenu::clearAllTracks()
 {
-    controlsValuesPerTrack.clear();
-    currentTrackIndex = TrackPlayerConstants::noTrackChosen;
     displaySliderValuesForCurrentTrack();
+    controlsValuesPerTrack.clear();
     resized();
 }
