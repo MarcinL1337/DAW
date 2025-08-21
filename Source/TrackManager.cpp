@@ -72,7 +72,21 @@ int TrackManager::createTrackFromJson(const nlohmann::json& trackJson)
     setTrackProperty(newTrackIndex, AudioClipProperty::GAIN, trackJson["properties"]["gain"].get<float>());
     setTrackProperty(newTrackIndex, AudioClipProperty::PAN, trackJson["properties"]["pan"].get<float>());
 
-    sideMenu.setTrackProperties(newTrackIndex, trackJson["properties"]["gain"].get<float>() /* delay, reverb, ... */);
+    const bool isReverbOn = trackJson["properties"].value("reverb", false);
+    setTrackProperty(newTrackIndex, AudioClipProperty::REVERB, isReverbOn);
+
+    if(trackJson["properties"].contains("reverbProperties"))
+    {
+        const auto& reverbProps = trackJson["properties"]["reverbProperties"];
+        setTrackProperty(newTrackIndex, ReverbClipProperty::ROOM_SIZE, reverbProps.value("roomSize", 50.0f));
+        setTrackProperty(newTrackIndex, ReverbClipProperty::DAMP, reverbProps.value("damp", 50.0f));
+        setTrackProperty(newTrackIndex, ReverbClipProperty::WET_LEVEL, reverbProps.value("wetLevel", 33.0f));
+        setTrackProperty(newTrackIndex, ReverbClipProperty::DRY_LEVEL, reverbProps.value("dryLevel", 40.0f));
+        setTrackProperty(newTrackIndex, ReverbClipProperty::WIDTH, reverbProps.value("width", 100.0f));
+        setTrackProperty(newTrackIndex, ReverbClipProperty::FREEZE, reverbProps.value("freeze", 0.0f));
+    }
+
+    sideMenu.setTrackProperties(newTrackIndex, trackJson["properties"]["gain"].get<float>());
 
     const bool isMuted = trackJson["properties"]["mute"].get<bool>();
     const bool isSoloed = trackJson["properties"]["solo"].get<bool>();
@@ -81,6 +95,7 @@ int TrackManager::createTrackFromJson(const nlohmann::json& trackJson)
     setTrackProperty(newTrackIndex, AudioClipProperty::SOLO, isSoloed);
 
     const juce::String name = trackJson["properties"]["name"].get<std::string>();
+    setTrackName(newTrackIndex, name);
     trackGuiManager.setTrackName(newTrackIndex, name);
 
     return newTrackIndex;
@@ -389,7 +404,9 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
     }
     else if(property == ValueTreeIDs::exportTracksToJson)
     {
-        const auto exported = exportTracksToJson();
+        const auto projectJson = exportTracksToJson();
+        tree.setProperty(ValueTreeIDs::tracksJsonExported, projectJson.dump(4).data(), nullptr);
+        tree.setProperty(ValueTreeIDs::exportTracksToJson, ValueTreeConstants::doNothing, nullptr);
     }
     else if(property == ValueTreeIDs::addAudioFileToNewTrack)
     {

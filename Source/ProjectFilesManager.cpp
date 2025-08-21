@@ -150,8 +150,8 @@ void ProjectFilesManager::openTestProject()
     const juce::File dawDir =
         juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
     const juce::File projectFile = dawDir.getChildFile("Assets/test_project/test_project.json");
-    loadProjectFromFile(projectFile);
     currentProjectFile = projectFile;
+    loadProjectFromFile(projectFile);
 }
 
 void ProjectFilesManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
@@ -173,6 +173,7 @@ void ProjectFilesManager::valueTreePropertyChanged(juce::ValueTree&, const juce:
     {
         const auto projectString = tree[ValueTreeIDs::tracksJsonExported].toString();
         const auto result = currentProjectFile.replaceWithText(projectString);
+        std::cout << "dupsko" << std::endl;
         assert(result);
     }
 }

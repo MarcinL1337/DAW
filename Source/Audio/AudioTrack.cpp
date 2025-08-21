@@ -122,6 +122,14 @@ nlohmann::json AudioTrack::toJson() const
                        {"pan", properties.pan},
                        {"mute", properties.mute},
                        {"solo", properties.solo},
+                       {"reverb", properties.reverb},
+                       {"reverbProperties",
+                        {{"roomSize", properties.reverbProperties.roomSize},
+                         {"damp", properties.reverbProperties.damp},
+                         {"wetLevel", properties.reverbProperties.wetLevel},
+                         {"dryLevel", properties.reverbProperties.dryLevel},
+                         {"width", properties.reverbProperties.width},
+                         {"freeze", properties.reverbProperties.freeze}}},
                        {"name", properties.name.toStdString()}};
 
     j["audioClips"] = nlohmann::json::array();
