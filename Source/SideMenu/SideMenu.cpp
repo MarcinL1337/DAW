@@ -303,6 +303,9 @@ void SideMenu::displaySliderValuesForCurrentTrack()
         sliderSetting.slider.setVisible(isVisible);
         sliderSetting.sliderLabel.setVisible(isVisible);
     }
+    reverbButton.setVisible(isVisible);
+    reverbButtonLabel.setVisible(isVisible);
+    for(const auto& sliderSetting: reverbSliderSettings) { sliderSetting.slider.setVisible(isVisible); }
 }
 
 void SideMenu::addTrack()

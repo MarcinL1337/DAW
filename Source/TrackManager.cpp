@@ -423,7 +423,6 @@ void TrackManager::clearAllTracks()
     if(tracks.empty())
         return;
 
-    // Poniższe wywołania powodują błąd 0xC00...005
     trackGuiManager.clearAllTracks();
     sideMenu.clearAllTracks();
     tracks.clear();
