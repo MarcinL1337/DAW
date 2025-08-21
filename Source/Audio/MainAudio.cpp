@@ -8,6 +8,7 @@ MainAudio::MainAudio(juce::ValueTree& valueTree) : tree{valueTree}
     audioDeviceManager.addAudioCallback(this);
     graph.setPlayHead(this);
     tree.addListener(this);
+    startTimer(20);
 }
 
 void MainAudio::audioProcessorGraphInit()
@@ -20,9 +21,10 @@ void MainAudio::audioProcessorGraphInit()
 
 MainAudio::~MainAudio()
 {
-    audioDeviceManager.removeAudioCallback(&processorPlayer);
-    graph.clear();
     stopTimer();
+    tree.removeListener(this);
+    audioDeviceManager.removeAudioCallback(this);
+    graph.clear();
 }
 
 NodeID MainAudio::addAudioClip(const juce::File& file)
@@ -105,7 +107,6 @@ void MainAudio::setFreezeOfAudioClip(const NodeID nodeID, const float newFreezeV
 void MainAudio::play()
 {
     juce::ScopedLock sl(lock);
-    sampleCounter = currentPositionSamples;
     transportIsPlaying = true;
 }
 
@@ -119,7 +120,6 @@ void MainAudio::stop()
 {
     juce::ScopedLock sl(lock);
     transportIsPlaying = false;
-    sampleCounter = 0;
     setPlayheadPosition(0);
 }
 
@@ -247,15 +247,13 @@ void MainAudio::audioDeviceIOCallbackWithContext(const float* const* inputChanne
     if(transportIsPlaying)
     {
         juce::ScopedLock sl(lock);
-        sampleCounter += numSamples;
-        currentPositionSamples = sampleCounter;
+        currentPositionSamples += numSamples;
     }
 }
 
 void MainAudio::audioDeviceAboutToStart(juce::AudioIODevice* device)
 {
     processorPlayer.audioDeviceAboutToStart(device);
-    samplesPerBlock = device->getCurrentBufferSizeSamples();
 }
 
 void MainAudio::audioDeviceStopped() { processorPlayer.audioDeviceStopped(); }

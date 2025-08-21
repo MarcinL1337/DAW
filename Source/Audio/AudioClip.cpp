@@ -64,7 +64,6 @@ void AudioClip::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&
     if(const auto* ph = getPlayHead())
     {
         auto positionInfo = ph->getPosition();
-
         if(!positionInfo.hasValue())
             return;
 

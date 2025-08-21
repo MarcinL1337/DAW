@@ -15,7 +15,7 @@ public:
 
     TrackGui(const TrackGui&) = delete;
     TrackGui& operator=(const TrackGui&) = delete;
-    ~TrackGui() override = default;
+    ~TrackGui() override { tree.removeListener(this); }
 
     float getBoxWidthToFloat() const { return currentBoxWidth; }
     float getBoxHeightToFloat() const { return currentBoxHeight; }

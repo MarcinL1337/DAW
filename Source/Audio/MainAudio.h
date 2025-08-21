@@ -68,8 +68,6 @@ private:
     juce::AudioProcessorPlayer processorPlayer;
     juce::AudioProcessorGraph graph;
     NodeID outputNodeID;
-    int64_t sampleCounter{0};
-    int samplesPerBlock{0};
     bool transportIsPlaying{false};
     mutable int64_t currentPositionSamples{0};
     juce::CriticalSection lock;
