@@ -111,14 +111,7 @@ target_compile_definitions(${PROJECT_NAME}
 )
 
 juce_add_binary_data(BinaryData SOURCES
-        Assets/ToolbarImages/nextButton.png
-        Assets/ToolbarImages/pauseButton.png
-        Assets/ToolbarImages/playButton.png
         Assets/ToolbarImages/playPauseButton.png
-        Assets/ToolbarImages/playPauseButton2.png
-        Assets/ToolbarImages/previousButton.png
-        Assets/ToolbarImages/recordButton.png
-        Assets/ToolbarImages/replayButton.png
         Assets/ToolbarImages/stopButton.png
         Assets/ToolbarImages/followModeButton.png
         Assets/ToolbarImages/split.png
