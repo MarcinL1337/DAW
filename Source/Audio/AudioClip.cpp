@@ -57,16 +57,14 @@ bool AudioClip::processBlockChecker() const
     return isPrepared && mainAudio.isPlaying() && muteAndSoloCheck;
 }
 
-// TODO: Sometimes audio clips get out of sync, e.g., when muting and unmuting tracks. Fix audio clip synchronization.
 void AudioClip::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     buffer.clear();
-    if(!processBlockChecker())
-        return;
 
     if(const auto* ph = getPlayHead())
     {
         auto positionInfo = ph->getPosition();
+
         if(!positionInfo.hasValue())
             return;
 
@@ -77,22 +75,30 @@ void AudioClip::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&
         const auto localPositionSamples = static_cast<int64_t>(
             (static_cast<double>(*optGlobalPositionSamples - offsetSamples) / deviceSampleRate) * fileSampleRate);
 
-        if(localPositionSamples >= 0 && localPositionSamples < reader->lengthInSamples)
+        if(localPositionSamples >= -buffer.getNumSamples() && localPositionSamples < reader->lengthInSamples)
         {
             const int64_t positionDifference = std::abs(readerSource->getNextReadPosition() - localPositionSamples);
-            if(const auto threshold = static_cast<int64_t>(0.1 * fileSampleRate); positionDifference > threshold)
+            if(const auto threshold = static_cast<int64_t>(0.01 * fileSampleRate); positionDifference > threshold)
             {
                 readerSource->setNextReadPosition(localPositionSamples);
+                resampler->flushBuffers();
                 reverbProcessor.reset();
             }
-
-            resampler->getNextAudioBlock(juce::AudioSourceChannelInfo(&buffer, 0, buffer.getNumSamples()));
-            juce::dsp::AudioBlock<float> block(buffer);
-            gainProcessor.process(juce::dsp::ProcessContextReplacing(block));
-            panProcessor.process(juce::dsp::ProcessContextReplacing(block));
-            reverbProcessor.process(juce::dsp::ProcessContextReplacing(block));
-
-            applyFadeToBuffer(buffer, localPositionSamples);
+            if(processBlockChecker())
+            {
+                resampler->getNextAudioBlock(juce::AudioSourceChannelInfo(&buffer, 0, buffer.getNumSamples()));
+                juce::dsp::AudioBlock<float> block(buffer);
+                gainProcessor.process(juce::dsp::ProcessContextReplacing(block));
+                panProcessor.process(juce::dsp::ProcessContextReplacing(block));
+                reverbProcessor.process(juce::dsp::ProcessContextReplacing(block));
+                applyFadeToBuffer(buffer, localPositionSamples);
+            }
+            else
+            {
+                juce::AudioBuffer<float> dummyBuffer(reader->numChannels, buffer.getNumSamples());
+                resampler->getNextAudioBlock(
+                    juce::AudioSourceChannelInfo(&dummyBuffer, 0, dummyBuffer.getNumSamples()));
+            }
         }
     }
 }
