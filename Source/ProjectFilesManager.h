@@ -19,6 +19,7 @@ private:
     void markAsClean();
     void saveProjectToFile(const juce::File& file) const;
     void loadProjectFromFile(const juce::File& file);
+    void cleanupUnusedAudioFiles(const juce::String& projectJsonString) const;
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
 

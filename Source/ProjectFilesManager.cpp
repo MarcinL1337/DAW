@@ -181,6 +181,7 @@ void ProjectFilesManager::valueTreePropertyChanged(juce::ValueTree&, const juce:
         const auto result = currentProjectFile.replaceWithText(projectString);
         assert(result);
         markAsClean();
+        cleanupUnusedAudioFiles(projectString);
     }
     else if(property == ValueTreeIDs::trackGainChanged || property == ValueTreeIDs::trackPanChanged ||
             property == ValueTreeIDs::trackReverbChanged || property == ValueTreeIDs::trackNameChanged ||
@@ -213,4 +214,34 @@ void ProjectFilesManager::markAsClean()
         isDirty = false;
         tree.setProperty(ValueTreeIDs::projectDirtyStateChanged, false, nullptr);
     }
+}
+
+void ProjectFilesManager::cleanupUnusedAudioFiles(const juce::String& projectJsonString) const
+{
+    if(!currentProjectFile.existsAsFile())
+        return;
+
+    const juce::File audioDir = currentProjectFile.getParentDirectory().getChildFile(
+        currentProjectFile.getFileNameWithoutExtension() + audioDirSuffix);
+
+    if(!audioDir.exists())
+        return;
+
+    juce::StringArray usedFiles;
+    auto projectJson = nlohmann::json::parse(projectJsonString.toStdString());
+
+    if(projectJson.contains("tracks"))
+        for(const auto& track: projectJson["tracks"])
+            if(track.contains("audioClips"))
+                for(const auto& clip: track["audioClips"])
+                    if(clip.contains("path"))
+                        usedFiles.add(clip["path"].get<std::string>());
+
+    juce::Array<juce::File> audioFiles = audioDir.findChildFiles(juce::File::findFiles, false);
+    for(const auto& file: audioFiles)
+        if(!usedFiles.contains(file.getFileName()))
+        {
+            const bool result = file.deleteFile();
+            assert(result);
+        }
 }
