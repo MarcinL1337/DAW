@@ -70,7 +70,6 @@ void SideMenu::sliderValueChanged(juce::Slider* changedSlider)
     }
     else if(changedSlider == &gainSlider)
     {
-        // TODO: investigate bug where changing gain and switching between tracks
         sliderValuesPerTrack.at(currentTrackIndex).gainValue = gainSlider.getValue();
         const juce::Array<juce::var> trackAndGainInfo{currentTrackIndex, gainSlider.getValue()};
         tree.setProperty(ValueTreeIDs::trackGainChanged, trackAndGainInfo, nullptr);
@@ -92,10 +91,6 @@ void SideMenu::sliderValueChanged(juce::Slider* changedSlider)
         sliderValuesPerTrack.at(currentTrackIndex).bassBoostValue = bassBoostSlider.getValue();
     }
 }
-
-/* TODO:
-    - naprawic gunwo co napisałę Julianowi na mess
-*/
 
 void SideMenu::chooseNewTrackToBeSelected(const int deletedTrackIndex)
 {

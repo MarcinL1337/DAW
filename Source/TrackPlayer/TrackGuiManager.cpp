@@ -58,7 +58,6 @@ void TrackGuiManager::viewportsInit()
 {
     trackPlayerViewport.setScrollBarsShown(true, true);
     trackPlayerViewport.setViewedComponent(&trackGuiComponent, false);
-    // TODO: Temporary. Question: Why stepY = 26 scrolls whole box Height which is 85?
     trackPlayerViewport.setSingleStepSizes(8, 26);
 
     timelineViewport.setScrollBarsShown(false, false);

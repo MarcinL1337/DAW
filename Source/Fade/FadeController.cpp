@@ -47,8 +47,9 @@ void FadeController::mouseDrag(const juce::MouseEvent& event)
     const bool isFadeIn = *draggingHandle;
     const float newLengthSeconds = static_cast<float>(isFadeIn ? event.x : getWidth() - event.x) / currentBoxWidth;
 
+    constexpr float minGapBetweenFades{0.1f};
     const float otherFadeLength = getFadeData(!isFadeIn).lengthSeconds;
-    const float maxAllowedLength = audioLengthSeconds - otherFadeLength - 0.1f;  // min 0.1 sec gap between fades
+    const float maxAllowedLength = audioLengthSeconds - otherFadeLength - minGapBetweenFades;
 
     getFadeData(isFadeIn).lengthSeconds = juce::jlimit(0.0f, juce::jmax(0.0f, maxAllowedLength), newLengthSeconds);
 

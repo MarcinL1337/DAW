@@ -19,6 +19,8 @@ MainComponent::MainComponent() :
     flexBoxInit();
 
     addTestTracks();
+
+    setWantsKeyboardFocus(true);
 }
 
 void MainComponent::paint(juce::Graphics& g)
@@ -27,6 +29,34 @@ void MainComponent::paint(juce::Graphics& g)
 }
 
 void MainComponent::resized() { topLevelFlexBox.performLayout(getLocalBounds()); }
+
+bool MainComponent::keyPressed(const juce::KeyPress& key)
+{
+    if(key == juce::KeyPress('n', juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('h', juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('=', juce::ModifierKeys::shiftModifier, 0))
+    {
+        trackManager.addTrack();
+        return true;
+    }
+
+    if(key == juce::KeyPress::spaceKey)
+    {
+        tree.setProperty(ValueTreeIDs::playPauseButtonClicked, true, nullptr);
+        tree.setProperty(ValueTreeIDs::playPauseButtonClicked, ValueTreeConstants::doNothing, nullptr);
+        return true;
+    }
+
+    return false;
+}
 
 void MainComponent::flexBoxInit()
 {

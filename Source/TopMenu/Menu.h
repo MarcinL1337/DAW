@@ -10,11 +10,11 @@ public:
     explicit Menu(juce::ValueTree& parentTree);
     ~Menu() override;
 
+    bool keyPressed(const juce::KeyPress& key) override;
+
 private:
     void resized() override;
     void paint(juce::Graphics& g) override;
-
-    bool keyPressed(const juce::KeyPress& key) override;
 
     juce::StringArray getMenuBarNames() override;
     juce::PopupMenu getMenuForIndex(int index, const juce::String& name) override;
@@ -24,7 +24,9 @@ private:
     void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
     bool perform(const InvocationInfo& info) override;
 
+    void setKeyMapping();
     void openFileButtonClicked();
+    void openHelp();
 
     std::unique_ptr<juce::MenuBarComponent> menuBarComponent;
     juce::ApplicationCommandManager commandManager;
