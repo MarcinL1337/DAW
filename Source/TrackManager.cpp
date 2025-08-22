@@ -203,6 +203,13 @@ void TrackManager::setTrackProperty(const int trackIndex, const AudioClipPropert
     tracks[trackIndex]->setProperty(property, floatValue);
 }
 
+void TrackManager::setTrackProperty(const int trackIndex, const ReverbClipProperty property,
+                                    const float floatValue) const
+{
+    assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
+    tracks[trackIndex]->setProperty(property, floatValue);
+}
+
 TrackProperties TrackManager::getTrackProperties(const int trackIndex) const
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
@@ -237,6 +244,54 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const int trackIndex = tree[ValueTreeIDs::trackGainChanged][0];
         const float gainValue = tree[ValueTreeIDs::trackGainChanged][1];
         setTrackProperty(trackIndex, AudioClipProperty::GAIN, gainValue);
+    }
+    else if(property == ValueTreeIDs::trackPanChanged)
+    {
+        const int trackIndex = tree[ValueTreeIDs::trackPanChanged][0];
+        const float panValue = tree[ValueTreeIDs::trackPanChanged][1];
+        setTrackProperty(trackIndex, AudioClipProperty::PAN, panValue);
+    }
+    else if(property == ValueTreeIDs::trackReverbChanged)
+    {
+        const int trackIndex = tree[ValueTreeIDs::trackReverbChanged][0];
+        const bool isReverbOn = tree[ValueTreeIDs::trackReverbChanged][1];
+        setTrackProperty(trackIndex, AudioClipProperty::REVERB, isReverbOn);
+    }
+    else if(property == ValueTreeIDs::trackRoomSizeChanged)
+    {
+        const int trackIndex = tree[ValueTreeIDs::trackRoomSizeChanged][0];
+        const float roomSizeValue = tree[ValueTreeIDs::trackRoomSizeChanged][1];
+        setTrackProperty(trackIndex, ReverbClipProperty::ROOM_SIZE, roomSizeValue);
+    }
+    else if(property == ValueTreeIDs::trackDampChanged)
+    {
+        const int trackIndex = tree[ValueTreeIDs::trackDampChanged][0];
+        const float dampValue = tree[ValueTreeIDs::trackDampChanged][1];
+        setTrackProperty(trackIndex, ReverbClipProperty::DAMP, dampValue);
+    }
+    else if(property == ValueTreeIDs::trackWetLevelChanged)
+    {
+        const int trackIndex = tree[ValueTreeIDs::trackWetLevelChanged][0];
+        const float wetValue = tree[ValueTreeIDs::trackWetLevelChanged][1];
+        setTrackProperty(trackIndex, ReverbClipProperty::WET_LEVEL, wetValue);
+    }
+    else if(property == ValueTreeIDs::trackDryLevelChanged)
+    {
+        const int trackIndex = tree[ValueTreeIDs::trackDryLevelChanged][0];
+        const float dryValue = tree[ValueTreeIDs::trackDryLevelChanged][1];
+        setTrackProperty(trackIndex, ReverbClipProperty::DRY_LEVEL, dryValue);
+    }
+    else if(property == ValueTreeIDs::trackWidthChanged)
+    {
+        const int trackIndex = tree[ValueTreeIDs::trackWidthChanged][0];
+        const float widthValue = tree[ValueTreeIDs::trackWidthChanged][1];
+        setTrackProperty(trackIndex, ReverbClipProperty::WIDTH, widthValue);
+    }
+    else if(property == ValueTreeIDs::trackFreezeChanged)
+    {
+        const int trackIndex = tree[ValueTreeIDs::trackFreezeChanged][0];
+        const float freezeValue = tree[ValueTreeIDs::trackFreezeChanged][1];
+        setTrackProperty(trackIndex, ReverbClipProperty::FREEZE, freezeValue);
     }
     else if(property == ValueTreeIDs::deleteTrackGui)
     {

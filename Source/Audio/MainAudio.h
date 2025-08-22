@@ -47,6 +47,14 @@ private:
     void setSoloOfAudioClip(NodeID nodeID, bool solo) const;
     void setMuteOfAudioClip(NodeID nodeID, bool mute) const;
 
+    void setReverbOfAudioClip(NodeID nodeID, bool mute) const;
+    void setRoomSizeOfAudioClip(NodeID nodeID, float newRoomSizeValue) const;
+    void setDampOfAudioClip(NodeID nodeID, float newDampValue) const;
+    void setWetLevelOfAudioClip(NodeID nodeID, float newWetLevelValue) const;
+    void setDryLevelOfAudioClip(NodeID nodeID, float newDryLevelValue) const;
+    void setWidthOfAudioClip(NodeID nodeID, float newWidthValue) const;
+    void setFreezeOfAudioClip(NodeID nodeID, float newFreezeValue) const;
+
     juce::ValueTree& tree;
 
     juce::AudioDeviceManager audioDeviceManager;

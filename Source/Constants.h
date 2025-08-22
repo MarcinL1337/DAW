@@ -52,10 +52,14 @@ inline static const juce::Identifier muteButtonClicked{"muteButtonClicked"};
 inline static const juce::Identifier newAudioFile{"newAudioFile"};
 
 inline static const juce::Identifier trackGainChanged{"trackGainChanged"};
-inline static const juce::Identifier trackFaderChanged{"trackFaderChanged"};
-inline static const juce::Identifier trackDelayChanged{"trackDelayChanged"};
+inline static const juce::Identifier trackPanChanged{"trackPanChanged"};
 inline static const juce::Identifier trackReverbChanged{"trackReverbChanged"};
-inline static const juce::Identifier trackBassBoostChanged{"trackBassBoostChanged"};
+inline static const juce::Identifier trackRoomSizeChanged{"trackRoomSizeChanged"};
+inline static const juce::Identifier trackDampChanged{"trackDampChanged"};
+inline static const juce::Identifier trackWetLevelChanged{"trackWetLevelChanged"};
+inline static const juce::Identifier trackDryLevelChanged{"trackDryLevelChanged"};
+inline static const juce::Identifier trackWidthChanged{"trackWidthChanged"};
+inline static const juce::Identifier trackFreezeChanged{"trackFreezeChanged"};
 
 inline static const juce::Identifier trackPlayerZoomPercentage{"trackPlayerZoomPercentage"};
 inline static const juce::Identifier numOfSecondsChanged{"numOfSecondsChanged"};
