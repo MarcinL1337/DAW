@@ -37,4 +37,6 @@ private:
     juce::FlexBox trackPlayerFlexBox{};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
+
+    friend class MainWindow;
 };

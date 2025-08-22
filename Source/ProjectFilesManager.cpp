@@ -1,13 +1,18 @@
 #include "ProjectFilesManager.h"
 #include "Constants.h"
 
-ProjectFilesManager::ProjectFilesManager(juce::ValueTree& parentTree) : tree{parentTree} { tree.addListener(this); }
+ProjectFilesManager::ProjectFilesManager(juce::ValueTree& parentTree) : tree{parentTree}
+{
+    tree.addListener(this);
+    markAsClean();
+}
 
 void ProjectFilesManager::createNewProject()
 {
     tree.setProperty(ValueTreeIDs::clearAllTracks, true, nullptr);
     tree.setProperty(ValueTreeIDs::clearAllTracks, ValueTreeConstants::doNothing, nullptr);
     currentProjectFile = juce::File{};
+    markAsClean();
 }
 
 void ProjectFilesManager::openProject()
@@ -62,7 +67,7 @@ void ProjectFilesManager::saveProjectToFile(const juce::File& file) const
     tree.setProperty(ValueTreeIDs::exportTracksToJson, ValueTreeConstants::doNothing, nullptr);
 }
 
-void ProjectFilesManager::loadProjectFromFile(const juce::File& file) const
+void ProjectFilesManager::loadProjectFromFile(const juce::File& file)
 {
     tree.setProperty(ValueTreeIDs::clearAllTracks, true, nullptr);
     tree.setProperty(ValueTreeIDs::clearAllTracks, ValueTreeConstants::doNothing, nullptr);
@@ -86,6 +91,7 @@ void ProjectFilesManager::loadProjectFromFile(const juce::File& file) const
         tree.setProperty(ValueTreeIDs::createTrackFromJson, trackJsonString, nullptr);
         tree.setProperty(ValueTreeIDs::createTrackFromJson, ValueTreeConstants::doNothing, nullptr);
     }
+    juce::Timer::callAfterDelay(500, [this]() { markAsClean(); });
 }
 
 void ProjectFilesManager::addAudioFile()
@@ -173,7 +179,38 @@ void ProjectFilesManager::valueTreePropertyChanged(juce::ValueTree&, const juce:
     {
         const auto projectString = tree[ValueTreeIDs::tracksJsonExported].toString();
         const auto result = currentProjectFile.replaceWithText(projectString);
-        std::cout << "dupsko" << std::endl;
         assert(result);
+        markAsClean();
+    }
+    else if(property == ValueTreeIDs::trackGainChanged || property == ValueTreeIDs::trackPanChanged ||
+            property == ValueTreeIDs::trackReverbChanged || property == ValueTreeIDs::trackNameChanged ||
+            property == ValueTreeIDs::deleteTrackGui || property == ValueTreeIDs::duplicateTrackGui ||
+            property == ValueTreeIDs::deleteAudioClip || property == ValueTreeIDs::splitAudioClip ||
+            property == ValueTreeIDs::reorderTracks || property == ValueTreeIDs::audioClipFadeChanged ||
+            property == ValueTreeIDs::addAudioFileToNewTrack || property == ValueTreeIDs::trackRoomSizeChanged ||
+            property == ValueTreeIDs::trackDampChanged || property == ValueTreeIDs::trackWetLevelChanged ||
+            property == ValueTreeIDs::trackDryLevelChanged || property == ValueTreeIDs::trackWidthChanged ||
+            property == ValueTreeIDs::trackFreezeChanged || property == ValueTreeIDs::pasteAudioClip ||
+            property == ValueTreeIDs::muteButtonClicked || property == ValueTreeIDs::soloButtonClicked)
+    {
+        markAsDirty();
+    }
+}
+
+void ProjectFilesManager::markAsDirty()
+{
+    if(!isDirty)
+    {
+        isDirty = true;
+        tree.setProperty(ValueTreeIDs::projectDirtyStateChanged, true, nullptr);
+    }
+}
+
+void ProjectFilesManager::markAsClean()
+{
+    if(isDirty)
+    {
+        isDirty = false;
+        tree.setProperty(ValueTreeIDs::projectDirtyStateChanged, false, nullptr);
     }
 }

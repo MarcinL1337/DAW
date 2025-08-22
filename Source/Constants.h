@@ -91,6 +91,8 @@ inline static const juce::Identifier tracksJsonExported{"tracksJsonExported"};
 inline static const juce::Identifier createTrackFromJson{"createTrackFromJson"};
 inline static const juce::Identifier exportTracksToJson{"exportTracksToJson"};
 inline static const juce::Identifier addAudioFileToNewTrack{"addAudioFileToNewTrack"};
+
+inline static const juce::Identifier projectDirtyStateChanged{"projectDirtyStateChanged"};
 }  // namespace ValueTreeIDs
 
 namespace PlayheadFollowConstants

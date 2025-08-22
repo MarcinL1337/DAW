@@ -15,11 +15,14 @@ public:
     void openTestProject();
 
 private:
+    void markAsDirty();
+    void markAsClean();
     void saveProjectToFile(const juce::File& file) const;
-    void loadProjectFromFile(const juce::File& file) const;
+    void loadProjectFromFile(const juce::File& file);
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
 
+    bool isDirty{false};
     juce::ValueTree& tree;
     juce::File currentProjectFile{};
     static constexpr auto audioDirSuffix = "AudioFiles";
