@@ -5,10 +5,10 @@ MainAudio::MainAudio(juce::ValueTree& valueTree) : tree{valueTree}
     audioProcessorGraphInit();
     processorPlayer.setProcessor(&graph);
     audioDeviceManager.initialiseWithDefaultDevices(0, 2);
-    audioDeviceManager.addAudioCallback(&processorPlayer);
+    audioDeviceManager.addAudioCallback(this);
     graph.setPlayHead(this);
     tree.addListener(this);
-    startTimer(30);
+    startTimer(20);
 }
 
 void MainAudio::audioProcessorGraphInit()
@@ -21,9 +21,10 @@ void MainAudio::audioProcessorGraphInit()
 
 MainAudio::~MainAudio()
 {
-    audioDeviceManager.removeAudioCallback(&processorPlayer);
-    graph.clear();
     stopTimer();
+    tree.removeListener(this);
+    audioDeviceManager.removeAudioCallback(this);
+    graph.clear();
 }
 
 NodeID MainAudio::addAudioClip(const juce::File& file)
@@ -106,8 +107,6 @@ void MainAudio::setFreezeOfAudioClip(const NodeID nodeID, const float newFreezeV
 void MainAudio::play()
 {
     juce::ScopedLock sl(lock);
-    const auto timeOffset = juce::RelativeTime::seconds(static_cast<double>(currentPositionSamples) / getSampleRate());
-    startTime = juce::Time::getCurrentTime() - timeOffset;
     transportIsPlaying = true;
     tree.setProperty(ValueTreeIDs::isPlaying, true, nullptr);
 }
@@ -155,20 +154,8 @@ juce::Optional<juce::AudioPlayHead::PositionInfo> MainAudio::getPosition() const
 {
     juce::ScopedLock sl(lock);
     PositionInfo info;
-    int64_t currentSamples;
 
-    if(transportIsPlaying)
-    {
-        const double elapsedSeconds = (juce::Time::getCurrentTime() - startTime).inSeconds();
-        currentSamples = static_cast<int64_t>(elapsedSeconds * getSampleRate());
-        currentPositionSamples = currentSamples;
-    }
-    else
-    {
-        currentSamples = currentPositionSamples;
-    }
-
-    info.setTimeInSamples(currentSamples);
+    info.setTimeInSamples(currentPositionSamples);
     info.setIsPlaying(transportIsPlaying);
     info.setIsRecording(false);
     return info;
@@ -263,6 +250,26 @@ void MainAudio::setFadeOfAudioClip(const NodeID nodeID, const Fade::Data& fadeIn
     dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setFadeData(fadeIn, fadeOut);
 }
 
+void MainAudio::audioDeviceIOCallbackWithContext(const float* const* inputChannelData, int numInputChannels,
+                                                 float* const* outputChannelData, int numOutputChannels, int numSamples,
+                                                 const juce::AudioIODeviceCallbackContext& context)
+{
+    processorPlayer.audioDeviceIOCallbackWithContext(
+        inputChannelData, numInputChannels, outputChannelData, numOutputChannels, numSamples, context);
+
+    if(transportIsPlaying)
+    {
+        juce::ScopedLock sl(lock);
+        currentPositionSamples += numSamples;
+    }
+}
+
+void MainAudio::audioDeviceAboutToStart(juce::AudioIODevice* device)
+{
+    processorPlayer.audioDeviceAboutToStart(device);
+}
+
+void MainAudio::audioDeviceStopped() { processorPlayer.audioDeviceStopped(); }
 std::pair<Fade::Data, Fade::Data> MainAudio::getAudioClipFadeData(const NodeID nodeID) const
 {
     const auto* audioClip = dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor());
