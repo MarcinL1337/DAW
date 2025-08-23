@@ -15,7 +15,7 @@ class TrackManager final : public juce::Component,
 {
 public:
     TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef, SideMenu& sideMenuRef);
-    ~TrackManager() override;
+    ~TrackManager() override = default;
 
     int addTrack();
     void removeTrack(int trackIndex);
@@ -49,9 +49,11 @@ public:
 
 private:
     void changeTrackOrder(int fromIndex, int toIndex);
-    void chooseNewNamesForSplitFiles(juce::String& firstFile, juce::String& secondFile,
-                                     const juce::String& extension) const;
-    void handleSplitClipsDirCreation() const;
+    juce::String getBaseName(const juce::String& fileName) const;
+    juce::String findNextAvailableName(const juce::String& baseName, const juce::String& extension) const;
+    void generateSplitFileNames(const juce::File& originalFile, juce::String& firstFileName,
+                                juce::String& secondFileName) const;
+    juce::File getProjectAudioFolder() const;
 
     TrackGuiManager& trackGuiManager;
     MainAudio& mainAudio;
@@ -59,6 +61,4 @@ private:
     juce::ValueTree& tree;
     std::vector<std::unique_ptr<AudioTrack>> tracks;
     std::optional<juce::File> currentlyCopiedClipFilePath{std::nullopt};
-    const juce::File tempClipsFolder{
-        juce::File::getSpecialLocation(juce::File::tempDirectory).getChildFile("DAW_TemporarySplitClips")};
 };

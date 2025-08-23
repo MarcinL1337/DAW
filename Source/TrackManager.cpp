@@ -6,20 +6,6 @@ TrackManager::TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainA
 {
     trackGuiManagerRef.addKeyListener(this);
     tree.addListener(this);
-    handleSplitClipsDirCreation();
-}
-
-TrackManager::~TrackManager() { assert(tempClipsFolder.deleteRecursively()); }
-
-void TrackManager::handleSplitClipsDirCreation() const
-{
-    if(tempClipsFolder.exists())
-    {
-        assert(tempClipsFolder.deleteRecursively());
-    }
-
-    const auto result = tempClipsFolder.createDirectory();
-    assert(result.wasOk());
 }
 
 int TrackManager::addTrack()
@@ -152,24 +138,45 @@ void TrackManager::handleWriteToFile(juce::AudioFormatReader& reader, const juce
     firstFormatWriter->writeFromAudioSampleBuffer(buffer, 0, numOfSamplesToWrite);
 }
 
-void TrackManager::chooseNewNamesForSplitFiles(juce::String& firstFile, juce::String& secondFile,
-                                               const juce::String& extension) const
+juce::String TrackManager::getBaseName(const juce::String& fileName) const
 {
-    auto suffix{1u};
-    while(tempClipsFolder.getChildFile(juce::StringRef(firstFile)).existsAsFile() or
-          tempClipsFolder.getChildFile(juce::StringRef(secondFile)).existsAsFile())
+    const int splitPos = fileName.lastIndexOf("_split");
+    if(splitPos == -1)
+        return fileName;
+
+    return fileName.substring(0, splitPos);
+}
+
+juce::String TrackManager::findNextAvailableName(const juce::String& baseName, const juce::String& extension) const
+{
+    const auto audioFolder = getProjectAudioFolder();
+
+    static int counter = 1;
+    while(true)
     {
-        firstFile = firstFile.replaceFirstOccurrenceOf(extension, "");
-        firstFile += "(" + juce::String(suffix) + ")" + extension;
-        secondFile = secondFile.replaceFirstOccurrenceOf(extension, "");
-        secondFile += "(" + juce::String(suffix) + ")" + extension;
-        suffix++;
+        const juce::String testFileName = baseName + "_split" + juce::String(counter++) + extension;
+        if(!audioFolder.getChildFile(testFileName).existsAsFile())
+            return testFileName;
     }
+}
+
+void TrackManager::generateSplitFileNames(const juce::File& originalFile, juce::String& firstFileName,
+                                          juce::String& secondFileName) const
+{
+    const juce::String originalName = originalFile.getFileNameWithoutExtension();
+    const juce::String extension = originalFile.getFileExtension() == ".mp3" ? ".wav" : originalFile.getFileExtension();
+    const juce::String baseName = getBaseName(originalName);
+
+    firstFileName = findNextAvailableName(baseName, extension);
+    secondFileName = findNextAvailableName(baseName, extension);
 }
 
 void TrackManager::addNewAudioClipsBySplit(const int trackIndex, const juce::File& fileToBeSplit,
                                            const float waveformSplitRatio, const double splitClipOffset) const
 {
+    const auto audioFolder = getProjectAudioFolder();
+    assert(audioFolder.exists());
+
     juce::AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
     const std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(fileToBeSplit));
@@ -183,17 +190,13 @@ void TrackManager::addNewAudioClipsBySplit(const int trackIndex, const juce::Fil
     const auto splitFileExtension =
         fileToBeSplit.getFileExtension() == ".mp3" ? ".wav" : fileToBeSplit.getFileExtension();
 
-    juce::String firstDestFileName{fileToBeSplit.getFileNameWithoutExtension() + "_part1" + splitFileExtension};
-    juce::String secondDestFileName{fileToBeSplit.getFileNameWithoutExtension() + "_part2" + splitFileExtension};
+    juce::String firstDestFileName, secondDestFileName;
+    generateSplitFileNames(fileToBeSplit, firstDestFileName, secondDestFileName);
+    assert(not audioFolder.getChildFile(juce::StringRef(firstDestFileName)).existsAsFile() and
+           not audioFolder.getChildFile(juce::StringRef(secondDestFileName)).existsAsFile());
 
-    if(tempClipsFolder.getChildFile(juce::StringRef(firstDestFileName)).existsAsFile() or
-       tempClipsFolder.getChildFile(juce::StringRef(secondDestFileName)).existsAsFile())
-    {
-        chooseNewNamesForSplitFiles(firstDestFileName, secondDestFileName, splitFileExtension);
-    }
-
-    const juce::File firstDestFile{tempClipsFolder.getFullPathName() + "/" + firstDestFileName};
-    const juce::File secondDestFile{tempClipsFolder.getFullPathName() + "/" + secondDestFileName};
+    const juce::File firstDestFile{audioFolder.getFullPathName() + "/" + firstDestFileName};
+    const juce::File secondDestFile{audioFolder.getFullPathName() + "/" + secondDestFileName};
 
     handleWriteToFile(*reader, formatManager, firstDestFile, firstSamplesToWrite, 0);
     handleWriteToFile(*reader, formatManager, secondDestFile, secondSamplesToWrite, firstSamplesToWrite);
@@ -443,4 +446,12 @@ void TrackManager::clearAllTracks()
     trackGuiManager.clearAllTracks();
     sideMenu.clearAllTracks();
     tracks.clear();
+}
+
+juce::File TrackManager::getProjectAudioFolder() const
+{
+    if(!tree.hasProperty("projectAudioDir"))
+        return juce::File{};
+
+    return juce::File{tree["projectAudioDir"].toString()};
 }

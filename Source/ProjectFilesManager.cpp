@@ -62,7 +62,7 @@ void ProjectFilesManager::saveProjectToFile(const juce::File& file) const
         const auto result = audioDir.createDirectory();
         assert(result.wasOk());
     }
-
+    tree.setProperty("projectAudioDir", audioDir.getFullPathName(), nullptr);
     tree.setProperty(ValueTreeIDs::exportTracksToJson, true, nullptr);
     tree.setProperty(ValueTreeIDs::exportTracksToJson, ValueTreeConstants::doNothing, nullptr);
 }
@@ -76,6 +76,8 @@ void ProjectFilesManager::loadProjectFromFile(const juce::File& file)
     auto projectJson = nlohmann::json::parse(jsonString.toStdString());
     const juce::File audioDir =
         file.getParentDirectory().getChildFile(file.getFileNameWithoutExtension() + audioDirSuffix);
+    tree.setProperty("projectAudioDir", audioDir.getFullPathName(), nullptr);
+
     if(not projectJson.contains("tracks"))
         return;
 
