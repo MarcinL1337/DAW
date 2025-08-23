@@ -8,7 +8,15 @@ ProjectFilesManager::ProjectFilesManager(juce::ValueTree& parentTree) : tree{par
     markAsClean();
 }
 
-ProjectFilesManager::~ProjectFilesManager() { cleanupTempDirectory(); }
+ProjectFilesManager::~ProjectFilesManager()
+{
+    if(currentProjectFile.existsAsFile())
+    {
+        const auto projectString = currentProjectFile.loadFileAsString();
+        cleanupUnusedAudioFiles(projectString);
+    }
+    cleanupTempDirectory();
+}
 
 void ProjectFilesManager::createNewProject()
 {
@@ -53,6 +61,39 @@ void ProjectFilesManager::createNewProjectInternal()
 
 void ProjectFilesManager::openProject()
 {
+    if(isDirty)
+    {
+        const auto options = juce::MessageBoxOptions()
+                                 .withIconType(juce::MessageBoxIconType::QuestionIcon)
+                                 .withTitle("Unsaved Changes")
+                                 .withMessage("You have unsaved changes. Do you want to save before opening another project?")
+                                 .withButton("Save and Open")
+                                 .withButton("Open Without Saving")
+                                 .withButton("Cancel");
+
+        juce::AlertWindow::showAsync(
+            options,
+            [this](const int result)
+            {
+                if(result == 1)
+                {
+                    saveProject();
+                    openProjectInternal();
+                }
+                else if(result == 2)
+                {
+                    openProjectInternal();
+                }
+            });
+    }
+    else
+    {
+        openProjectInternal();
+    }
+}
+
+void ProjectFilesManager::openProjectInternal()
+{
     constexpr auto flags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
 
     projectFileChooser.launchAsync(flags,
@@ -65,6 +106,7 @@ void ProjectFilesManager::openProject()
                                        }
                                    });
 }
+
 
 void ProjectFilesManager::saveProject()
 {

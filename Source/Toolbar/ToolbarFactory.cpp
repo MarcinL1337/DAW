@@ -244,15 +244,17 @@ void ToolbarFactory::followModeButtonClicked() const
 // Eg. Should it be turned off in that case or should other actions be restricted etc.
 void ToolbarFactory::clipSplitButtonClicked()
 {
-    if(tree.hasProperty(ValueTreeIDs::isPlaying) && static_cast<bool>(tree[ValueTreeIDs::isPlaying]))
-        return;
-
     isClipSplitActive = not isClipSplitActive;
     tree.setProperty(ValueTreeIDs::toggleSplitAudioClipMode, isClipSplitActive, nullptr);
     if(isClipSplitActive)
     {
         clipSplitButton->setButtonText("Split");
         clipSplitButton->setStyle(juce::Toolbar::ToolbarItemStyle::iconsWithText);
+        if(tree.hasProperty(ValueTreeIDs::isPlaying) && static_cast<bool>(tree[ValueTreeIDs::isPlaying]))
+        {
+            tree.setProperty(ValueTreeIDs::playPauseButtonClicked, true, nullptr);
+            tree.setProperty(ValueTreeIDs::playPauseButtonClicked, ValueTreeConstants::doNothing, nullptr);
+        }
     }
     else
     {
