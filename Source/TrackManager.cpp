@@ -450,8 +450,8 @@ void TrackManager::clearAllTracks()
 
 juce::File TrackManager::getProjectAudioFolder() const
 {
-    if(!tree.hasProperty("projectAudioDir"))
+    if(!tree.hasProperty(ValueTreeIDs::projectAudioDir))
         return juce::File{};
 
-    return juce::File{tree["projectAudioDir"].toString()};
+    return juce::File{tree[ValueTreeIDs::projectAudioDir].toString()};
 }

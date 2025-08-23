@@ -4,8 +4,11 @@
 ProjectFilesManager::ProjectFilesManager(juce::ValueTree& parentTree) : tree{parentTree}
 {
     tree.addListener(this);
+    cleanupTempDirectory();
     markAsClean();
 }
+
+ProjectFilesManager::~ProjectFilesManager() { cleanupTempDirectory(); }
 
 void ProjectFilesManager::createNewProject()
 {
@@ -47,8 +50,8 @@ void ProjectFilesManager::saveAsProject()
                                    {
                                        if(const auto file = chooser.getResult(); file.getParentDirectory().exists())
                                        {
-                                           saveProjectToFile(file);
                                            currentProjectFile = file;
+                                           saveProjectToFile(file);
                                        }
                                    });
 }
@@ -57,12 +60,24 @@ void ProjectFilesManager::saveProjectToFile(const juce::File& file) const
 {
     const juce::File projectDir = file.getParentDirectory();
     const juce::File audioDir = projectDir.getChildFile(file.getFileNameWithoutExtension() + audioDirSuffix);
+
+    if(tree.hasProperty(ValueTreeIDs::projectAudioDir))
+    {
+        const juce::File currentAudioDir{tree[ValueTreeIDs::projectAudioDir].toString()};
+        if(currentAudioDir.exists() && currentAudioDir != audioDir)
+        {
+            const bool result = currentAudioDir.copyDirectoryTo(audioDir);
+            assert(result);
+        }
+    }
+
     if(!audioDir.exists())
     {
         const auto result = audioDir.createDirectory();
         assert(result.wasOk());
     }
-    tree.setProperty("projectAudioDir", audioDir.getFullPathName(), nullptr);
+
+    tree.setProperty(ValueTreeIDs::projectAudioDir, audioDir.getFullPathName(), nullptr);
     tree.setProperty(ValueTreeIDs::exportTracksToJson, true, nullptr);
     tree.setProperty(ValueTreeIDs::exportTracksToJson, ValueTreeConstants::doNothing, nullptr);
 }
@@ -76,7 +91,7 @@ void ProjectFilesManager::loadProjectFromFile(const juce::File& file)
     auto projectJson = nlohmann::json::parse(jsonString.toStdString());
     const juce::File audioDir =
         file.getParentDirectory().getChildFile(file.getFileNameWithoutExtension() + audioDirSuffix);
-    tree.setProperty("projectAudioDir", audioDir.getFullPathName(), nullptr);
+    tree.setProperty(ValueTreeIDs::projectAudioDir, audioDir.getFullPathName(), nullptr);
 
     if(not projectJson.contains("tracks"))
         return;
@@ -98,26 +113,6 @@ void ProjectFilesManager::loadProjectFromFile(const juce::File& file)
 
 void ProjectFilesManager::addAudioFile()
 {
-    if(not currentProjectFile.existsAsFile())
-    {
-        const auto options =
-            juce::MessageBoxOptions()
-                .withIconType(juce::MessageBoxIconType::QuestionIcon)
-                .withTitle("Project not saved")
-                .withMessage(
-                    "To add an audio file, the project must be saved first. Do you want to save the project now?")
-                .withButton("Save")
-                .withButton("Cancel");
-
-        juce::AlertWindow::showAsync(options,
-                                     [this](const int result)
-                                     {
-                                         if(result == 1)
-                                             saveAsProject();
-                                     });
-        return;
-    }
-
     static long long counter = 1;
     constexpr auto folderChooserFlags = juce::FileBrowserComponent::openMode |
                                         juce::FileBrowserComponent::canSelectFiles |
@@ -128,14 +123,18 @@ void ProjectFilesManager::addAudioFile()
         {
             if(const auto file = chooser.getResult(); file.existsAsFile())
             {
-                const auto currentProjectDir = currentProjectFile.getParentDirectory();
-                const juce::File audioDir =
-                    currentProjectDir.getChildFile(currentProjectFile.getFileNameWithoutExtension() + audioDirSuffix);
+                juce::File audioDir;
 
-                if(!audioDir.exists())
+                if(currentProjectFile.existsAsFile())
                 {
-                    const auto result = audioDir.createDirectory();
-                    assert(result.wasOk());
+                    const auto currentProjectDir = currentProjectFile.getParentDirectory();
+                    audioDir = currentProjectDir.getChildFile(currentProjectFile.getFileNameWithoutExtension() +
+                                                              audioDirSuffix);
+                }
+                else
+                {
+                    audioDir = getTempAudioDirectory();
+                    tree.setProperty(ValueTreeIDs::projectAudioDir, audioDir.getFullPathName(), nullptr);
                 }
 
                 const juce::File dstFile = audioDir.getChildFile(file.getFileNameWithoutExtension() +
@@ -148,7 +147,6 @@ void ProjectFilesManager::addAudioFile()
 
                 tree.setProperty(ValueTreeIDs::addAudioFileToNewTrack, dstFile.getFullPathName(), nullptr);
                 tree.setProperty(ValueTreeIDs::addAudioFileToNewTrack, ValueTreeConstants::doNothing, nullptr);
-                saveProjectToFile(currentProjectFile);
             }
         });
 }
@@ -246,4 +244,23 @@ void ProjectFilesManager::cleanupUnusedAudioFiles(const juce::String& projectJso
             const bool result = file.deleteFile();
             assert(result);
         }
+}
+
+juce::File ProjectFilesManager::getTempAudioDirectory() const
+{
+    auto tempDir = juce::File::getSpecialLocation(juce::File::tempDirectory).getChildFile("DAW_AudioFiles");
+
+    if(!tempDir.exists())
+    {
+        const auto result = tempDir.createDirectory();
+        assert(result.wasOk());
+    }
+    std::cout << tempDir.getFullPathName() << " " << tempDir.exists() << std::endl;
+    return tempDir;
+}
+
+void ProjectFilesManager::cleanupTempDirectory() const
+{
+    const bool result = getTempAudioDirectory().deleteRecursively();
+    assert(result);
 }

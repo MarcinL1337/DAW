@@ -86,14 +86,14 @@ inline static const juce::Identifier openProject{"openProject"};
 inline static const juce::Identifier saveProject{"saveProject"};
 inline static const juce::Identifier saveAsProject{"saveAsProject"};
 inline static const juce::Identifier addAudioFile{"addAudioFile"};
+inline static const juce::Identifier projectDirtyStateChanged{"projectDirtyStateChanged"};
+inline static const juce::Identifier projectAudioDir{"projectAudioDir"};
 
 inline static const juce::Identifier clearAllTracks{"clearAllTracks"};
 inline static const juce::Identifier tracksJsonExported{"tracksJsonExported"};
 inline static const juce::Identifier createTrackFromJson{"createTrackFromJson"};
 inline static const juce::Identifier exportTracksToJson{"exportTracksToJson"};
 inline static const juce::Identifier addAudioFileToNewTrack{"addAudioFileToNewTrack"};
-
-inline static const juce::Identifier projectDirtyStateChanged{"projectDirtyStateChanged"};
 }  // namespace ValueTreeIDs
 
 namespace PlayheadFollowConstants

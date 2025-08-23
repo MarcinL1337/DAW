@@ -6,6 +6,7 @@ class ProjectFilesManager final : public juce::ValueTree::Listener
 {
 public:
     explicit ProjectFilesManager(juce::ValueTree& parentTree);
+    ~ProjectFilesManager() override;
 
     void createNewProject();
     void openProject();
@@ -22,6 +23,8 @@ private:
     void cleanupUnusedAudioFiles(const juce::String& projectJsonString) const;
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
+    juce::File getTempAudioDirectory() const;
+    void cleanupTempDirectory() const;
 
     bool isDirty{false};
     juce::ValueTree& tree;
