@@ -67,6 +67,9 @@ void AudioClip::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&
         if(!positionInfo.hasValue())
             return;
 
+        if(not positionInfo->getIsPlaying())
+            return;
+
         auto optGlobalPositionSamples = positionInfo->getTimeInSamples();
         if(!optGlobalPositionSamples.hasValue())
             return;
