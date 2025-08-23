@@ -26,7 +26,7 @@ private:
     void previousButtonClicked() const;
     void nextButtonClicked() const;
     void replayButtonClicked() const;
-    void playPauseButtonClicked() const;
+    void playPauseButtonClicked();
     void startRecordingButtonClicked() const;
     void stopButtonClicked() const;
     void followModeButtonClicked() const;

@@ -111,21 +111,38 @@ void AudioTrack::setProperty(const ReverbClipProperty property, const float floa
     }
 }
 
+void AudioTrack::setTrackName(const juce::String& stringValue) { properties.name = stringValue; }
+
 TrackProperties AudioTrack::getProperties() const { return properties; }
 
 nlohmann::json AudioTrack::toJson() const
 {
     nlohmann::json j;
-    j["properties"] = {
-        {"gain", properties.gain}, {"pan", properties.pan}, {"mute", properties.mute}, {"solo", properties.solo}};
+    j["properties"] = {{"gain", properties.gain},
+                       {"pan", properties.pan},
+                       {"mute", properties.mute},
+                       {"solo", properties.solo},
+                       {"reverb", properties.reverb},
+                       {"reverbProperties",
+                        {{"roomSize", properties.reverbProperties.roomSize},
+                         {"damp", properties.reverbProperties.damp},
+                         {"wetLevel", properties.reverbProperties.wetLevel},
+                         {"dryLevel", properties.reverbProperties.dryLevel},
+                         {"width", properties.reverbProperties.width},
+                         {"freeze", properties.reverbProperties.freeze}}},
+                       {"name", properties.name.toStdString()}};
 
     j["audioClips"] = nlohmann::json::array();
     for(const auto& clipId: audioClips)
     {
         auto clipPath = mainAudio.getAudioClipPath(clipId);
         auto offset = mainAudio.getAudioClipOffsetInSeconds(clipId);
+        auto [fadeIn, fadeOut] = mainAudio.getAudioClipFadeData(clipId);
 
-        j["audioClips"].push_back({{"path", clipPath.getFullPathName().toStdString()}, {"offsetSeconds", offset}});
+        j["audioClips"].push_back({{"path", clipPath.getFileName().toStdString()},
+                                   {"offsetSeconds", offset},
+                                   {"fadeIn", fadeDataToJson(fadeIn)},
+                                   {"fadeOut", fadeDataToJson(fadeOut)}});
     }
     return j;
 }

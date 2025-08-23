@@ -53,6 +53,7 @@ private:
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
     void setSoloOfAudioClip(NodeID nodeID, bool solo) const;
     void setMuteOfAudioClip(NodeID nodeID, bool mute) const;
+    std::pair<Fade::Data, Fade::Data> getAudioClipFadeData(NodeID nodeID) const;
 
     void setReverbOfAudioClip(NodeID nodeID, bool mute) const;
     void setRoomSizeOfAudioClip(NodeID nodeID, float newRoomSizeValue) const;
@@ -70,5 +71,6 @@ private:
     NodeID outputNodeID;
     bool transportIsPlaying{false};
     mutable int64_t currentPositionSamples{0};
+    double projectLengthSeconds{TrackPlayerConstants::startNumOfBoxes};
     juce::CriticalSection lock;
 };

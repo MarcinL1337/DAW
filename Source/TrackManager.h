@@ -15,12 +15,13 @@ class TrackManager final : public juce::Component,
 {
 public:
     TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef, SideMenu& sideMenuRef);
-    ~TrackManager() override;
+    ~TrackManager() override = default;
 
     int addTrack();
     void removeTrack(int trackIndex);
     int duplicateTrack(int trackIndex);
     int createTrackFromJson(const nlohmann::json& trackJson);
+    void clearAllTracks();
 
     NodeID addAudioClipToTrack(int trackIndex, const juce::File& file) const;
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
@@ -38,16 +39,21 @@ public:
     void setTrackProperty(int trackIndex, AudioClipProperty property, bool boolValue) const;
     void setTrackProperty(int trackIndex, AudioClipProperty property, float floatValue) const;
     void setTrackProperty(int trackIndex, ReverbClipProperty property, float floatValue) const;
+    void setTrackName(int trackIndex, juce::String stringValue) const;
     TrackProperties getTrackProperties(int trackIndex) const;
 
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
 
+    nlohmann::json exportTracksToJson() const;
+
 private:
     void changeTrackOrder(int fromIndex, int toIndex);
-    void chooseNewNamesForSplitFiles(juce::String& firstFile, juce::String& secondFile,
-                                     const juce::String& extension) const;
-    void handleSplitClipsDirCreation() const;
+    juce::String getBaseName(const juce::String& fileName) const;
+    juce::String findNextAvailableName(const juce::String& baseName, const juce::String& extension) const;
+    void generateSplitFileNames(const juce::File& originalFile, juce::String& firstFileName,
+                                juce::String& secondFileName) const;
+    juce::File getProjectAudioFolder() const;
 
     TrackGuiManager& trackGuiManager;
     MainAudio& mainAudio;
@@ -55,5 +61,4 @@ private:
     juce::ValueTree& tree;
     std::vector<std::unique_ptr<AudioTrack>> tracks;
     std::optional<juce::File> currentlyCopiedClipFilePath{std::nullopt};
-    const juce::File tempClipsFolder{"../../../Assets/Audio/TemporarySplitClips"};
 };

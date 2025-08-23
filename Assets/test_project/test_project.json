@@ -1,0 +1,112 @@
+{
+    "tracks": [
+        {
+            "audioClips": [
+                {
+                    "fadeIn": {
+                        "function": 4,
+                        "lengthSeconds": 3.5999999046325684
+                    },
+                    "fadeOut": {
+                        "function": 1,
+                        "lengthSeconds": 2.1249890327453613
+                    },
+                    "offsetSeconds": 0.0,
+                    "path": "countdown.wav"
+                },
+                {
+                    "fadeIn": {
+                        "function": 2,
+                        "lengthSeconds": 14.014286041259766
+                    },
+                    "fadeOut": {
+                        "function": 1,
+                        "lengthSeconds": 0.0
+                    },
+                    "offsetSeconds": 6.0,
+                    "path": "test.wav"
+                }
+            ],
+            "properties": {
+                "gain": -15.0,
+                "mute": false,
+                "name": "Track",
+                "pan": 0.0,
+                "reverb": false,
+                "reverbProperties": {
+                    "damp": 0.5,
+                    "dryLevel": 0.4000000059604645,
+                    "freeze": 0.0,
+                    "roomSize": 0.5,
+                    "wetLevel": 0.33000001311302185,
+                    "width": 1.0
+                },
+                "solo": false
+            }
+        },
+        {
+            "audioClips": [
+                {
+                    "fadeIn": {
+                        "function": 2,
+                        "lengthSeconds": 14.014286041259766
+                    },
+                    "fadeOut": {
+                        "function": 1,
+                        "lengthSeconds": 0.0
+                    },
+                    "offsetSeconds": 6.0,
+                    "path": "test(-1).wav"
+                }
+            ],
+            "properties": {
+                "gain": -14.911242485046387,
+                "mute": false,
+                "name": "Track",
+                "pan": 1.0,
+                "reverb": false,
+                "reverbProperties": {
+                    "damp": 0.5,
+                    "dryLevel": 0.4000000059604645,
+                    "freeze": 0.0,
+                    "roomSize": 0.5,
+                    "wetLevel": 0.33000001311302185,
+                    "width": 1.0
+                },
+                "solo": false
+            }
+        },
+        {
+            "audioClips": [
+                {
+                    "fadeIn": {
+                        "function": 3,
+                        "lengthSeconds": 18.128570556640625
+                    },
+                    "fadeOut": {
+                        "function": 1,
+                        "lengthSeconds": 0.0
+                    },
+                    "offsetSeconds": 1.0,
+                    "path": "test.mp3"
+                }
+            ],
+            "properties": {
+                "gain": -16.804733276367188,
+                "mute": false,
+                "name": "Bangaranag",
+                "pan": 0.0,
+                "reverb": false,
+                "reverbProperties": {
+                    "damp": 50.0,
+                    "dryLevel": 40.0,
+                    "freeze": 0.0,
+                    "roomSize": 50.0,
+                    "wetLevel": 33.0,
+                    "width": 100.0
+                },
+                "solo": false
+            }
+        }
+    ]
+}

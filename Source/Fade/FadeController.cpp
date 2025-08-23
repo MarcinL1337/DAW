@@ -4,7 +4,10 @@ FadeController::FadeController(juce::ValueTree& parentTree, const NodeID audioCl
     tree{parentTree}, audioClipID{audioClipID}
 {
     setInterceptsMouseClicks(true, false);
+    tree.addListener(this);
 }
+
+FadeController::~FadeController() { tree.removeListener(this); }
 
 void FadeController::updateForNewAudioLength(const float audioLengthSeconds)
 {
@@ -167,3 +170,25 @@ float FadeController::getFadeMultiplier(const double timePositionSeconds, const 
 }
 
 bool FadeController::hasFade() const { return fadeIn.lengthSeconds > 0.0f || fadeOut.lengthSeconds > 0.0f; }
+
+void FadeController::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
+{
+    if(static_cast<int>(tree[property]) == ValueTreeConstants::doNothing)
+        return;
+
+    if(property == ValueTreeIDs::audioClipFadeChanged)
+    {
+        const auto fadeInfo = tree[ValueTreeIDs::audioClipFadeChanged];
+        const NodeID clipID{static_cast<uint32_t>(static_cast<int>(fadeInfo[0]))};
+        if(clipID == audioClipID)
+        {
+            fadeIn.lengthSeconds = fadeInfo[1];
+            fadeIn.function = static_cast<Fade::Function>(static_cast<int>(fadeInfo[2]));
+            fadeOut.lengthSeconds = fadeInfo[3];
+            fadeOut.function = static_cast<Fade::Function>(static_cast<int>(fadeInfo[4]));
+
+            rebuildPaths();
+            repaint();
+        }
+    }
+}

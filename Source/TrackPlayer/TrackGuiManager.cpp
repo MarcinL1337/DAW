@@ -97,13 +97,13 @@ void TrackGuiManager::setTrackButtonStates(const int trackIndex, const bool mute
 void TrackGuiManager::removeTrack(const int trackIndex)
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(trackGuiVector.size()));
-    trackGuiVector.erase(trackGuiVector.begin() + trackIndex);
 
-    for(size_t i = trackIndex; i < trackGuiVector.size(); ++i)
-        trackGuiVector[i]->setBounds(
+    for(size_t i = trackIndex; i < trackGuiVector.size() - 1; ++i)
+        trackGuiVector[i + 1]->setBounds(
             0, i * currentTrackGuiBoxHeight, trackGuiComponent.getWidth(), currentTrackGuiBoxHeight);
 
     trackPlayerSideMenu.removeTrackControls(trackIndex);
+    trackGuiVector.erase(trackGuiVector.begin() + trackIndex);
     assert(trackPlayerSideMenu.getCurrentNumberOfTracks() == getCurrentNumberOfTracks());
     resized();
 }
@@ -225,4 +225,15 @@ void TrackGuiManager::reorderTrackGuis(const int fromIndex, const int toIndex)
 
     for(size_t i = 0; i < trackGuiVector.size(); ++i)
         trackGuiVector[i]->setTopLeftPosition(0, i * currentTrackGuiBoxHeight);
+}
+
+void TrackGuiManager::clearAllTracks()
+{
+    trackGuiVector.clear();
+    trackPlayerSideMenu.clearAllTracks();
+}
+
+void TrackGuiManager::setTrackName(const int trackIndex, const juce::String& name) const
+{
+    trackPlayerSideMenu.setTrackName(trackIndex, name);
 }

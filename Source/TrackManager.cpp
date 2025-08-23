@@ -6,20 +6,6 @@ TrackManager::TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainA
 {
     trackGuiManagerRef.addKeyListener(this);
     tree.addListener(this);
-    handleSplitClipsDirCreation();
-}
-
-TrackManager::~TrackManager() { assert(tempClipsFolder.deleteRecursively()); }
-
-void TrackManager::handleSplitClipsDirCreation() const
-{
-    if(tempClipsFolder.exists())
-    {
-        assert(tempClipsFolder.deleteRecursively());
-    }
-
-    const auto result = tempClipsFolder.createDirectory();
-    assert(result.wasOk());
 }
 
 int TrackManager::addTrack()
@@ -33,9 +19,9 @@ int TrackManager::addTrack()
 void TrackManager::removeTrack(const int trackIndex)
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
-    tracks.erase(tracks.begin() + trackIndex);
     juce::Timer::callAfterDelay(1, [this, trackIndex]() { trackGuiManager.removeTrack(trackIndex); });
     sideMenu.removeTrack(trackIndex);
+    tracks.erase(tracks.begin() + trackIndex);
 }
 
 int TrackManager::duplicateTrack(const int trackIndex)
@@ -54,19 +40,49 @@ int TrackManager::createTrackFromJson(const nlohmann::json& trackJson)
         {
             const NodeID clipId = addAudioClipToTrack(newTrackIndex, audioFile);
             setOffsetOfAudioClipInSeconds(clipId, clipJson["offsetSeconds"]);
+
+            const auto fadeInData = Fade::fadeDataFromJson(clipJson["fadeIn"]);
+            const auto fadeOutData = Fade::fadeDataFromJson(clipJson["fadeOut"]);
+
+            juce::Array<juce::var> fadeInfo{static_cast<int>(clipId.uid),
+                                            fadeInData.lengthSeconds,
+                                            static_cast<int>(fadeInData.function),
+                                            fadeOutData.lengthSeconds,
+                                            static_cast<int>(fadeOutData.function)};
+
+            tree.setProperty(ValueTreeIDs::audioClipFadeChanged, fadeInfo, nullptr);
+            tree.setProperty(ValueTreeIDs::audioClipFadeChanged, ValueTreeConstants::doNothing, nullptr);
         }
     }
 
     setTrackProperty(newTrackIndex, AudioClipProperty::GAIN, trackJson["properties"]["gain"].get<float>());
     setTrackProperty(newTrackIndex, AudioClipProperty::PAN, trackJson["properties"]["pan"].get<float>());
 
-    sideMenu.setTrackProperties(newTrackIndex, trackJson["properties"]["gain"].get<float>() /* delay, reverb, ... */);
+    const bool isReverbOn = trackJson["properties"].value("reverb", false);
+    setTrackProperty(newTrackIndex, AudioClipProperty::REVERB, isReverbOn);
+
+    if(trackJson["properties"].contains("reverbProperties"))
+    {
+        const auto& reverbProps = trackJson["properties"]["reverbProperties"];
+        setTrackProperty(newTrackIndex, ReverbClipProperty::ROOM_SIZE, reverbProps.value("roomSize", 50.0f));
+        setTrackProperty(newTrackIndex, ReverbClipProperty::DAMP, reverbProps.value("damp", 50.0f));
+        setTrackProperty(newTrackIndex, ReverbClipProperty::WET_LEVEL, reverbProps.value("wetLevel", 33.0f));
+        setTrackProperty(newTrackIndex, ReverbClipProperty::DRY_LEVEL, reverbProps.value("dryLevel", 40.0f));
+        setTrackProperty(newTrackIndex, ReverbClipProperty::WIDTH, reverbProps.value("width", 100.0f));
+        setTrackProperty(newTrackIndex, ReverbClipProperty::FREEZE, reverbProps.value("freeze", 0.0f));
+    }
+
+    sideMenu.setTrackProperties(newTrackIndex, trackJson["properties"]["gain"].get<float>());
 
     const bool isMuted = trackJson["properties"]["mute"].get<bool>();
     const bool isSoloed = trackJson["properties"]["solo"].get<bool>();
     trackGuiManager.setTrackButtonStates(newTrackIndex, isMuted, isSoloed);
     setTrackProperty(newTrackIndex, AudioClipProperty::MUTE, isMuted);
     setTrackProperty(newTrackIndex, AudioClipProperty::SOLO, isSoloed);
+
+    const juce::String name = trackJson["properties"]["name"].get<std::string>();
+    setTrackName(newTrackIndex, name);
+    trackGuiManager.setTrackName(newTrackIndex, name);
 
     return newTrackIndex;
 }
@@ -122,24 +138,45 @@ void TrackManager::handleWriteToFile(juce::AudioFormatReader& reader, const juce
     firstFormatWriter->writeFromAudioSampleBuffer(buffer, 0, numOfSamplesToWrite);
 }
 
-void TrackManager::chooseNewNamesForSplitFiles(juce::String& firstFile, juce::String& secondFile,
-                                               const juce::String& extension) const
+juce::String TrackManager::getBaseName(const juce::String& fileName) const
 {
-    auto suffix{1u};
-    while(tempClipsFolder.getChildFile(juce::StringRef(firstFile)).existsAsFile() or
-          tempClipsFolder.getChildFile(juce::StringRef(secondFile)).existsAsFile())
+    const int splitPos = fileName.lastIndexOf("_split");
+    if(splitPos == -1)
+        return fileName;
+
+    return fileName.substring(0, splitPos);
+}
+
+juce::String TrackManager::findNextAvailableName(const juce::String& baseName, const juce::String& extension) const
+{
+    const auto audioFolder = getProjectAudioFolder();
+
+    static int counter = 1;
+    while(true)
     {
-        firstFile = firstFile.replaceFirstOccurrenceOf(extension, "");
-        firstFile += "(" + juce::String(suffix) + ")" + extension;
-        secondFile = secondFile.replaceFirstOccurrenceOf(extension, "");
-        secondFile += "(" + juce::String(suffix) + ")" + extension;
-        suffix++;
+        const juce::String testFileName = baseName + "_split" + juce::String(counter++) + extension;
+        if(!audioFolder.getChildFile(testFileName).existsAsFile())
+            return testFileName;
     }
+}
+
+void TrackManager::generateSplitFileNames(const juce::File& originalFile, juce::String& firstFileName,
+                                          juce::String& secondFileName) const
+{
+    const juce::String originalName = originalFile.getFileNameWithoutExtension();
+    const juce::String extension = originalFile.getFileExtension() == ".mp3" ? ".wav" : originalFile.getFileExtension();
+    const juce::String baseName = getBaseName(originalName);
+
+    firstFileName = findNextAvailableName(baseName, extension);
+    secondFileName = findNextAvailableName(baseName, extension);
 }
 
 void TrackManager::addNewAudioClipsBySplit(const int trackIndex, const juce::File& fileToBeSplit,
                                            const float waveformSplitRatio, const double splitClipOffset) const
 {
+    const auto audioFolder = getProjectAudioFolder();
+    assert(audioFolder.exists());
+
     juce::AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
     const std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(fileToBeSplit));
@@ -153,17 +190,13 @@ void TrackManager::addNewAudioClipsBySplit(const int trackIndex, const juce::Fil
     const auto splitFileExtension =
         fileToBeSplit.getFileExtension() == ".mp3" ? ".wav" : fileToBeSplit.getFileExtension();
 
-    juce::String firstDestFileName{fileToBeSplit.getFileNameWithoutExtension() + "_part1" + splitFileExtension};
-    juce::String secondDestFileName{fileToBeSplit.getFileNameWithoutExtension() + "_part2" + splitFileExtension};
+    juce::String firstDestFileName, secondDestFileName;
+    generateSplitFileNames(fileToBeSplit, firstDestFileName, secondDestFileName);
+    assert(not audioFolder.getChildFile(juce::StringRef(firstDestFileName)).existsAsFile() and
+           not audioFolder.getChildFile(juce::StringRef(secondDestFileName)).existsAsFile());
 
-    if(tempClipsFolder.getChildFile(juce::StringRef(firstDestFileName)).existsAsFile() or
-       tempClipsFolder.getChildFile(juce::StringRef(secondDestFileName)).existsAsFile())
-    {
-        chooseNewNamesForSplitFiles(firstDestFileName, secondDestFileName, splitFileExtension);
-    }
-
-    const juce::File firstDestFile{tempClipsFolder.getFullPathName() + "/" + firstDestFileName};
-    const juce::File secondDestFile{tempClipsFolder.getFullPathName() + "/" + secondDestFileName};
+    const juce::File firstDestFile{audioFolder.getFullPathName() + "/" + firstDestFileName};
+    const juce::File secondDestFile{audioFolder.getFullPathName() + "/" + secondDestFileName};
 
     handleWriteToFile(*reader, formatManager, firstDestFile, firstSamplesToWrite, 0);
     handleWriteToFile(*reader, formatManager, secondDestFile, secondSamplesToWrite, firstSamplesToWrite);
@@ -221,6 +254,12 @@ void TrackManager::setTrackProperty(const int trackIndex, const ReverbClipProper
     tracks[trackIndex]->setProperty(property, floatValue);
 }
 
+void TrackManager::setTrackName(const int trackIndex, juce::String stringValue) const
+{
+    assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
+    tracks[trackIndex]->setTrackName(stringValue);
+}
+
 TrackProperties TrackManager::getTrackProperties(const int trackIndex) const
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
@@ -231,14 +270,7 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
 {
     if(static_cast<int>(tree[property]) == ValueTreeConstants::doNothing)
         return;
-    if(property == ValueTreeIDs::newAudioFile)
-    {
-        const juce::var newAudioFilePath = tree[ValueTreeIDs::newAudioFile];
-
-        const auto index = addTrack();
-        std::ignore = addAudioClipToTrack(index, juce::File(newAudioFilePath));
-    }
-    else if(property == ValueTreeIDs::soloButtonClicked)
+    if(property == ValueTreeIDs::soloButtonClicked)
     {
         const int trackIndex = tree[ValueTreeIDs::soloButtonClicked];
         const bool soloValue = getTrackProperties(trackIndex).solo;
@@ -304,6 +336,12 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const float freezeValue = tree[ValueTreeIDs::trackFreezeChanged][1];
         setTrackProperty(trackIndex, ReverbClipProperty::FREEZE, freezeValue);
     }
+    else if(property == ValueTreeIDs::trackNameChanged)
+    {
+        const int trackIndex = tree[ValueTreeIDs::trackNameChanged][0];
+        const juce::String nameValue = tree[ValueTreeIDs::trackNameChanged][1];
+        setTrackName(trackIndex, nameValue);
+    }
     else if(property == ValueTreeIDs::deleteTrackGui)
     {
         const int trackIndex = tree[ValueTreeIDs::deleteTrackGui];
@@ -357,6 +395,31 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const int toIndex = tree[ValueTreeIDs::reorderTracks][1];
         changeTrackOrder(fromIndex, toIndex);
     }
+    else if(property == ValueTreeIDs::clearAllTracks)
+    {
+        clearAllTracks();
+    }
+    else if(property == ValueTreeIDs::createTrackFromJson)
+    {
+        const juce::String trackJsonString = tree[ValueTreeIDs::createTrackFromJson];
+        auto trackJson = nlohmann::json::parse(trackJsonString.toStdString());
+        createTrackFromJson(trackJson);
+    }
+    else if(property == ValueTreeIDs::exportTracksToJson)
+    {
+        const auto projectJson = exportTracksToJson();
+        tree.setProperty(ValueTreeIDs::tracksJsonExported, projectJson.dump(4).data(), nullptr);
+        tree.setProperty(ValueTreeIDs::exportTracksToJson, ValueTreeConstants::doNothing, nullptr);
+    }
+    else if(property == ValueTreeIDs::addAudioFileToNewTrack)
+    {
+        const juce::String audioFilePath = tree[ValueTreeIDs::addAudioFileToNewTrack];
+        if(const juce::File audioFile(audioFilePath); audioFile.existsAsFile())
+        {
+            const int newTrackIndex = addTrack();
+            std::ignore = addAudioClipToTrack(newTrackIndex, audioFile);
+        }
+    }
 }
 
 // TODO: maybe this shouldn't be in this class. Add this to TrackManager refactor
@@ -365,4 +428,30 @@ void TrackManager::changeTrackOrder(const int fromIndex, const int toIndex)
     auto trackToMove = std::move(tracks[fromIndex]);
     tracks.erase(tracks.begin() + fromIndex);
     tracks.insert(tracks.begin() + toIndex, std::move(trackToMove));
+}
+
+nlohmann::json TrackManager::exportTracksToJson() const
+{
+    nlohmann::json projectJson;
+    projectJson["tracks"] = nlohmann::json::array();
+    for(const auto& track: tracks) { projectJson["tracks"].push_back(track->toJson()); }
+    return projectJson;
+}
+
+void TrackManager::clearAllTracks()
+{
+    if(tracks.empty())
+        return;
+
+    trackGuiManager.clearAllTracks();
+    sideMenu.clearAllTracks();
+    tracks.clear();
+}
+
+juce::File TrackManager::getProjectAudioFolder() const
+{
+    if(!tree.hasProperty(ValueTreeIDs::projectAudioDir))
+        return juce::File{};
+
+    return juce::File{tree[ValueTreeIDs::projectAudioDir].toString()};
 }

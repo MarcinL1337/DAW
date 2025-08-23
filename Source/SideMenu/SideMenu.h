@@ -1,6 +1,7 @@
 #pragma once
 
 #include <juce_gui_extra/juce_gui_extra.h>
+#include "../TrackPlayer/TrackPlayerSideMenu.h"
 #include "ZoomSlider.h"
 
 struct SliderSettings
@@ -38,6 +39,7 @@ public:
     void addTrack();
     void removeTrack(const int trackToBeDeletedIndex);
     void setTrackProperties(const int trackIndex, const float gainValue);
+    void clearAllTracks();
 
 private:
     void paint(juce::Graphics& g) override;
@@ -90,7 +92,7 @@ private:
     std::vector<SliderSettings> sliderSettings{};
     std::vector<ControlsValues> controlsValuesPerTrack{};
 
-    int currentTrackIndex{0};
+    int currentTrackIndex{TrackPlayerConstants::noTrackChosen};
     uint8_t paddingBetweenSliders{};
     uint8_t sliderHeight{};
 

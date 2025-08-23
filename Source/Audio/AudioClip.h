@@ -31,6 +31,7 @@ public:
     bool isMuted() const { return mute; }
     bool isSoloed() const { return solo; }
     void setFadeData(const Fade::Data& fadeIn, const Fade::Data& fadeOut);
+    std::pair<Fade::Data, Fade::Data> getFadeData() const { return {fadeIn, fadeOut}; }
 
     // AudioProcessor
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;

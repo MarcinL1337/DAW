@@ -38,6 +38,8 @@ private:
     void setTrackButtonStates(int trackIndex, bool muted, bool soloed) const;
     void removeTrack(int trackIndex);
     void reorderTrackGuis(int fromIndex, int toIndex);
+    void clearAllTracks();
+    void setTrackName(int trackIndex, const juce::String& name) const;
 
     void addWaveformToTrackGui(const juce::String& newAudioFilePath, int trackIndex, NodeID newAudioClipID) const;
     void setOffsetOfWaveformInSeconds(int trackIndex, NodeID audioClipID, double offsetSeconds) const;

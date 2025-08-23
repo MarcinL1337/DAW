@@ -201,8 +201,14 @@ void ToolbarFactory::buttonClicked(juce::Button* button)
 void ToolbarFactory::previousButtonClicked() const { temporaryButtonsFunction("previousButton"); }
 void ToolbarFactory::nextButtonClicked() const { temporaryButtonsFunction("nextButton"); }
 void ToolbarFactory::replayButtonClicked() const { temporaryButtonsFunction("replayButton"); }
-void ToolbarFactory::playPauseButtonClicked() const
+void ToolbarFactory::playPauseButtonClicked()
 {
+    if(isClipSplitActive)
+    {
+        isClipSplitActive = false;
+        tree.setProperty(ValueTreeIDs::toggleSplitAudioClipMode, false, nullptr);
+        clipSplitButton->setStyle(juce::Toolbar::ToolbarItemStyle::iconsOnly);
+    }
     tree.setProperty(ValueTreeIDs::playPauseButtonClicked, true, nullptr);
     tree.setProperty(ValueTreeIDs::playPauseButtonClicked, ValueTreeConstants::doNothing, nullptr);
 }
@@ -244,6 +250,11 @@ void ToolbarFactory::clipSplitButtonClicked()
     {
         clipSplitButton->setButtonText("Split");
         clipSplitButton->setStyle(juce::Toolbar::ToolbarItemStyle::iconsWithText);
+        if(tree.hasProperty(ValueTreeIDs::isPlaying) && static_cast<bool>(tree[ValueTreeIDs::isPlaying]))
+        {
+            tree.setProperty(ValueTreeIDs::playPauseButtonClicked, true, nullptr);
+            tree.setProperty(ValueTreeIDs::playPauseButtonClicked, ValueTreeConstants::doNothing, nullptr);
+        }
     }
     else
     {

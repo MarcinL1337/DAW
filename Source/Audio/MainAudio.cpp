@@ -108,12 +108,14 @@ void MainAudio::play()
 {
     juce::ScopedLock sl(lock);
     transportIsPlaying = true;
+    tree.setProperty(ValueTreeIDs::isPlaying, true, nullptr);
 }
 
 void MainAudio::pause()
 {
     juce::ScopedLock sl(lock);
     transportIsPlaying = false;
+    tree.setProperty(ValueTreeIDs::isPlaying, false, nullptr);
 }
 
 void MainAudio::stop()
@@ -121,6 +123,7 @@ void MainAudio::stop()
     juce::ScopedLock sl(lock);
     transportIsPlaying = false;
     setPlayheadPosition(0);
+    tree.setProperty(ValueTreeIDs::isPlaying, false, nullptr);
 }
 
 void MainAudio::setPlayheadPosition(const int64_t positionSamples)
@@ -210,6 +213,10 @@ void MainAudio::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifie
 
         setFadeOfAudioClip(clipID, fadeIn, fadeOut);
     }
+    else if(property == ValueTreeIDs::numOfSecondsChanged)
+    {
+        projectLengthSeconds = tree[ValueTreeIDs::numOfSecondsChanged];
+    }
 }
 
 void MainAudio::timerCallback()
@@ -218,6 +225,12 @@ void MainAudio::timerCallback()
     {
         const double positionInSeconds = static_cast<double>(currentPositionSamples) / getSampleRate();
         tree.setProperty(ValueTreeIDs::timeBarTime, positionInSeconds, nullptr);
+
+        if(positionInSeconds >= projectLengthSeconds)
+        {
+            tree.setProperty(ValueTreeIDs::stopButtonClicked, true, nullptr);
+            tree.setProperty(ValueTreeIDs::stopButtonClicked, ValueTreeConstants::doNothing, nullptr);
+        }
     }
 }
 
@@ -257,3 +270,9 @@ void MainAudio::audioDeviceAboutToStart(juce::AudioIODevice* device)
 }
 
 void MainAudio::audioDeviceStopped() { processorPlayer.audioDeviceStopped(); }
+std::pair<Fade::Data, Fade::Data> MainAudio::getAudioClipFadeData(const NodeID nodeID) const
+{
+    const auto* audioClip = dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor());
+    assert(audioClip);
+    return audioClip->getFadeData();
+}
