@@ -288,7 +288,6 @@ juce::File ProjectFilesManager::getTempAudioDirectory() const
         const auto result = tempDir.createDirectory();
         assert(result.wasOk());
     }
-    std::cout << tempDir.getFullPathName() << " " << tempDir.exists() << std::endl;
     return tempDir;
 }
 
