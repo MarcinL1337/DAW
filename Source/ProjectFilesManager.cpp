@@ -12,6 +12,39 @@ ProjectFilesManager::~ProjectFilesManager() { cleanupTempDirectory(); }
 
 void ProjectFilesManager::createNewProject()
 {
+    if(isDirty)
+    {
+        const auto options =
+            juce::MessageBoxOptions()
+                .withIconType(juce::MessageBoxIconType::QuestionIcon)
+                .withTitle("Unsaved Changes")
+                .withMessage("You have unsaved changes. Do you want to save before creating a new project?")
+                .withButton("Save and Create New")
+                .withButton("Create New Without Saving")
+                .withButton("Cancel");
+
+        juce::AlertWindow::showAsync(options,
+                                     [this](const int result)
+                                     {
+                                         if(result == 1)
+                                         {
+                                             saveProject();
+                                             createNewProjectInternal();
+                                         }
+                                         else if(result == 2)
+                                         {
+                                             createNewProjectInternal();
+                                         }
+                                     });
+    }
+    else
+    {
+        createNewProjectInternal();
+    }
+}
+
+void ProjectFilesManager::createNewProjectInternal()
+{
     tree.setProperty(ValueTreeIDs::clearAllTracks, true, nullptr);
     tree.setProperty(ValueTreeIDs::clearAllTracks, ValueTreeConstants::doNothing, nullptr);
     currentProjectFile = juce::File{};
