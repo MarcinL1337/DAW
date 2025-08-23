@@ -286,15 +286,15 @@ void SideMenu::displaySliderValuesForCurrentTrack()
                newWidthValue,
                newFreezeValue] = controlsValuesPerTrack.at(currentTrackIndex);
 
-        gainSlider.setValue(newGainValue);
-        panSlider.setValue(newFaderValue);
-        reverbButton.setToggleState(newReverbState, juce::NotificationType::dontSendNotification);
-        roomSizeSlider.setValue(newRoomSizeValue);
-        dampingSlider.setValue(newDampValue);
-        wetLevelSlider.setValue(newWetLevelValue);
-        dryLevelSlider.setValue(newDryLevelValue);
-        reverbWidthSlider.setValue(newWidthValue);
-        reverbFreezeSlider.setValue(newFreezeValue);
+        gainSlider.setValue(newGainValue, juce::dontSendNotification);
+        panSlider.setValue(newFaderValue, juce::dontSendNotification);
+        reverbButton.setToggleState(newReverbState, juce::dontSendNotification);
+        roomSizeSlider.setValue(newRoomSizeValue, juce::dontSendNotification);
+        dampingSlider.setValue(newDampValue, juce::dontSendNotification);
+        wetLevelSlider.setValue(newWetLevelValue, juce::dontSendNotification);
+        dryLevelSlider.setValue(newDryLevelValue, juce::dontSendNotification);
+        reverbWidthSlider.setValue(newWidthValue, juce::dontSendNotification);
+        reverbFreezeSlider.setValue(newFreezeValue, juce::dontSendNotification);
 
         positionReverbButtonAndSliders();
     }

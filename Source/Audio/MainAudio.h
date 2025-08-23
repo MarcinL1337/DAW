@@ -65,5 +65,6 @@ private:
     juce::Time startTime;
     bool transportIsPlaying{false};
     mutable int64_t currentPositionSamples{0};
+    double projectLengthSeconds{TrackPlayerConstants::startNumOfBoxes};
     juce::CriticalSection lock;
 };

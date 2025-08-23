@@ -223,6 +223,10 @@ void MainAudio::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifie
 
         setFadeOfAudioClip(clipID, fadeIn, fadeOut);
     }
+    else if(property == ValueTreeIDs::numOfSecondsChanged)
+    {
+        projectLengthSeconds = tree[ValueTreeIDs::numOfSecondsChanged];
+    }
 }
 
 void MainAudio::timerCallback()
@@ -231,6 +235,12 @@ void MainAudio::timerCallback()
     {
         const double positionInSeconds = static_cast<double>(currentPositionSamples) / getSampleRate();
         tree.setProperty(ValueTreeIDs::timeBarTime, positionInSeconds, nullptr);
+
+        if(positionInSeconds >= projectLengthSeconds)
+        {
+            tree.setProperty(ValueTreeIDs::stopButtonClicked, true, nullptr);
+            tree.setProperty(ValueTreeIDs::stopButtonClicked, ValueTreeConstants::doNothing, nullptr);
+        }
     }
 }
 
