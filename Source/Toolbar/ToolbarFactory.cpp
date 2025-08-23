@@ -201,8 +201,14 @@ void ToolbarFactory::buttonClicked(juce::Button* button)
 void ToolbarFactory::previousButtonClicked() const { temporaryButtonsFunction("previousButton"); }
 void ToolbarFactory::nextButtonClicked() const { temporaryButtonsFunction("nextButton"); }
 void ToolbarFactory::replayButtonClicked() const { temporaryButtonsFunction("replayButton"); }
-void ToolbarFactory::playPauseButtonClicked() const
+void ToolbarFactory::playPauseButtonClicked()
 {
+    if(isClipSplitActive)
+    {
+        isClipSplitActive = false;
+        tree.setProperty(ValueTreeIDs::toggleSplitAudioClipMode, false, nullptr);
+        clipSplitButton->setStyle(juce::Toolbar::ToolbarItemStyle::iconsOnly);
+    }
     tree.setProperty(ValueTreeIDs::playPauseButtonClicked, true, nullptr);
     tree.setProperty(ValueTreeIDs::playPauseButtonClicked, ValueTreeConstants::doNothing, nullptr);
 }
@@ -238,6 +244,9 @@ void ToolbarFactory::followModeButtonClicked() const
 // Eg. Should it be turned off in that case or should other actions be restricted etc.
 void ToolbarFactory::clipSplitButtonClicked()
 {
+    if(tree.hasProperty(ValueTreeIDs::isPlaying) && static_cast<bool>(tree[ValueTreeIDs::isPlaying]))
+        return;
+
     isClipSplitActive = not isClipSplitActive;
     tree.setProperty(ValueTreeIDs::toggleSplitAudioClipMode, isClipSplitActive, nullptr);
     if(isClipSplitActive)

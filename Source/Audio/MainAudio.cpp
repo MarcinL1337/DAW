@@ -109,12 +109,14 @@ void MainAudio::play()
     const auto timeOffset = juce::RelativeTime::seconds(static_cast<double>(currentPositionSamples) / getSampleRate());
     startTime = juce::Time::getCurrentTime() - timeOffset;
     transportIsPlaying = true;
+    tree.setProperty(ValueTreeIDs::isPlaying, true, nullptr);
 }
 
 void MainAudio::pause()
 {
     juce::ScopedLock sl(lock);
     transportIsPlaying = false;
+    tree.setProperty(ValueTreeIDs::isPlaying, false, nullptr);
 }
 
 void MainAudio::stop()
@@ -122,6 +124,7 @@ void MainAudio::stop()
     juce::ScopedLock sl(lock);
     transportIsPlaying = false;
     setPlayheadPosition(0);
+    tree.setProperty(ValueTreeIDs::isPlaying, false, nullptr);
 }
 
 void MainAudio::setPlayheadPosition(const int64_t positionSamples)

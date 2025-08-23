@@ -46,6 +46,7 @@ inline static const juce::Identifier isCurrentlyDraggingTimeBar{"isCurrentlyDrag
 inline static const juce::Identifier setPlayheadPosition{"setPlayheadPosition"};
 inline static const juce::Identifier followModeChanged{"followModeChanged"};
 
+inline static const juce::Identifier isPlaying{"isPlaying"};
 inline static const juce::Identifier soloButtonClicked{"soloButtonClicked"};
 inline static const juce::Identifier muteButtonClicked{"muteButtonClicked"};
 inline static const juce::Identifier newAudioFile{"newAudioFile"};
