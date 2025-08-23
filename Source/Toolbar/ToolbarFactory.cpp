@@ -11,41 +11,25 @@ void ToolbarFactory::initPlayheadFollowMode() const
 }
 void ToolbarFactory::getAllToolbarItemIds(juce::Array<int>& ids)
 {
-    const juce::Array<int> toolbarButtons{separatorBarId,
-                                          spacerId,
-                                          flexibleSpacerId,
-                                          previous,
-                                          next,
-                                          replay,
-                                          playPause,
-                                          stop,
-                                          startRecording,
-                                          clipSplit,
-                                          followMode};
+    const juce::Array<int> toolbarButtons{
+        separatorBarId, spacerId, flexibleSpacerId, playPause, stop, clipSplit, followMode};
     ids.addArray(toolbarButtons);
 }
 
 void ToolbarFactory::getDefaultItemSet(juce::Array<int>& ids)
 {
-// TODO: Delete this shit and fix toolbar length
-#define REPEAT7(x) x, x, x, x, x, x, x
-    const juce::Array<int> toolbarDefaultButtons{previous,
-                                                 separatorBarId,
-                                                 next,
-                                                 separatorBarId,
-                                                 replay,
-                                                 separatorBarId,
+    const juce::Array<int> toolbarDefaultButtons{separatorBarId,
                                                  playPause,
                                                  separatorBarId,
-                                                 startRecording,
                                                  separatorBarId,
                                                  stop,
                                                  separatorBarId,
                                                  separatorBarId,
                                                  clipSplit,
-                                                 flexibleSpacerId,
+                                                 separatorBarId,
+                                                 separatorBarId,
                                                  followMode,
-                                                 REPEAT7(spacerId)};
+                                                 separatorBarId};
     ids.addArray(toolbarDefaultButtons);
 }
 
@@ -53,26 +37,10 @@ juce::ToolbarItemComponent* ToolbarFactory::createItem(const int itemId)
 {
     switch(itemId)
     {
-        case previous:
-            previousButton = createButtonFromImage(previous, "Play previous");
-            previousButton->addListener(this);
-            return previousButton;
-        case next:
-            nextButton = createButtonFromImage(next, "Next");
-            nextButton->addListener(this);
-            return nextButton;
-        case replay:
-            replayButton = createButtonFromImage(replay, "Replay");
-            replayButton->addListener(this);
-            return replayButton;
         case playPause:
             playPauseButton = createButtonFromImage(playPause, "Play/Pause");
             playPauseButton->addListener(this);
             return playPauseButton;
-        case startRecording:
-            startRecordingButton = createButtonFromImage(startRecording, "Start recording");
-            startRecordingButton->addListener(this);
-            return startRecordingButton;
         case stop:
             stopButton = createButtonFromImage(stop, "Stop");
             stopButton->addListener(this);
@@ -98,25 +66,9 @@ juce::ToolbarButton* ToolbarFactory::createButtonFromImage(int itemId,
 
     switch(itemId)
     {
-        case previous:
-            png = BinaryData::previousButton_png;
-            pngSize.emplace(BinaryData::previousButton_pngSize);
-            break;
-        case next:
-            png = BinaryData::nextButton_png;
-            pngSize.emplace(BinaryData::nextButton_pngSize);
-            break;
-        case replay:
-            png = BinaryData::replayButton_png;
-            pngSize.emplace(BinaryData::replayButton_pngSize);
-            break;
         case playPause:
             png = BinaryData::playPauseButton_png;
             pngSize.emplace(BinaryData::playPauseButton_pngSize);
-            break;
-        case startRecording:
-            png = BinaryData::recordButton_png;
-            pngSize.emplace(BinaryData::recordButton_pngSize);
             break;
         case stop:
             png = BinaryData::stopButton_png;
@@ -140,49 +92,11 @@ juce::ToolbarButton* ToolbarFactory::createButtonFromImage(int itemId,
         itemId, "juce!", juce::Drawable::createFromImageData(png.value(), pngSize.value()), {});
 }
 
-void ToolbarFactory::temporaryButtonsFunction(const juce::String& buttonName) const
-{
-    juce::DialogWindow* dialogWindow;
-    juce::DialogWindow::LaunchOptions launchOptions;
-
-    auto* label = new juce::Label();
-    label->setText(buttonName + " clicked", juce::dontSendNotification);
-    label->setColour(juce::Label::textColourId, juce::Colours::whitesmoke);
-    label->setJustificationType(juce::Justification::centred);
-    launchOptions.content.setOwned(label);
-    launchOptions.content->setVisible(true);
-
-    launchOptions.dialogTitle = "Dialogowe okno!";
-    launchOptions.dialogBackgroundColour = juce::Colour(0xff0e345a);
-    launchOptions.escapeKeyTriggersCloseButton = true;
-    launchOptions.useNativeTitleBar = false;
-    launchOptions.resizable = true;
-
-    dialogWindow = launchOptions.launchAsync();
-    dialogWindow->centreWithSize(300, 300);
-}
-
 void ToolbarFactory::buttonClicked(juce::Button* button)
 {
-    if(button == previousButton)
-    {
-        previousButtonClicked();
-    }
-    else if(button == nextButton)
-    {
-        nextButtonClicked();
-    }
-    else if(button == replayButton)
-    {
-        replayButtonClicked();
-    }
-    else if(button == playPauseButton)
+    if(button == playPauseButton)
     {
         playPauseButtonClicked();
-    }
-    else if(button == startRecordingButton)
-    {
-        startRecordingButtonClicked();
     }
     else if(button == stopButton)
     {
@@ -198,9 +112,6 @@ void ToolbarFactory::buttonClicked(juce::Button* button)
     }
 }
 
-void ToolbarFactory::previousButtonClicked() const { temporaryButtonsFunction("previousButton"); }
-void ToolbarFactory::nextButtonClicked() const { temporaryButtonsFunction("nextButton"); }
-void ToolbarFactory::replayButtonClicked() const { temporaryButtonsFunction("replayButton"); }
 void ToolbarFactory::playPauseButtonClicked()
 {
     if(isClipSplitActive)
@@ -212,7 +123,7 @@ void ToolbarFactory::playPauseButtonClicked()
     tree.setProperty(ValueTreeIDs::playPauseButtonClicked, true, nullptr);
     tree.setProperty(ValueTreeIDs::playPauseButtonClicked, ValueTreeConstants::doNothing, nullptr);
 }
-void ToolbarFactory::startRecordingButtonClicked() const { temporaryButtonsFunction("startRecordingButton"); }
+
 void ToolbarFactory::stopButtonClicked() const
 {
     tree.setProperty(ValueTreeIDs::stopButtonClicked, true, nullptr);
@@ -240,8 +151,6 @@ void ToolbarFactory::followModeButtonClicked() const
                        });
 }
 
-// TODO: think about handling clicking outside of tracks region when isClipSplitActive == true.
-// Eg. Should it be turned off in that case or should other actions be restricted etc.
 void ToolbarFactory::clipSplitButtonClicked()
 {
     isClipSplitActive = not isClipSplitActive;

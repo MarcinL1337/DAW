@@ -9,18 +9,19 @@
 #include "Toolbar/MainToolbar.h"
 #include "TopMenu/Menu.h"
 #include "TrackManager.h"
-#include "TrackPlayer/Timeline.h"
 #include "TrackPlayer/TrackGuiManager.h"
 
 class MainComponent final : public juce::Component
 {
 public:
     MainComponent();
-    void paint(juce::Graphics&) override;
-    void resized() override;
-    void flexBoxInit();
 
 private:
+    void paint(juce::Graphics&) override;
+    void resized() override;
+    bool keyPressed(const juce::KeyPress& key) override;
+    void flexBoxInit();
+
     juce::Identifier treeType{"mainComponentValueTree"};
     juce::ValueTree tree{treeType};
 

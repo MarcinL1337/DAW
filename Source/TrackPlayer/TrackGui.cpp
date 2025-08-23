@@ -60,7 +60,6 @@ void TrackGui::handleRightMouseClick(const juce::MouseEvent& event)
     showPopUpMenuForTrack(event.mouseDownPosition.x);
 }
 
-// TODO: track delete bug
 void TrackGui::mouseDown(const juce::MouseEvent& event)
 {
     if(event.mods.isRightButtonDown())
@@ -204,7 +203,7 @@ void TrackGui::triggerTrackGuiAction(const juce::Identifier& actionId) const
         trackPlayer->trackGuiVector.begin(),
         std::ranges::find_if(trackPlayer->trackGuiVector, [this](auto& trackGui) { return this == trackGui.get(); }));
 
-    tree.setProperty(actionId, currentTrackIndex, nullptr);
+    tree.setProperty(actionId, static_cast<int>(currentTrackIndex), nullptr);
     tree.setProperty(actionId, ValueTreeConstants::doNothing, nullptr);
 }
 
@@ -215,7 +214,7 @@ void TrackGui::handleClipDelete(const Waveform& clipWaveform)
         trackPlayer->trackGuiVector.begin(),
         std::ranges::find_if(trackPlayer->trackGuiVector, [this](auto& trackGui) { return this == trackGui.get(); }));
 
-    const juce::Array<juce::var> deletedClipInfo{currentTrackIndex,
+    const juce::Array<juce::var> deletedClipInfo{static_cast<int>(currentTrackIndex),
                                                  static_cast<int>(clipWaveform.getAudioClipID().uid)};
     tree.setProperty(ValueTreeIDs::deleteAudioClip, deletedClipInfo, nullptr);
 
@@ -267,7 +266,7 @@ void TrackGui::handleClipSplit(const juce::MouseEvent& event)
                 (event.mouseDownPosition.x - static_cast<float>(waveformOffset)) / static_cast<float>(waveformWidth);
 
             const juce::Array<juce::var> splitClipInfo{
-                currentTrackIndex, static_cast<int>(waveform->getAudioClipID().uid), waveformSplit};
+                static_cast<int>(currentTrackIndex), static_cast<int>(waveform->getAudioClipID().uid), waveformSplit};
 
             waveforms.erase(std::ranges::find_if(
                 waveforms, [&waveform](auto& waveformPtr) { return waveformPtr.get() == waveform.get(); }));
