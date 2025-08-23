@@ -63,28 +63,28 @@ void ProjectFilesManager::openProject()
 {
     if(isDirty)
     {
-        const auto options = juce::MessageBoxOptions()
-                                 .withIconType(juce::MessageBoxIconType::QuestionIcon)
-                                 .withTitle("Unsaved Changes")
-                                 .withMessage("You have unsaved changes. Do you want to save before opening another project?")
-                                 .withButton("Save and Open")
-                                 .withButton("Open Without Saving")
-                                 .withButton("Cancel");
+        const auto options =
+            juce::MessageBoxOptions()
+                .withIconType(juce::MessageBoxIconType::QuestionIcon)
+                .withTitle("Unsaved Changes")
+                .withMessage("You have unsaved changes. Do you want to save before opening another project?")
+                .withButton("Save and Open")
+                .withButton("Open Without Saving")
+                .withButton("Cancel");
 
-        juce::AlertWindow::showAsync(
-            options,
-            [this](const int result)
-            {
-                if(result == 1)
-                {
-                    saveProject();
-                    openProjectInternal();
-                }
-                else if(result == 2)
-                {
-                    openProjectInternal();
-                }
-            });
+        juce::AlertWindow::showAsync(options,
+                                     [this](const int result)
+                                     {
+                                         if(result == 1)
+                                         {
+                                             saveProject();
+                                             openProjectInternal();
+                                         }
+                                         else if(result == 2)
+                                         {
+                                             openProjectInternal();
+                                         }
+                                     });
     }
     else
     {
@@ -106,7 +106,6 @@ void ProjectFilesManager::openProjectInternal()
                                        }
                                    });
 }
-
 
 void ProjectFilesManager::saveProject()
 {
