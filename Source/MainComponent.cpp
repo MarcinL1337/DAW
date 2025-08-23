@@ -36,6 +36,26 @@ bool MainComponent::keyPressed(const juce::KeyPress& key)
         return topLevelMenu.keyPressed(key);
     }
 
+    if(key == juce::KeyPress('o', juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('s', juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('s', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('a', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
     if(key == juce::KeyPress('h', juce::ModifierKeys::ctrlModifier, 0))
     {
         return topLevelMenu.keyPressed(key);
@@ -49,8 +69,13 @@ bool MainComponent::keyPressed(const juce::KeyPress& key)
 
     if(key == juce::KeyPress::spaceKey)
     {
-        tree.setProperty(ValueTreeIDs::playPauseButtonClicked, true, nullptr);
-        tree.setProperty(ValueTreeIDs::playPauseButtonClicked, ValueTreeConstants::doNothing, nullptr);
+        mainToolbar.toolbarFactory.playPauseButtonClicked();
+        return true;
+    }
+
+    if(key == juce::KeyPress::backspaceKey)
+    {
+        mainToolbar.toolbarFactory.stopButtonClicked();
         return true;
     }
 

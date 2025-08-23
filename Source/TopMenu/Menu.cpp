@@ -25,7 +25,13 @@ void Menu::paint(juce::Graphics& g)
 
 void Menu::setKeyMapping()
 {
-    keyPressMappingSet.addKeyPress(openFile, juce::KeyPress('n', juce::ModifierKeys::ctrlModifier, 0));
+    keyPressMappingSet.addKeyPress(newProject, juce::KeyPress('n', juce::ModifierKeys::ctrlModifier, 0));
+    keyPressMappingSet.addKeyPress(openProject, juce::KeyPress('o', juce::ModifierKeys::ctrlModifier, 0));
+    keyPressMappingSet.addKeyPress(saveProject, juce::KeyPress('s', juce::ModifierKeys::ctrlModifier, 0));
+    keyPressMappingSet.addKeyPress(
+        saveProjectAs, juce::KeyPress('s', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier, 0));
+    keyPressMappingSet.addKeyPress(
+        addAudioFile, juce::KeyPress('a', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier, 0));
     keyPressMappingSet.addKeyPress(howToUse, juce::KeyPress('h', juce::ModifierKeys::ctrlModifier, 0));
 }
 
@@ -40,9 +46,10 @@ juce::PopupMenu Menu::getMenuForIndex(const int index, [[maybe_unused]] const ju
     switch(index)
     {
         case file:
-            options.addCommandItem(&commandManager, openFile);
-            options.addCommandItem(&commandManager, saveFile);
-            options.addCommandItem(&commandManager, saveAsFile);
+            options.addCommandItem(&commandManager, newProject);
+            options.addCommandItem(&commandManager, openProject);
+            options.addCommandItem(&commandManager, saveProject);
+            options.addCommandItem(&commandManager, saveProjectAs);
             options.addCommandItem(&commandManager, addAudioFile);
             break;
         case help:
@@ -61,7 +68,8 @@ juce::ApplicationCommandTarget* Menu::getNextCommandTarget() { return findFirstT
 
 void Menu::getAllCommands(juce::Array<juce::CommandID>& c)
 {
-    const juce::Array<juce::CommandID> allCommands{newFile, openFile, saveFile, saveAsFile, addAudioFile, howToUse};
+    const juce::Array<juce::CommandID> allCommands{
+        newProject, openProject, saveProject, saveProjectAs, addAudioFile, howToUse};
     c.addArray(allCommands);
 }
 
@@ -69,20 +77,24 @@ void Menu::getCommandInfo(const juce::CommandID commandID, juce::ApplicationComm
 {
     switch(commandID)
     {
-        case openFile:
-            result.setInfo("Open a file", "Opens a file", "File", 0);
+        case newProject:
+            result.setInfo("New project", "Creates a new project", "File", 0);
             result.addDefaultKeypress('n', juce::ModifierKeys::ctrlModifier);
             break;
-        case saveFile:
-            result.setInfo("SaveFile", "Saves a file", "File", 0);
+        case openProject:
+            result.setInfo("Open project", "Opens an existing project", "File", 0);
+            result.addDefaultKeypress('o', juce::ModifierKeys::ctrlModifier);
+            break;
+        case saveProject:
+            result.setInfo("Save project", "Saves current project", "File", 0);
             result.addDefaultKeypress('s', juce::ModifierKeys::ctrlModifier);
             break;
-        case saveAsFile:
-            result.setInfo("SaveAsFile", "Saves as a specified file", "File", 0);
+        case saveProjectAs:
+            result.setInfo("Save project as", "Saves current project as", "File", 0);
             result.addDefaultKeypress('s', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier);
             break;
         case addAudioFile:
-            result.setInfo("AddAudioFile", "Adds audio file to new track", "File", 0);
+            result.setInfo("Add audio file", "Adds new audio file to project", "File", 0);
             result.addDefaultKeypress('a', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier);
             break;
         case howToUse:
@@ -98,19 +110,19 @@ bool Menu::perform(const InvocationInfo& info)
 {
     switch(info.commandID)
     {
-        case newFile:
+        case newProject:
             tree.setProperty(ValueTreeIDs::createNewProject, true, nullptr);
             tree.setProperty(ValueTreeIDs::createNewProject, ValueTreeConstants::doNothing, nullptr);
             break;
-        case openFile:
+        case openProject:
             tree.setProperty(ValueTreeIDs::openProject, true, nullptr);
             tree.setProperty(ValueTreeIDs::openProject, ValueTreeConstants::doNothing, nullptr);
             break;
-        case saveFile:
+        case saveProject:
             tree.setProperty(ValueTreeIDs::saveProject, true, nullptr);
             tree.setProperty(ValueTreeIDs::saveProject, ValueTreeConstants::doNothing, nullptr);
             break;
-        case saveAsFile:
+        case saveProjectAs:
             tree.setProperty(ValueTreeIDs::saveAsProject, true, nullptr);
             tree.setProperty(ValueTreeIDs::saveAsProject, ValueTreeConstants::doNothing, nullptr);
             break;
@@ -148,18 +160,19 @@ void Menu::openHelp()
 {
     juce::DialogWindow::LaunchOptions launchOptions;
 
-    std::string helpContent =
+    const std::string helpContent =
         "How to Use This App\n"
-        "================================\n\n"
+        "=========================================\n\n"
         "Getting Started:\n"
         "1. Open an existing project via Ctrl + o or from menu File -> Open project\n"
-        "   or save a fresh project one via Ctrl + Shift + s or from menu File -> Save as\n"
-        "2. Load an audio file via Ctrl + n or from menu File -> Open file\n"
-        "3. Save current project via Ctrl + s or from menu File -> Save\n\n"
+        "   or save a fresh project one via Ctrl + Shift + s or from menu File -> Save project as\n"
+        "2. Load an audio file via Ctrl + Shift + a or from menu File -> Add audio file\n"
+        "3. Save current project via Ctrl + s or from menu File -> Save project\n"
+        "4. Open new project via Ctrl + n or from menu File -> New project\n\n"
         "Basic Controls:\n"
         "• Play/Pause: Space bar or click the play/pause button in the toolbar\n"
         "• Stop: Backspace or click the stop button in the toolbar\n"
-        "• Turn on/off split mode for clips: s or click the split button in the toolbar\n"
+        "• Turn on/off split mode for clips: click the split button in the toolbar\n"
         "• Follow mode for the playhead: Click the follow mode button in the toolbar\n"
         "• Track currently played second via the counter in the top right corner\n"
         "• Track the time of splitting an audio clip when split mode is active in the top right\n\n"

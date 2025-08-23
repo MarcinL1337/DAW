@@ -49,10 +49,10 @@ private:
     enum LowerLevelMenuOptions
     {
         // File
-        newFile = 1,
-        openFile,
-        saveFile,
-        saveAsFile,
+        newProject = 1,
+        openProject,
+        saveProject,
+        saveProjectAs,
         addAudioFile,
         // Help
         howToUse

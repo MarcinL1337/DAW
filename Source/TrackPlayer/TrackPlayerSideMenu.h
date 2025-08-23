@@ -47,9 +47,9 @@ private:
     void setupSoloButton(const std::unique_ptr<juce::TextButton>& soloButton, juce::Rectangle<int>& buttonArea,
                          const uint16_t currentRow) const;
     void setupMuteButton(const std::unique_ptr<juce::TextButton>& muteButton, juce::Rectangle<int>& buttonArea,
-                         const uint16_t currentRow);
+                         const uint16_t currentRow) const;
     void setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel, juce::Rectangle<int>& trackNameArea,
-                             const uint16_t currentRow);
+                             const uint16_t currentRow) const;
 
     juce::Rectangle<int> getCurrentTrackButtonsArea(const uint16_t currentRow) const;
     juce::Rectangle<int> getCurrentTrackNameArea(const uint16_t currentRow) const;

@@ -217,7 +217,7 @@ void TrackPlayerSideMenu::setupMuteButton(const std::unique_ptr<juce::TextButton
 }
 
 void TrackPlayerSideMenu::setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel,
-                                              juce::Rectangle<int>& trackNameArea, const uint16_t currentRow)
+                                              juce::Rectangle<int>& trackNameArea, const uint16_t currentRow) const
 {
     trackNameLabel->setBounds(trackNameArea.removeFromRight(0.9 * trackNameArea.getWidth()));
     trackNameLabel->setEditable(false, true, false);

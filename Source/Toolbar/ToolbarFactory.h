@@ -61,5 +61,7 @@ private:
     juce::ValueTree& tree;
 
     bool isClipSplitActive{false};
+
+    friend class MainComponent;
 };
 
