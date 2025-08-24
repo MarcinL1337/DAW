@@ -19,6 +19,7 @@ MainComponent::MainComponent() :
     flexBoxInit();
 
     projectFilesManager.openTestProject();
+    setWantsKeyboardFocus(true);
 }
 
 void MainComponent::paint(juce::Graphics& g)
@@ -27,6 +28,59 @@ void MainComponent::paint(juce::Graphics& g)
 }
 
 void MainComponent::resized() { topLevelFlexBox.performLayout(getLocalBounds()); }
+
+bool MainComponent::keyPressed(const juce::KeyPress& key)
+{
+    if(key == juce::KeyPress('n', juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('o', juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('s', juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('s', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('a', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('h', juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('=', juce::ModifierKeys::shiftModifier, 0))
+    {
+        trackManager.addTrack();
+        return true;
+    }
+
+    if(key == juce::KeyPress::spaceKey)
+    {
+        mainToolbar.toolbarFactory.playPauseButtonClicked();
+        return true;
+    }
+
+    if(key == juce::KeyPress::backspaceKey)
+    {
+        mainToolbar.toolbarFactory.stopButtonClicked();
+        return true;
+    }
+
+    return false;
+}
 
 void MainComponent::flexBoxInit()
 {

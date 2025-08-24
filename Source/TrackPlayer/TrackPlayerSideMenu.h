@@ -5,14 +5,12 @@
 
 struct trackControls
 {
-    std::unique_ptr<juce::TextButton> recordButton;
     std::unique_ptr<juce::TextButton> soloButton;
     std::unique_ptr<juce::TextButton> muteButton;
     std::unique_ptr<juce::Label> trackNameLabel;
 
     void setAlpha(const float alpha) const
     {
-        recordButton->setAlpha(alpha);
         soloButton->setAlpha(alpha);
         muteButton->setAlpha(alpha);
         trackNameLabel->setAlpha(alpha);
@@ -46,14 +44,12 @@ private:
     void mouseDrag(const juce::MouseEvent& event) override;
     void mouseUp(const juce::MouseEvent& event) override;
 
-    void setupRecordButton(const std::unique_ptr<juce::TextButton>& recordButton, juce::Rectangle<int>& buttonArea,
-                           const uint16_t currentRow);
     void setupSoloButton(const std::unique_ptr<juce::TextButton>& soloButton, juce::Rectangle<int>& buttonArea,
-                         const uint16_t currentRow);
+                         const uint16_t currentRow) const;
     void setupMuteButton(const std::unique_ptr<juce::TextButton>& muteButton, juce::Rectangle<int>& buttonArea,
-                         const uint16_t currentRow);
+                         const uint16_t currentRow) const;
     void setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel, juce::Rectangle<int>& trackNameArea,
-                             const uint16_t currentRow);
+                             const uint16_t currentRow) const;
 
     juce::Rectangle<int> getCurrentTrackButtonsArea(const uint16_t currentRow) const;
     juce::Rectangle<int> getCurrentTrackNameArea(const uint16_t currentRow) const;

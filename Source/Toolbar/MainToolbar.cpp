@@ -16,7 +16,7 @@ void MainToolbar::resized()
     timeBarValueArea = getLocalBounds().reduced(0.47f * getWidth(), 2).withX(0.94f * getWidth());
     timeBarValueLabel.setBounds(timeBarValueArea);
 
-    splitSecondsArea = getLocalBounds().reduced(0.47f * getWidth(), 2).withX(0.85f * getWidth());
+    splitSecondsArea = getLocalBounds().reduced(0.47f * getWidth(), 2).withX(0.88f * getWidth());
     splitSecondsLabel.setBounds(splitSecondsArea);
 }
 
@@ -50,7 +50,7 @@ void MainToolbar::paintSplitSecondsValue(juce::Graphics& g)
     oss.str("");
     oss.clear();
     oss << std::fixed << std::setprecision(2) << splitSeconds;
-    splitSecondsLabel.setText(oss.str() + "s", juce::dontSendNotification);
+    splitSecondsLabel.setText("split at: " + oss.str() + "s", juce::dontSendNotification);
 }
 
 void MainToolbar::initTimeBarValueLabel()

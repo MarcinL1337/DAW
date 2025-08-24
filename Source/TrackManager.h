@@ -10,7 +10,6 @@
 #include "TrackPlayer/TrackGuiManager.h"
 
 class TrackManager final : public juce::Component,
-                           public juce::KeyListener,
                            public juce::ValueTree::Listener
 {
 public:
@@ -32,9 +31,6 @@ public:
     static void handleWriteToFile(juce::AudioFormatReader& reader, const juce::AudioFormatManager& formatManager,
                                   const juce::File& destFile, const int numOfSamplesToWrite,
                                   const int readerOffsetInSamples);
-    bool moveAudioClipBetweenTracks(int sourceTrackIndex, int destTrackIndex, NodeID clipId);  // to be implemented
-
-    bool keyPressed(const juce::KeyPress& key, Component* originatingComponent) override;
 
     void setTrackProperty(int trackIndex, AudioClipProperty property, bool boolValue) const;
     void setTrackProperty(int trackIndex, AudioClipProperty property, float floatValue) const;

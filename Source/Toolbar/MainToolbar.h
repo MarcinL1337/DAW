@@ -34,4 +34,6 @@ private:
     bool isClipSplitActive{false};
     juce::Rectangle<int> timeBarValueArea{};
     juce::Rectangle<int> splitSecondsArea{};
+
+    friend class MainComponent;
 };

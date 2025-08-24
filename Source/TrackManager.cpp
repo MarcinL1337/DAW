@@ -4,7 +4,6 @@
 TrackManager::TrackManager(TrackGuiManager& trackGuiManagerRef, MainAudio& mainAudioRef, SideMenu& sideMenuRef) :
     trackGuiManager{trackGuiManagerRef}, mainAudio{mainAudioRef}, sideMenu{sideMenuRef}, tree{trackGuiManagerRef.tree}
 {
-    trackGuiManagerRef.addKeyListener(this);
     tree.addListener(this);
 }
 
@@ -224,16 +223,6 @@ void TrackManager::splitAudioClip(const int trackIndex, const NodeID clipId, con
     assert(removeAudioClipFromTrack(trackIndex, clipId));
 }
 
-bool TrackManager::keyPressed(const juce::KeyPress& key, Component* originatingComponent)
-{
-    if(key.getModifiers().isShiftDown() && key.getTextCharacter() == '+')
-    {
-        addTrack();
-        return true;
-    }
-    return false;
-}
-
 void TrackManager::setTrackProperty(const int trackIndex, const AudioClipProperty property, const bool boolValue) const
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
@@ -422,7 +411,6 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
     }
 }
 
-// TODO: maybe this shouldn't be in this class. Add this to TrackManager refactor
 void TrackManager::changeTrackOrder(const int fromIndex, const int toIndex)
 {
     auto trackToMove = std::move(tracks[fromIndex]);

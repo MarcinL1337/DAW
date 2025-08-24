@@ -44,22 +44,14 @@ private:
 
     enum ToolbarElementsIds
     {
-        previous = 1,
-        next,
-        replay,
-        playPause,
-        startRecording,
+        playPause = 1,
         stop,
         clipSplit,
         followMode
     };
 
     // Main Toolbar buttons
-    juce::ToolbarButton* previousButton{nullptr};
-    juce::ToolbarButton* nextButton{nullptr};
     juce::ToolbarButton* playPauseButton{nullptr};
-    juce::ToolbarButton* replayButton{nullptr};
-    juce::ToolbarButton* startRecordingButton{nullptr};
     juce::ToolbarButton* stopButton{nullptr};
     juce::ToolbarButton* followModeButton{nullptr};
 
@@ -69,5 +61,7 @@ private:
     juce::ValueTree& tree;
 
     bool isClipSplitActive{false};
+
+    friend class MainComponent;
 };
 
