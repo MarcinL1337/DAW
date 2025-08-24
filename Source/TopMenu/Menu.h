@@ -25,7 +25,6 @@ private:
     bool perform(const InvocationInfo& info) override;
 
     void setKeyMapping();
-    void openFileButtonClicked();
     void openHelp();
 
     std::unique_ptr<juce::MenuBarComponent> menuBarComponent;

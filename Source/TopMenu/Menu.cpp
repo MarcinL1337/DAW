@@ -139,23 +139,6 @@ bool Menu::perform(const InvocationInfo& info)
     return true;
 }
 
-void Menu::openFileButtonClicked()
-{
-    const auto folderChooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles |
-                                    juce::FileBrowserComponent::canSelectDirectories;
-    fileChooser.launchAsync(folderChooserFlags,
-                            [this](const juce::FileChooser& chooser)
-                            {
-                                auto selectedFileFullPath{chooser.getResult().getFullPathName()};
-                                if(selectedFileFullPath.isNotEmpty())
-                                {
-                                    tree.setProperty(
-                                        ValueTreeIDs::newAudioFile, ValueTreeConstants::doNothing, nullptr);
-                                    tree.setProperty(ValueTreeIDs::newAudioFile, selectedFileFullPath, nullptr);
-                                }
-                            });
-}
-
 void Menu::openHelp()
 {
     juce::DialogWindow::LaunchOptions launchOptions;
