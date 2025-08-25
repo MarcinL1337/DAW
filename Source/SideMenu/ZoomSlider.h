@@ -6,7 +6,7 @@ class ZoomSlider final : public juce::Slider
 public:
     ZoomSlider();
 
-    double snapValue(double attemptedValue, DragMode dragMode) override;
+    double snapValue(const double attemptedValue, DragMode dragMode) override;
 
 private:
     juce::Label zoomSliderLabel;

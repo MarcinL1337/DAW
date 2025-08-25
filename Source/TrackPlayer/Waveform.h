@@ -24,19 +24,23 @@ public:
     double getOffsetSeconds() const { return offsetSeconds; }
 
     void mouseDrag(const juce::MouseEvent& event) override;
+    void mouseDown(const juce::MouseEvent& event) override;
+    void mouseMove(const juce::MouseEvent& event) override;
+    void mouseEnter(const juce::MouseEvent& event) override;
+    void mouseExit(const juce::MouseEvent& event) override;
 
 private:
     void paint(juce::Graphics& g) override;
     void drawWaveformWithFade(juce::Graphics& g, const juce::Rectangle<int>& bounds);
     void resized() override;
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
+    static void initStaticData();
 
-    // TODO: when TrackManager will be ready, think if formatReader and formatManager are necessary here
-    juce::AudioBuffer<float> samplesBuffer{};
-    juce::AudioFormatReader* formatReader{nullptr};  // change to unique_ptr -> for now it stays as is
-    juce::AudioFormatManager formatManager;
-    juce::AudioThumbnailCache audioThumbnailCache;
-    juce::AudioThumbnail audioThumbnail;
+    juce::AudioFormatReader* formatReader{nullptr};
+    static juce::AudioFormatManager formatManager;
+    static std::unique_ptr<juce::AudioThumbnailCache> audioThumbnailCache;
+    std::unique_ptr<juce::AudioThumbnail> audioThumbnail;
+    inline static bool isStaticDataInitialized{false};
 
     juce::ValueTree& tree;
 

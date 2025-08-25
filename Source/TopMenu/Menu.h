@@ -7,8 +7,10 @@ class Menu final : public juce::Component,
                    public juce::MenuBarModel
 {
 public:
-    Menu(const juce::ValueTree& parentTree);
+    explicit Menu(juce::ValueTree& parentTree);
     ~Menu() override;
+
+    bool keyPressed(const juce::KeyPress& key) override;
 
 private:
     void resized() override;
@@ -22,40 +24,36 @@ private:
     void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
     bool perform(const InvocationInfo& info) override;
 
-    void openFileButtonClicked();
+    void setKeyMapping();
+    void openHelp();
 
     std::unique_ptr<juce::MenuBarComponent> menuBarComponent;
     juce::ApplicationCommandManager commandManager;
-    juce::ValueTree tree;
+    juce::KeyPressMappingSet keyPressMappingSet;
+    juce::ValueTree& tree;
 
     std::string fileChooserDialogText{"Choose an audio file to open"};
     juce::File fileChooserStartDirectory{juce::File::getSpecialLocation(juce::File::userMusicDirectory)};
     std::string fileChooserValidFileExtensions{"*.wav;*.mp3"};
     juce::FileChooser fileChooser{fileChooserDialogText, fileChooserStartDirectory, fileChooserValidFileExtensions};
 
-    juce::StringArray menuBarNames{"File", "Edit", "View", "Help"};
+    juce::StringArray menuBarNames{"File", "Help"};
 
     enum TopLevelMenuOptions
     {
         file = 0,
-        edit,
-        view,
         help
     };
 
     enum LowerLevelMenuOptions
     {
         // File
-        newFile = 1,
-        openFile,
-        saveFile,
-        saveAsFile,
-        // Edit
-        undo,
-        redo,
-        // View
-        view1,
+        newProject = 1,
+        openProject,
+        saveProject,
+        saveProjectAs,
+        addAudioFile,
         // Help
-        help1
+        howToUse
     };
 };

@@ -7,24 +7,33 @@ class MainToolbar final : public juce::Component,
                           public juce::ValueTree::Listener
 {
 public:
-    explicit MainToolbar(const juce::ValueTree& parentTree);
+    explicit MainToolbar(juce::ValueTree& parentTree);
     ~MainToolbar() override = default;
 
 private:
     void resized() override;
     void paint(juce::Graphics& g) override;
 
-    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged, const juce::Identifier& property) override;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
 
     void paintTimeBarValue(juce::Graphics& g);
+    void paintSplitSecondsValue(juce::Graphics& g);
     void initTimeBarValueLabel();
+    void initSplitSecondsLabel();
 
     juce::Label timeBarValueLabel;
-    juce::ValueTree tree;
+    juce::Label splitSecondsLabel;
+    juce::ValueTree& tree;
     juce::Toolbar toolbar;
     ToolbarFactory toolbarFactory;
 
     std::ostringstream oss;
     float timeBarValue{0.0f};
+    float splitSeconds{0.0f};
+    bool isClipSplitActive{false};
     juce::Rectangle<int> timeBarValueArea{};
+    juce::Rectangle<int> splitSecondsArea{};
+
+    friend class MainComponent;
 };

@@ -35,7 +35,6 @@ constexpr float sideMenuWidthRatio{0.15f};
 namespace ValueTreeConstants
 {
 constexpr int doNothing{0x42abcdef};
-constexpr int noTrackSelected{-1};
 }  // namespace ValueTreeConstants
 
 namespace ValueTreeIDs
@@ -47,15 +46,21 @@ inline static const juce::Identifier isCurrentlyDraggingTimeBar{"isCurrentlyDrag
 inline static const juce::Identifier setPlayheadPosition{"setPlayheadPosition"};
 inline static const juce::Identifier followModeChanged{"followModeChanged"};
 
+inline static const juce::Identifier isPlaying{"isPlaying"};
 inline static const juce::Identifier soloButtonClicked{"soloButtonClicked"};
 inline static const juce::Identifier muteButtonClicked{"muteButtonClicked"};
 inline static const juce::Identifier newAudioFile{"newAudioFile"};
 
 inline static const juce::Identifier trackGainChanged{"trackGainChanged"};
-inline static const juce::Identifier trackFaderChanged{"trackFaderChanged"};
-inline static const juce::Identifier trackDelayChanged{"trackDelayChanged"};
+inline static const juce::Identifier trackPanChanged{"trackPanChanged"};
 inline static const juce::Identifier trackReverbChanged{"trackReverbChanged"};
-inline static const juce::Identifier trackBassBoostChanged{"trackBassBoostChanged"};
+inline static const juce::Identifier trackRoomSizeChanged{"trackRoomSizeChanged"};
+inline static const juce::Identifier trackDampChanged{"trackDampChanged"};
+inline static const juce::Identifier trackWetLevelChanged{"trackWetLevelChanged"};
+inline static const juce::Identifier trackDryLevelChanged{"trackDryLevelChanged"};
+inline static const juce::Identifier trackWidthChanged{"trackWidthChanged"};
+inline static const juce::Identifier trackFreezeChanged{"trackFreezeChanged"};
+inline static const juce::Identifier trackNameChanged{"trackNameChanged"};
 
 inline static const juce::Identifier trackPlayerZoomPercentage{"trackPlayerZoomPercentage"};
 inline static const juce::Identifier numOfSecondsChanged{"numOfSecondsChanged"};
@@ -68,9 +73,27 @@ inline static const juce::Identifier deleteAudioClip{"deleteAudioClip"};
 inline static const juce::Identifier copyAudioClip{"copyAudioClip"};
 inline static const juce::Identifier pasteAudioClip{"pasteAudioClip"};
 
+inline static const juce::Identifier splitAudioClip{"splitAudioClip"};
+inline static const juce::Identifier toggleSplitAudioClipMode{"toggleSplitAudioClipMode"};
+inline static const juce::Identifier splitSecondsChanged{"splitSecondsChanged"};
+
 inline static const juce::Identifier audioClipFadeChanged{"audioClipFadeChanged"};
 
 inline static const juce::Identifier reorderTracks{"reorderTracks"};
+
+inline static const juce::Identifier createNewProject{"createNewProject"};
+inline static const juce::Identifier openProject{"openProject"};
+inline static const juce::Identifier saveProject{"saveProject"};
+inline static const juce::Identifier saveAsProject{"saveAsProject"};
+inline static const juce::Identifier addAudioFile{"addAudioFile"};
+inline static const juce::Identifier projectDirtyStateChanged{"projectDirtyStateChanged"};
+inline static const juce::Identifier projectAudioDir{"projectAudioDir"};
+
+inline static const juce::Identifier clearAllTracks{"clearAllTracks"};
+inline static const juce::Identifier tracksJsonExported{"tracksJsonExported"};
+inline static const juce::Identifier createTrackFromJson{"createTrackFromJson"};
+inline static const juce::Identifier exportTracksToJson{"exportTracksToJson"};
+inline static const juce::Identifier addAudioFileToNewTrack{"addAudioFileToNewTrack"};
 }  // namespace ValueTreeIDs
 
 namespace PlayheadFollowConstants

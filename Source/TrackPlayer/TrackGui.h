@@ -2,19 +2,20 @@
 
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "../Constants.h"
+#include "ClipSplitBar.h"
 #include "Waveform.h"
 
 class TrackGuiManager;
 
 class TrackGui final : public juce::Component,
-                       public juce::DragAndDropTarget
+                       public juce::ValueTree::Listener ,public juce::DragAndDropTarget
 {
 public:
     explicit TrackGui(uint16_t boxWidth, int numOfSeconds, juce::ValueTree& parentTree);
 
     TrackGui(const TrackGui&) = delete;
     TrackGui& operator=(const TrackGui&) = delete;
-    ~TrackGui() override = default;
+    ~TrackGui() override { tree.removeListener(this); }
 
     float getBoxWidthToFloat() const { return currentBoxWidth; }
     float getBoxHeightToFloat() const { return currentBoxHeight; }
@@ -34,6 +35,11 @@ private:
     void paint(juce::Graphics& g) override;
     void resized() override;
     void mouseDown(const juce::MouseEvent& event) override;
+    void mouseMove(const juce::MouseEvent& event) override;
+    void mouseEnter(const juce::MouseEvent& event) override;
+    void mouseExit(const juce::MouseEvent& event) override;
+    void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
+                                  const juce::Identifier& property) override;
 
     void makeNewWaveformFromAudioFilePath(const juce::String& newAudioFilePath, NodeID newAudioClipID);
     static juce::PopupMenu initPopUpMenuForTrack();
@@ -45,6 +51,10 @@ private:
     void handleClipCopy(const Waveform& clipWaveform);
     void handleClipCut(const Waveform& clipWaveform);
     void handleClipPaste(const float clickOffset);
+    void handleClipSplit(const juce::MouseEvent& event);
+
+    void handleLeftMouseClick(const juce::MouseEvent& event);
+    void handleRightMouseClick(const juce::MouseEvent& event);
 
     bool isInterestedInDragSource(const SourceDetails& dragSourceDetails) override;
     void itemDropped(const SourceDetails& dragSourceDetails) override;
@@ -63,6 +73,9 @@ private:
     };
 
     inline static bool isAnyWaveformCopied{false};
+    inline static bool isClipSplitActive{false};
+    static ClipSplitBar clipSplitBar;
+
     std::vector<std::unique_ptr<Waveform>> waveforms{};
     juce::ValueTree& tree;
 

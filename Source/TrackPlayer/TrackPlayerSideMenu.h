@@ -5,14 +5,12 @@
 
 struct trackControls
 {
-    std::unique_ptr<juce::TextButton> recordButton;
     std::unique_ptr<juce::TextButton> soloButton;
     std::unique_ptr<juce::TextButton> muteButton;
     std::unique_ptr<juce::Label> trackNameLabel;
 
     void setAlpha(const float alpha) const
     {
-        recordButton->setAlpha(alpha);
         soloButton->setAlpha(alpha);
         muteButton->setAlpha(alpha);
         trackNameLabel->setAlpha(alpha);
@@ -33,6 +31,8 @@ public:
     void removeTrackControls(int trackIndex);
     void addTrackControls();
     void updateTrackButtonStates(int trackIndex, bool muted, bool soloed) const;
+    void clearAllTracks();
+    void setTrackName(int trackIndex, const juce::String& name) const;
 
     uint16_t getCurrentNumberOfTracks() const { return currentNumberOfTracks; }
     void incrementCurrentNumberOfTracks() { currentNumberOfTracks++; }
@@ -44,13 +44,12 @@ private:
     void mouseDrag(const juce::MouseEvent& event) override;
     void mouseUp(const juce::MouseEvent& event) override;
 
-    void setupRecordButton(const std::unique_ptr<juce::TextButton>& recordButton, juce::Rectangle<int>& buttonArea,
-                           const uint16_t currentRow);
     void setupSoloButton(const std::unique_ptr<juce::TextButton>& soloButton, juce::Rectangle<int>& buttonArea,
-                         const uint16_t currentRow);
+                         const uint16_t currentRow) const;
     void setupMuteButton(const std::unique_ptr<juce::TextButton>& muteButton, juce::Rectangle<int>& buttonArea,
-                         const uint16_t currentRow);
-    void setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel, juce::Rectangle<int>& trackNameArea);
+                         const uint16_t currentRow) const;
+    void setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel, juce::Rectangle<int>& trackNameArea,
+                             const uint16_t currentRow) const;
 
     juce::Rectangle<int> getCurrentTrackButtonsArea(const uint16_t currentRow) const;
     juce::Rectangle<int> getCurrentTrackNameArea(const uint16_t currentRow) const;
@@ -63,14 +62,14 @@ private:
 
     std::vector<trackControls> trackControlsVector{};
 
-    int currentSelectedTrack{0};
+    int currentSelectedTrack{TrackPlayerConstants::noTrackChosen};
     uint16_t currentNumberOfTracks{0u};
     uint16_t trackButtonsSize{};
     uint16_t buttonMargin{};
     uint16_t currentTrackGuiBoxHeight{TrackPlayerConstants::startBoxHeight};
 
-    int draggedTrackIndex{-1};
-    int dropTargetTrackIndex{-1};
+    int draggedTrackIndex{TrackPlayerConstants::noTrackChosen};
+    int dropTargetTrackIndex{TrackPlayerConstants::noTrackChosen};
     bool isDragging{false};
     juce::Point<int> currentDragPosition;
     static constexpr float dragScaleFactor{0.9f};

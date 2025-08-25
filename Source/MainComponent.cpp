@@ -1,24 +1,25 @@
 #include "MainComponent.h"
 
 MainComponent::MainComponent() :
-    mainAudio(tree),
-    topLevelMenu(tree),
-    mainToolbar(tree),
-    trackPlayer(tree),
-    trackManager(trackPlayer, mainAudio, sideMenu),
-    sideMenu(tree)
+    mainAudio{tree},
+    topLevelMenu{tree},
+    mainToolbar{tree},
+    trackPlayer{tree},
+    sideMenu{tree},
+    trackManager{trackPlayer, mainAudio, sideMenu},
+    projectFilesManager{tree}
 {
     // 2560 x 1392 = Total screen width x (Total screen height - (windows bar size + title bar size))
     setSize(getParentWidth(), getParentHeight());
     addAndMakeVisible(topLevelMenu);
     addAndMakeVisible(mainToolbar);
     addAndMakeVisible(trackPlayer);
-    addAndMakeVisible(trackManager);
-
     addAndMakeVisible(sideMenu);
+    addAndMakeVisible(trackManager);
     flexBoxInit();
 
-    addTestTracks();
+    projectFilesManager.openTestProject();
+    setWantsKeyboardFocus(true);
 }
 
 void MainComponent::paint(juce::Graphics& g)
@@ -27,6 +28,59 @@ void MainComponent::paint(juce::Graphics& g)
 }
 
 void MainComponent::resized() { topLevelFlexBox.performLayout(getLocalBounds()); }
+
+bool MainComponent::keyPressed(const juce::KeyPress& key)
+{
+    if(key == juce::KeyPress('n', juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('o', juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('s', juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('s', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('a', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('h', juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
+    if(key == juce::KeyPress('=', juce::ModifierKeys::shiftModifier, 0))
+    {
+        trackManager.addTrack();
+        return true;
+    }
+
+    if(key == juce::KeyPress::spaceKey)
+    {
+        mainToolbar.toolbarFactory.playPauseButtonClicked();
+        return true;
+    }
+
+    if(key == juce::KeyPress::backspaceKey)
+    {
+        mainToolbar.toolbarFactory.stopButtonClicked();
+        return true;
+    }
+
+    return false;
+}
 
 void MainComponent::flexBoxInit()
 {
@@ -49,62 +103,4 @@ void MainComponent::flexBoxInit()
     mainContentFlexBox.items.add(juce::FlexItem(trackPlayerFlexBox).withFlex(1));
 
     trackPlayerFlexBox.items.add(juce::FlexItem(trackPlayer).withFlex(1));
-}
-
-// This function is for testing. It can be long. Will be deleted soon
-void MainComponent::addTestTracks()
-{
-    const juce::File dawDir =
-        juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
-    const juce::File countdownAudioFile = dawDir.getChildFile("Assets/Audio/countdown.wav");
-    const juce::File musicAudioFile = dawDir.getChildFile("Assets/Audio/test.wav");
-    const juce::File invertedMusicAudioFile = dawDir.getChildFile("Assets/Audio/test(-1).wav");
-    const juce::File mutedMusicAudioFile = dawDir.getChildFile("Assets/Audio/test.mp3");
-
-    auto errorMsg = [](const juce::String& msg)
-    { juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon, "Error", msg + " not found :c"); };
-
-    auto trackIndex = trackManager.addTrack();
-
-    if(countdownAudioFile.existsAsFile())
-    {
-        const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, countdownAudioFile);
-        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 0.0f);
-        trackManager.setTrackProperty(trackIndex, AudioClipProperty::PAN, 0.0f);
-        trackManager.setTrackProperty(trackIndex, AudioClipProperty::GAIN, -15.0f);
-    }
-    else
-        errorMsg(countdownAudioFile.getFullPathName());
-
-    if(musicAudioFile.existsAsFile())
-    {
-        const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, musicAudioFile);
-        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
-    }
-    else
-        errorMsg(musicAudioFile.getFullPathName());
-
-    if(invertedMusicAudioFile.existsAsFile())
-    {
-        trackIndex = trackManager.addTrack();
-        const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, invertedMusicAudioFile);
-        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 6.0f);
-        trackManager.setTrackProperty(trackIndex, AudioClipProperty::PAN, 0.6f);
-        trackManager.setTrackProperty(trackIndex, AudioClipProperty::GAIN, -15.0f);
-    }
-    else
-        errorMsg(invertedMusicAudioFile.getFullPathName());
-
-    if(mutedMusicAudioFile.existsAsFile())
-    {
-        trackIndex = trackManager.addTrack();
-        const auto audioClipId = trackManager.addAudioClipToTrack(trackIndex, mutedMusicAudioFile);
-        trackManager.setOffsetOfAudioClipInSeconds(audioClipId, 1.0f);
-        trackManager.setTrackProperty(trackIndex, AudioClipProperty::PAN, 0.0f);
-        trackManager.setTrackProperty(trackIndex, AudioClipProperty::GAIN, -15.0f);
-        trackManager.setTrackProperty(trackIndex, AudioClipProperty::MUTE, false);
-        trackManager.setTrackProperty(trackIndex, AudioClipProperty::SOLO, false);
-    }
-    else
-        errorMsg(mutedMusicAudioFile.getFullPathName());
 }

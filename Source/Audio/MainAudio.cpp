@@ -5,10 +5,10 @@ MainAudio::MainAudio(juce::ValueTree& valueTree) : tree{valueTree}
     audioProcessorGraphInit();
     processorPlayer.setProcessor(&graph);
     audioDeviceManager.initialiseWithDefaultDevices(0, 2);
-    audioDeviceManager.addAudioCallback(&processorPlayer);
+    audioDeviceManager.addAudioCallback(this);
     graph.setPlayHead(this);
     tree.addListener(this);
-    startTimer(30);
+    startTimer(20);
 }
 
 void MainAudio::audioProcessorGraphInit()
@@ -21,9 +21,10 @@ void MainAudio::audioProcessorGraphInit()
 
 MainAudio::~MainAudio()
 {
-    audioDeviceManager.removeAudioCallback(&processorPlayer);
-    graph.clear();
     stopTimer();
+    tree.removeListener(this);
+    audioDeviceManager.removeAudioCallback(this);
+    graph.clear();
 }
 
 NodeID MainAudio::addAudioClip(const juce::File& file)
@@ -74,18 +75,47 @@ void MainAudio::setMuteOfAudioClip(const NodeID nodeID, const bool mute) const
     dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setMute(mute);
 }
 
+void MainAudio::setReverbOfAudioClip(NodeID nodeID, bool isReverbOn) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setReverb(isReverbOn);
+}
+void MainAudio::setRoomSizeOfAudioClip(const NodeID nodeID, const float newRoomSizeValue) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setRoomSize(newRoomSizeValue);
+}
+void MainAudio::setDampOfAudioClip(const NodeID nodeID, const float newDampValue) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setDamp(newDampValue);
+}
+void MainAudio::setWetLevelOfAudioClip(const NodeID nodeID, const float newWetLevelValue) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setWetLevel(newWetLevelValue);
+}
+void MainAudio::setDryLevelOfAudioClip(const NodeID nodeID, const float newDryLevelValue) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setDryLevel(newDryLevelValue);
+}
+void MainAudio::setWidthOfAudioClip(const NodeID nodeID, const float newWidthValue) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setWidth(newWidthValue);
+}
+void MainAudio::setFreezeOfAudioClip(const NodeID nodeID, const float newFreezeValue) const
+{
+    dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setFreeze(newFreezeValue);
+}
+
 void MainAudio::play()
 {
     juce::ScopedLock sl(lock);
-    const auto timeOffset = juce::RelativeTime::seconds(static_cast<double>(currentPositionSamples) / getSampleRate());
-    startTime = juce::Time::getCurrentTime() - timeOffset;
     transportIsPlaying = true;
+    tree.setProperty(ValueTreeIDs::isPlaying, true, nullptr);
 }
 
 void MainAudio::pause()
 {
     juce::ScopedLock sl(lock);
     transportIsPlaying = false;
+    tree.setProperty(ValueTreeIDs::isPlaying, false, nullptr);
 }
 
 void MainAudio::stop()
@@ -93,6 +123,7 @@ void MainAudio::stop()
     juce::ScopedLock sl(lock);
     transportIsPlaying = false;
     setPlayheadPosition(0);
+    tree.setProperty(ValueTreeIDs::isPlaying, false, nullptr);
 }
 
 void MainAudio::setPlayheadPosition(const int64_t positionSamples)
@@ -123,20 +154,8 @@ juce::Optional<juce::AudioPlayHead::PositionInfo> MainAudio::getPosition() const
 {
     juce::ScopedLock sl(lock);
     PositionInfo info;
-    int64_t currentSamples;
 
-    if(transportIsPlaying)
-    {
-        const double elapsedSeconds = (juce::Time::getCurrentTime() - startTime).inSeconds();
-        currentSamples = static_cast<int64_t>(elapsedSeconds * getSampleRate());
-        currentPositionSamples = currentSamples;
-    }
-    else
-    {
-        currentSamples = currentPositionSamples;
-    }
-
-    info.setTimeInSamples(currentSamples);
+    info.setTimeInSamples(currentPositionSamples);
     info.setIsPlaying(transportIsPlaying);
     info.setIsRecording(false);
     return info;
@@ -194,6 +213,10 @@ void MainAudio::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifie
 
         setFadeOfAudioClip(clipID, fadeIn, fadeOut);
     }
+    else if(property == ValueTreeIDs::numOfSecondsChanged)
+    {
+        projectLengthSeconds = tree[ValueTreeIDs::numOfSecondsChanged];
+    }
 }
 
 void MainAudio::timerCallback()
@@ -202,6 +225,12 @@ void MainAudio::timerCallback()
     {
         const double positionInSeconds = static_cast<double>(currentPositionSamples) / getSampleRate();
         tree.setProperty(ValueTreeIDs::timeBarTime, positionInSeconds, nullptr);
+
+        if(positionInSeconds >= projectLengthSeconds)
+        {
+            tree.setProperty(ValueTreeIDs::stopButtonClicked, true, nullptr);
+            tree.setProperty(ValueTreeIDs::stopButtonClicked, ValueTreeConstants::doNothing, nullptr);
+        }
     }
 }
 
@@ -219,4 +248,31 @@ double MainAudio::getAudioClipOffsetInSeconds(const NodeID nodeID) const
 void MainAudio::setFadeOfAudioClip(const NodeID nodeID, const Fade::Data& fadeIn, const Fade::Data& fadeOut) const
 {
     dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setFadeData(fadeIn, fadeOut);
+}
+
+void MainAudio::audioDeviceIOCallbackWithContext(const float* const* inputChannelData, int numInputChannels,
+                                                 float* const* outputChannelData, int numOutputChannels, int numSamples,
+                                                 const juce::AudioIODeviceCallbackContext& context)
+{
+    processorPlayer.audioDeviceIOCallbackWithContext(
+        inputChannelData, numInputChannels, outputChannelData, numOutputChannels, numSamples, context);
+
+    if(transportIsPlaying)
+    {
+        juce::ScopedLock sl(lock);
+        currentPositionSamples += numSamples;
+    }
+}
+
+void MainAudio::audioDeviceAboutToStart(juce::AudioIODevice* device)
+{
+    processorPlayer.audioDeviceAboutToStart(device);
+}
+
+void MainAudio::audioDeviceStopped() { processorPlayer.audioDeviceStopped(); }
+std::pair<Fade::Data, Fade::Data> MainAudio::getAudioClipFadeData(const NodeID nodeID) const
+{
+    const auto* audioClip = dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor());
+    assert(audioClip);
+    return audioClip->getFadeData();
 }

@@ -20,6 +20,7 @@ public:
     ~TrackGuiManager() override = default;
 
     uint16_t getCurrentNumberOfTracks() const { return trackGuiVector.size(); }
+    uint16_t getCurrentTrackGuiBoxWidth() const { return currentTrackGuiBoxWidth; }
 
     void setFollowMode(const PlayheadFollowConstants::Mode mode) { followMode = mode; }
     PlayheadFollowConstants::Mode getFollowMode() const { return followMode; }
@@ -38,6 +39,8 @@ private:
     void setTrackButtonStates(int trackIndex, bool muted, bool soloed) const;
     void removeTrack(int trackIndex);
     void reorderTrackGuis(int fromIndex, int toIndex);
+    void clearAllTracks();
+    void setTrackName(int trackIndex, const juce::String& name) const;
 
     void addWaveformToTrackGui(const juce::String& newAudioFilePath, int trackIndex, NodeID newAudioClipID) const;
     void setOffsetOfWaveformInSeconds(int trackIndex, NodeID audioClipID, double offsetSeconds) const;

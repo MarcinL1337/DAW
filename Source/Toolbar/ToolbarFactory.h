@@ -10,7 +10,7 @@ class ToolbarFactory final : public juce::ToolbarItemFactory,
 {
 public:
     ToolbarFactory() = delete;
-    explicit ToolbarFactory(juce::ValueTree& valueTree);
+    explicit ToolbarFactory(juce::ValueTree& parentTree);
     ~ToolbarFactory() override = default;
 
 private:
@@ -22,14 +22,15 @@ private:
     void buttonClicked(juce::Button* button) override;
 
     juce::ToolbarButton* createButtonFromImage(int itemId, const juce::String& shortDescription);
-    void temporaryButtonsFunction(juce::String buttonName);
-    void previousButtonClicked();
-    void nextButtonClicked();
-    void replayButtonClicked();
-    void playPauseButtonClicked() const;
-    void startRecordingButtonClicked();
+    void temporaryButtonsFunction(const juce::String& buttonName) const;
+    void previousButtonClicked() const;
+    void nextButtonClicked() const;
+    void replayButtonClicked() const;
+    void playPauseButtonClicked();
+    void startRecordingButtonClicked() const;
     void stopButtonClicked() const;
     void followModeButtonClicked() const;
+    void clipSplitButtonClicked();
 
     enum SpecialItemIds
     {
@@ -43,23 +44,24 @@ private:
 
     enum ToolbarElementsIds
     {
-        previous = 1,
-        next,
-        replay,
-        playPause,
-        startRecording,
+        playPause = 1,
         stop,
+        clipSplit,
         followMode
     };
 
-    juce::ToolbarButton* previousButton{nullptr};
-    juce::ToolbarButton* nextButton{nullptr};
+    // Main Toolbar buttons
     juce::ToolbarButton* playPauseButton{nullptr};
-    juce::ToolbarButton* replayButton{nullptr};
-    juce::ToolbarButton* startRecordingButton{nullptr};
     juce::ToolbarButton* stopButton{nullptr};
     juce::ToolbarButton* followModeButton{nullptr};
 
+    // Clip Toolkit buttons
+    juce::ToolbarButton* clipSplitButton{nullptr};
+
     juce::ValueTree& tree;
+
+    bool isClipSplitActive{false};
+
+    friend class MainComponent;
 };
 
