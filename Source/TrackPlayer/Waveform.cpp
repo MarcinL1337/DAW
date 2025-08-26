@@ -112,7 +112,7 @@ void Waveform::setOffsetSeconds(const double newOffsetSeconds)
 
 void Waveform::mouseDrag(const juce::MouseEvent& event)
 {
-    if(event.getDistanceFromDragStart() > 5)
+    if(event.mouseWasDraggedSinceMouseDown())
     {
         if(auto* dragContainer = juce::DragAndDropContainer::findParentDragContainerFor(this))
         {
@@ -149,8 +149,6 @@ juce::Image Waveform::createDragThumbnail() const
 
 void Waveform::mouseDown(const juce::MouseEvent& event)
 {
-    if(event.mods.isRightButtonDown() or
-       (tree.hasProperty(ValueTreeIDs::toggleSplitAudioClipMode) and tree[ValueTreeIDs::toggleSplitAudioClipMode]))
         if(auto* parent = getParentComponent())
             parent->mouseDown(event.getEventRelativeTo(parent));
 }
