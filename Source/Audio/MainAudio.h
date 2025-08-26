@@ -29,6 +29,7 @@ public:
     juce::File getAudioClipPath(NodeID nodeID) const;
     double getAudioClipOffsetInSeconds(NodeID nodeID) const;
     void setFadeOfAudioClip(NodeID nodeID, const Fade::Data& fadeIn, const Fade::Data& fadeOut) const;
+    std::pair<Fade::Data, Fade::Data> getAudioClipFadeData(NodeID nodeID) const;
 
 private:
     void audioProcessorGraphInit();
@@ -53,7 +54,6 @@ private:
     void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
     void setSoloOfAudioClip(NodeID nodeID, bool solo) const;
     void setMuteOfAudioClip(NodeID nodeID, bool mute) const;
-    std::pair<Fade::Data, Fade::Data> getAudioClipFadeData(NodeID nodeID) const;
 
     void setReverbOfAudioClip(NodeID nodeID, bool mute) const;
     void setRoomSizeOfAudioClip(NodeID nodeID, float newRoomSizeValue) const;

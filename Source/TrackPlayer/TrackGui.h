@@ -48,6 +48,7 @@ private:
     void showPopUpMenuForClip(const Waveform& clipWaveform);
     void triggerTrackGuiAction(const juce::Identifier& actionId) const;
     void handleClipDelete(const Waveform& clipWaveform);
+    void handleClipDelete(NodeID audioClipID);
     void handleClipCopy(const Waveform& clipWaveform);
     void handleClipCut(const Waveform& clipWaveform);
     void handleClipPaste(const float clickOffset);

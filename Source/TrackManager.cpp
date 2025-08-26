@@ -220,7 +220,8 @@ void TrackManager::splitAudioClip(const int trackIndex, const NodeID clipId, con
     const auto splitFile = mainAudio.getAudioClipPath(clipId);
     const auto splitClipOffset = mainAudio.getAudioClipOffsetInSeconds(clipId);
     addNewAudioClipsBySplit(trackIndex, splitFile, waveformSplitRatio, splitClipOffset);
-    assert(removeAudioClipFromTrack(trackIndex, clipId));
+    const bool result = removeAudioClipFromTrack(trackIndex, clipId);
+    assert(result);
 }
 
 void TrackManager::setTrackProperty(const int trackIndex, const AudioClipProperty property, const bool boolValue) const
@@ -348,8 +349,8 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const int trackIndex = tree[ValueTreeIDs::deleteAudioClip][0];
         const int audioClipUid = tree[ValueTreeIDs::deleteAudioClip][1];
         const NodeID audioClipID{static_cast<uint32_t>(audioClipUid)};
-
-        assert(removeAudioClipFromTrack(trackIndex, audioClipID));
+        const bool result = removeAudioClipFromTrack(trackIndex, audioClipID);
+        assert(result);
     }
     else if(property == ValueTreeIDs::copyAudioClip)
     {
@@ -408,6 +409,27 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
             const int newTrackIndex = addTrack();
             std::ignore = addAudioClipToTrack(newTrackIndex, audioFile);
         }
+    }
+    else if(property == ValueTreeIDs::moveAudioClip)
+    {
+        const int audioClipUid = tree[ValueTreeIDs::moveAudioClip][0];
+        const int targetTrackIndex = tree[ValueTreeIDs::moveAudioClip][1];
+        const float newOffsetSeconds = tree[ValueTreeIDs::moveAudioClip][2];
+        const NodeID audioClipID{static_cast<uint32_t>(audioClipUid)};
+
+        auto clipPath = mainAudio.getAudioClipPath(audioClipID);
+        auto [fadeIn, fadeOut] = mainAudio.getAudioClipFadeData(audioClipID);
+
+        auto newClipID = addAudioClipToTrack(targetTrackIndex, clipPath);
+        setOffsetOfAudioClipInSeconds(newClipID, newOffsetSeconds);
+
+        juce::Array<juce::var> fadeInfo{static_cast<int>(newClipID.uid),
+                                        fadeIn.lengthSeconds,
+                                        static_cast<int>(fadeIn.function),
+                                        fadeOut.lengthSeconds,
+                                        static_cast<int>(fadeOut.function)};
+        tree.setProperty(ValueTreeIDs::audioClipFadeChanged, fadeInfo, nullptr);
+        tree.setProperty(ValueTreeIDs::audioClipFadeChanged, ValueTreeConstants::doNothing, nullptr);
     }
 }
 

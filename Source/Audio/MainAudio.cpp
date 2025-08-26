@@ -215,7 +215,10 @@ void MainAudio::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifie
     }
     else if(property == ValueTreeIDs::numOfSecondsChanged)
     {
-        projectLengthSeconds = tree[ValueTreeIDs::numOfSecondsChanged];
+        if(const int newNumOfSeconds = tree[ValueTreeIDs::numOfSecondsChanged]; newNumOfSeconds > projectLengthSeconds)
+        {
+            projectLengthSeconds = newNumOfSeconds;
+        }
     }
 }
 
