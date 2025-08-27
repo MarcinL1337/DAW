@@ -417,17 +417,17 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const float newOffsetSeconds = tree[ValueTreeIDs::moveAudioClip][2];
         const NodeID audioClipID{static_cast<uint32_t>(audioClipUid)};
 
-        auto clipPath = mainAudio.getAudioClipPath(audioClipID);
-        auto [fadeIn, fadeOut] = mainAudio.getAudioClipFadeData(audioClipID);
+        const auto& clipPath = mainAudio.getAudioClipPath(audioClipID);
+        const auto& [fadeIn, fadeOut] = mainAudio.getAudioClipFadeData(audioClipID);
 
-        auto newClipID = addAudioClipToTrack(targetTrackIndex, clipPath);
+        const auto newClipID = addAudioClipToTrack(targetTrackIndex, clipPath);
         setOffsetOfAudioClipInSeconds(newClipID, newOffsetSeconds);
 
-        juce::Array<juce::var> fadeInfo{static_cast<int>(newClipID.uid),
-                                        fadeIn.lengthSeconds,
-                                        static_cast<int>(fadeIn.function),
-                                        fadeOut.lengthSeconds,
-                                        static_cast<int>(fadeOut.function)};
+        const juce::Array<juce::var> fadeInfo{static_cast<int>(newClipID.uid),
+                                              fadeIn.lengthSeconds,
+                                              static_cast<int>(fadeIn.function),
+                                              fadeOut.lengthSeconds,
+                                              static_cast<int>(fadeOut.function)};
         tree.setProperty(ValueTreeIDs::audioClipFadeChanged, fadeInfo, nullptr);
         tree.setProperty(ValueTreeIDs::audioClipFadeChanged, ValueTreeConstants::doNothing, nullptr);
     }
