@@ -53,6 +53,8 @@ void ProjectFilesManager::createNewProject()
 
 void ProjectFilesManager::createNewProjectInternal()
 {
+    tree.setProperty(ValueTreeIDs::stopButtonClicked, true, nullptr);
+    tree.setProperty(ValueTreeIDs::stopButtonClicked, ValueTreeConstants::doNothing, nullptr);
     tree.setProperty(ValueTreeIDs::clearAllTracks, true, nullptr);
     tree.setProperty(ValueTreeIDs::clearAllTracks, ValueTreeConstants::doNothing, nullptr);
     currentProjectFile = juce::File{};
