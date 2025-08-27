@@ -9,7 +9,7 @@ Waveform::Waveform(const uint16_t boxWidth, juce::ValueTree& parentTree, const N
     initStaticData();
     audioThumbnail = std::make_unique<juce::AudioThumbnail>(64, formatManager, *audioThumbnailCache);
     audioThumbnail->addChangeListener(this);
-    setInterceptsMouseClicks(false, true);
+    setInterceptsMouseClicks(true, false);
     fadeController = std::make_unique<FadeController>(tree, audioClipID);
 }
 
@@ -108,4 +108,68 @@ void Waveform::setOffsetSeconds(const double newOffsetSeconds)
             ValueTreeIDs::numOfSecondsChanged, std::ceil(audioThumbnail->getTotalLength()) + offsetSeconds, nullptr);
     }
     resized();
+}
+
+void Waveform::mouseDrag(const juce::MouseEvent& event)
+{
+    if(event.mouseWasDraggedSinceMouseDown())
+    {
+        if(auto* dragContainer = juce::DragAndDropContainer::findParentDragContainerFor(this))
+        {
+            juce::var dragDescription;
+            dragDescription.append(static_cast<int>(audioClipID.uid));
+            dragDescription.append("waveform");
+            const auto dragImage = createDragThumbnail();
+            const juce::Point dragOffset{0, -dragImage.getHeight() / 2};
+            dragContainer->startDragging(dragDescription, this, dragImage, false, &dragOffset);
+        }
+    }
+}
+
+juce::Image Waveform::createDragThumbnail() const
+{
+    juce::Image dragImage(
+        juce::Image::ARGB, TrackPlayerConstants::maxDragWidth, TrackPlayerConstants::maxDragHeight, true);
+    juce::Graphics g(dragImage);
+
+    g.setColour(juce::Colour(30, 30, 30).withAlpha(0.75f));
+    g.fillRect(0, 0, TrackPlayerConstants::maxDragWidth, TrackPlayerConstants::maxDragHeight);
+
+    g.setColour(juce::Colour(10, 190, 150).withAlpha(0.9f));
+    audioThumbnail->drawChannel(
+        g,
+        juce::Rectangle(0, 0, TrackPlayerConstants::maxDragWidth, TrackPlayerConstants::maxDragHeight),
+        0.0,
+        audioThumbnail->getTotalLength(),
+        0,
+        1.0f);
+
+    return dragImage;
+}
+
+void Waveform::mouseDown(const juce::MouseEvent& event)
+{
+        if(auto* parent = getParentComponent())
+            parent->mouseDown(event.getEventRelativeTo(parent));
+}
+
+void Waveform::mouseMove(const juce::MouseEvent& event)
+{
+    if(tree.hasProperty(ValueTreeIDs::toggleSplitAudioClipMode) and tree[ValueTreeIDs::toggleSplitAudioClipMode])
+        if(auto* parent = getParentComponent())
+            parent->mouseMove(event.getEventRelativeTo(parent));
+}
+
+void Waveform::mouseEnter(const juce::MouseEvent& event)
+{
+    if(tree.hasProperty(ValueTreeIDs::toggleSplitAudioClipMode) && tree[ValueTreeIDs::toggleSplitAudioClipMode])
+        if(auto* parent = getParentComponent())
+            parent->mouseEnter(event.getEventRelativeTo(parent));
+}
+
+void Waveform::mouseExit(const juce::MouseEvent& event)
+{
+    if(tree.hasProperty(ValueTreeIDs::toggleSplitAudioClipMode) && tree[ValueTreeIDs::toggleSplitAudioClipMode])
+        if(auto* parent = getParentComponent())
+            parent->mouseExit(event.getEventRelativeTo(parent));
 }

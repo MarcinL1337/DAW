@@ -222,6 +222,21 @@ void TrackGui::handleClipDelete(const Waveform& clipWaveform)
         waveforms, [&clipWaveform](auto& waveformPtr) { return waveformPtr.get() == &clipWaveform; }));
 }
 
+void TrackGui::handleClipDelete(const NodeID audioClipID)
+{
+    const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
+    const auto currentTrackIndex = std::distance(
+        trackPlayer->trackGuiVector.begin(),
+        std::ranges::find_if(trackPlayer->trackGuiVector, [this](auto& trackGui) { return this == trackGui.get(); }));
+
+    const juce::Array<juce::var> deletedClipInfo{static_cast<int>(currentTrackIndex),
+                                                 static_cast<int>(audioClipID.uid)};
+    tree.setProperty(ValueTreeIDs::deleteAudioClip, deletedClipInfo, nullptr);
+
+    waveforms.erase(std::ranges::find_if(
+        waveforms, [&audioClipID](auto& waveformPtr) { return waveformPtr->getAudioClipID() == audioClipID; }));
+}
+
 void TrackGui::handleClipCopy(const Waveform& clipWaveform)
 {
     isAnyWaveformCopied = true;
@@ -286,3 +301,40 @@ void TrackGui::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier
         isClipSplitActive = tree[ValueTreeIDs::toggleSplitAudioClipMode];
     }
 }
+
+bool TrackGui::isInterestedInDragSource(const SourceDetails& dragSourceDetails)
+{
+    return dragSourceDetails.description.size() >= 2 && dragSourceDetails.description[1] == "waveform";
+}
+
+void TrackGui::itemDropped(const SourceDetails& dragSourceDetails)
+{
+    if(!isInterestedInDragSource(dragSourceDetails))
+        return;
+
+    const int audioClipUid = dragSourceDetails.description[0];
+    const NodeID audioClipID{static_cast<uint32_t>(audioClipUid)};
+
+    float newOffsetSeconds = dragSourceDetails.localPosition.x / static_cast<float>(currentBoxWidth);
+
+    const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
+    const int targetTrackIndex = static_cast<int>(std::distance(
+        trackPlayer->trackGuiVector.begin(),
+        std::ranges::find_if(trackPlayer->trackGuiVector, [this](auto& trackGui) { return this == trackGui.get(); })));
+
+    const juce::Array<juce::var> moveInfo{static_cast<int>(audioClipID.uid), targetTrackIndex, newOffsetSeconds};
+    tree.setProperty(ValueTreeIDs::moveAudioClip, moveInfo, nullptr);
+    tree.setProperty(ValueTreeIDs::moveAudioClip, ValueTreeConstants::doNothing, nullptr);
+
+    if(const auto* srcWaveform = dynamic_cast<Waveform*>(dragSourceDetails.sourceComponent.get()))
+        if(auto* srcTrackGui = dynamic_cast<TrackGui*>(srcWaveform->getParentComponent()))
+            srcTrackGui->handleClipDelete(audioClipID);
+}
+
+void TrackGui::itemDragEnter(const SourceDetails& dragSourceDetails)
+{
+    if(isInterestedInDragSource(dragSourceDetails))
+        repaint();
+}
+
+void TrackGui::itemDragExit(const SourceDetails& dragSourceDetails) { repaint(); }

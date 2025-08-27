@@ -25,6 +25,8 @@ constexpr float trackPlayerSideMenuWidthRatio{0.12f};
 
 constexpr int noTrackChosen{-1};
 
+constexpr int maxDragWidth{startBoxWidth * 4};
+constexpr int maxDragHeight{static_cast<int>(startBoxHeight * 0.7)};
 }  // namespace TrackPlayerConstants
 
 namespace SideMenuConstants
@@ -94,6 +96,8 @@ inline static const juce::Identifier tracksJsonExported{"tracksJsonExported"};
 inline static const juce::Identifier createTrackFromJson{"createTrackFromJson"};
 inline static const juce::Identifier exportTracksToJson{"exportTracksToJson"};
 inline static const juce::Identifier addAudioFileToNewTrack{"addAudioFileToNewTrack"};
+
+inline static const juce::Identifier moveAudioClip{"moveAudioClip"};
 }  // namespace ValueTreeIDs
 
 namespace PlayheadFollowConstants

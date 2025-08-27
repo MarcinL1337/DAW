@@ -10,7 +10,8 @@
 #include "TrackPlayerSideMenu.h"
 
 class TrackGuiManager final : public juce::Component,
-                              public juce::ValueTree::Listener
+                              public juce::ValueTree::Listener,
+                              public juce::DragAndDropContainer
 {
 public:
     explicit TrackGuiManager(juce::ValueTree& parentTree);

@@ -23,12 +23,19 @@ public:
     void setOffsetSeconds(double newOffsetSeconds);
     double getOffsetSeconds() const { return offsetSeconds; }
 
+    void mouseDrag(const juce::MouseEvent& event) override;
+    void mouseDown(const juce::MouseEvent& event) override;
+    void mouseMove(const juce::MouseEvent& event) override;
+    void mouseEnter(const juce::MouseEvent& event) override;
+    void mouseExit(const juce::MouseEvent& event) override;
+
 private:
     void paint(juce::Graphics& g) override;
     void drawWaveformWithFade(juce::Graphics& g, const juce::Rectangle<int>& bounds);
     void resized() override;
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
     static void initStaticData();
+    juce::Image createDragThumbnail() const;
 
     juce::AudioFormatReader* formatReader{nullptr};
     static juce::AudioFormatManager formatManager;

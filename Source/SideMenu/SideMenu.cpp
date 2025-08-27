@@ -39,7 +39,7 @@ void SideMenu::initRunTimeVariables()
 
 void SideMenu::initReverbButton()
 {
-    addAndMakeVisible(reverbButton);
+    addChildComponent(reverbButton);
     reverbButton.onClick = [this]()
     {
         toggleReverbStateInCurrentTrack();
@@ -61,7 +61,7 @@ void SideMenu::initZoomSlider()
 
 void SideMenu::initTrackPropertiesSliders()
 {
-    sliderSettings.push_back(SliderSettings{gainSlider, -40, 40, 1, " dB", gainLabel, "Gain"});
+    sliderSettings.push_back(SliderSettings{gainSlider, -75, 25, 1, " dB", gainLabel, "Gain"});
     sliderSettings.push_back(SliderSettings{panSlider, -1, 1, 2, "", panLabel, "Panner"});
 
     for(auto& sliderSetting: sliderSettings)
