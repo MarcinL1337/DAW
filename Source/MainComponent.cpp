@@ -18,7 +18,7 @@ MainComponent::MainComponent() :
     addAndMakeVisible(trackManager);
     flexBoxInit();
 
-    projectFilesManager.openTestProject();
+    // projectFilesManager.openTestProject();
     setWantsKeyboardFocus(true);
 }
 

@@ -26,7 +26,15 @@ void TrackManager::removeTrack(const int trackIndex)
 int TrackManager::duplicateTrack(const int trackIndex)
 {
     assert(trackIndex >= 0 && trackIndex < static_cast<int>(tracks.size()));
-    const nlohmann::json trackJson = tracks[trackIndex]->toJson();
+
+    nlohmann::json trackJson = tracks[trackIndex]->toJson();
+    const auto audioFolder = getProjectAudioFolder();
+    for(auto& clip: trackJson["audioClips"])
+    {
+        juce::File audioFile = audioFolder.getChildFile(clip["path"].get<std::string>());
+        clip["path"] = audioFile.getFullPathName().toStdString();
+    }
+
     return createTrackFromJson(trackJson);
 }
 
