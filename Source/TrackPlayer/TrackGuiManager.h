@@ -51,6 +51,7 @@ private:
     void changeTrackGuiBoxWidthAndPropagate(const int newBoxWidthPercentage);
 
     void updatePlayheadFollowing();
+    void mouseWheelMove(const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel) override;
 
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
