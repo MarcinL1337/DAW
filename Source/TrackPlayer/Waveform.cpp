@@ -149,8 +149,8 @@ juce::Image Waveform::createDragThumbnail() const
 
 void Waveform::mouseDown(const juce::MouseEvent& event)
 {
-        if(auto* parent = getParentComponent())
-            parent->mouseDown(event.getEventRelativeTo(parent));
+    if(auto* parent = getParentComponent())
+        parent->mouseDown(event.getEventRelativeTo(parent));
 }
 
 void Waveform::mouseMove(const juce::MouseEvent& event)

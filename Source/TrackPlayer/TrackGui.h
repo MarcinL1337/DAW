@@ -8,7 +8,8 @@
 class TrackGuiManager;
 
 class TrackGui final : public juce::Component,
-                       public juce::ValueTree::Listener ,public juce::DragAndDropTarget
+                       public juce::ValueTree::Listener,
+                       public juce::DragAndDropTarget
 {
 public:
     explicit TrackGui(uint16_t boxWidth, int numOfSeconds, juce::ValueTree& parentTree);

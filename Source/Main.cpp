@@ -7,7 +7,7 @@ class GuiAppApplication final : public juce::JUCEApplication
 {
 public:
     GuiAppApplication() = default;
-    
+
     const juce::String getApplicationName() override { return "Nasz superancki kurcze DAW"; }
     const juce::String getApplicationVersion() override { return "1.0.0"; }
     bool moreThanOneInstanceAllowed() override { return true; }
