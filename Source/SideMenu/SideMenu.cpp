@@ -326,7 +326,7 @@ void SideMenu::removeTrack(const int trackToBeDeletedIndex)
 void SideMenu::setTrackProperties(const int trackIndex, const float gainValue)
 {
     controlsValuesPerTrack.at(trackIndex).gainValue = gainValue;
-    displaySliderValuesForCurrentTrack(); // TODO: check if needed here
+    displaySliderValuesForCurrentTrack();  // TODO: check if needed here
 }
 
 void SideMenu::reorderSliderValues(const int fromIndex, const int toIndex)

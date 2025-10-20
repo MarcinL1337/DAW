@@ -1,0 +1,38 @@
+name: Clang Format Check
+
+on:
+    push:
+        branches: [ "*" ]
+    pull_request:
+        branches: [ "*" ]
+
+jobs:
+    clang-format:
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Checkout repository
+                uses: actions/checkout@v4
+
+            -   name: Install clang-format-19
+                run: |
+                    sudo apt-get update
+                    sudo apt-get install -y clang-format-19
+
+            -   name: Check formatting and show colorized diffs
+                run: |
+                    formatted=0
+                    files=$(find . -name '*.cpp' -o -name '*.h')
+                    for file in $files; do
+                      diff_output=$(git diff --color=always "$file" <(clang-format-19 --style=file "$file") || true)
+                      if [[ -n "$diff_output" ]]; then
+                        echo -e "Formatting issues found in $file:\n$diff_output"
+                        formatted=1
+                      fi
+                    done
+                    
+                    if [[ $formatted -ne 0 ]]; then
+                      echo "::error ::Code style violations found. Please apply corrections locally to fix."
+                      exit 1
+                    fi
+                shell: bash
