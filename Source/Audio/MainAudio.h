@@ -3,6 +3,7 @@
 #include <cassert>
 #include "../Constants.h"
 #include "AudioClip.h"
+#include "AudioExporter.h"
 
 using NodeID = juce::AudioProcessorGraph::NodeID;
 
@@ -73,4 +74,5 @@ private:
     mutable int64_t currentPositionSamples{0};
     double projectLengthSeconds{TrackPlayerConstants::startNumOfBoxes};
     juce::CriticalSection lock;
+    std::unique_ptr<AudioExporter> audioExporter;
 };

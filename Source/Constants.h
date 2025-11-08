@@ -89,6 +89,8 @@ inline static const juce::Identifier saveProject{"saveProject"};
 inline static const juce::Identifier saveAsProject{"saveAsProject"};
 inline static const juce::Identifier addAudioFile{"addAudioFile"};
 inline static const juce::Identifier projectDirtyStateChanged{"projectDirtyStateChanged"};
+inline static const juce::Identifier exportToWav{"exportToWav"};
+inline static const juce::Identifier performExport{"performExport"};
 inline static const juce::Identifier projectAudioDir{"projectAudioDir"};
 
 inline static const juce::Identifier clearAllTracks{"clearAllTracks"};

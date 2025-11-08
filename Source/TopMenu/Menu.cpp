@@ -32,6 +32,8 @@ void Menu::setKeyMapping()
         saveProjectAs, juce::KeyPress('s', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier, 0));
     keyPressMappingSet.addKeyPress(
         addAudioFile, juce::KeyPress('a', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier, 0));
+    keyPressMappingSet.addKeyPress(
+        exportToWav, juce::KeyPress('e', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier, 0));
     keyPressMappingSet.addKeyPress(howToUse, juce::KeyPress('h', juce::ModifierKeys::ctrlModifier, 0));
 }
 
@@ -51,6 +53,7 @@ juce::PopupMenu Menu::getMenuForIndex(const int index, [[maybe_unused]] const ju
             options.addCommandItem(&commandManager, saveProject);
             options.addCommandItem(&commandManager, saveProjectAs);
             options.addCommandItem(&commandManager, addAudioFile);
+            options.addCommandItem(&commandManager, exportToWav);
             break;
         case help:
             options.addCommandItem(&commandManager, howToUse);
@@ -69,7 +72,7 @@ juce::ApplicationCommandTarget* Menu::getNextCommandTarget() { return findFirstT
 void Menu::getAllCommands(juce::Array<juce::CommandID>& c)
 {
     const juce::Array<juce::CommandID> allCommands{
-        newProject, openProject, saveProject, saveProjectAs, addAudioFile, howToUse};
+        newProject, openProject, saveProject, saveProjectAs, addAudioFile, exportToWav, howToUse};
     c.addArray(allCommands);
 }
 
@@ -96,6 +99,10 @@ void Menu::getCommandInfo(const juce::CommandID commandID, juce::ApplicationComm
         case addAudioFile:
             result.setInfo("Add audio file", "Adds new audio file to project", "File", 0);
             result.addDefaultKeypress('a', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier);
+            break;
+        case exportToWav:
+            result.setInfo("Export to wav", "Exports project to wav", "File", 0);
+            result.addDefaultKeypress('e', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier);
             break;
         case howToUse:
             result.setInfo("How to use", "Shows a help menu", "Help", 0);
@@ -129,6 +136,10 @@ bool Menu::perform(const InvocationInfo& info)
         case addAudioFile:
             tree.setProperty(ValueTreeIDs::addAudioFile, true, nullptr);
             tree.setProperty(ValueTreeIDs::addAudioFile, ValueTreeConstants::doNothing, nullptr);
+            break;
+        case exportToWav:
+            tree.setProperty(ValueTreeIDs::exportToWav, true, nullptr);
+            tree.setProperty(ValueTreeIDs::exportToWav, ValueTreeConstants::doNothing, nullptr);
             break;
         case howToUse:
             openHelp();
