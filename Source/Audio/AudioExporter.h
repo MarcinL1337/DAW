@@ -7,22 +7,17 @@ class AudioClip;
 class AudioExporter
 {
 public:
-    AudioExporter(juce::AudioPlayHead& playHeadRef, juce::AudioProcessorGraph& graphRef,
-                  const juce::AudioProcessorGraph::NodeID& outputNodeIDRef, int64_t& currentPositionSamplesRef,
-                  bool& transportIsPlayingRef);
-    void exportToWav(const juce::File& outputFile);
+    AudioExporter(juce::AudioProcessorGraph& graphRef, int64_t& currentPositionSamplesRef);
+    void exportToWav(const juce::File& outputFile) const;
 
 private:
-    void renderAudioToFile(const juce::File& outputFile, double startSeconds, double endSeconds);
+    void renderAudioToFile(const juce::File& outputFile, double startSeconds, double endSeconds,
+                           double sampleRate) const;
     std::pair<double, double> calculateExportRange() const;
-    bool createWriter(const juce::File& outputFile, std::unique_ptr<juce::AudioFormatWriter>& writer);
-    void updateTransportState(int64_t position, bool isPlaying);
+    bool createWriter(const juce::File& outputFile, std::unique_ptr<juce::AudioFormatWriter>& writer) const;
 
-    juce::AudioPlayHead& playHead;
     juce::AudioProcessorGraph& graph;
-    const juce::AudioProcessorGraph::NodeID& outputNodeID;
     int64_t& currentPositionSamples;
-    bool& transportIsPlaying;
 
     static constexpr int BUFFER_SIZE = 512;
     static constexpr int NUM_CHANNELS = 2;

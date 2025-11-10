@@ -1,72 +1,48 @@
 #include "AudioExporter.h"
 #include "AudioClip.h"
 
-AudioExporter::AudioExporter(juce::AudioPlayHead& playHeadRef, juce::AudioProcessorGraph& graphRef,
-                             const juce::AudioProcessorGraph::NodeID& outputNodeIDRef,
-                             int64_t& currentPositionSamplesRef, bool& transportIsPlayingRef) :
-    playHead{playHeadRef},
-    graph{graphRef},
-    outputNodeID{outputNodeIDRef},
-    currentPositionSamples{currentPositionSamplesRef},
-    transportIsPlaying{transportIsPlayingRef}
+AudioExporter::AudioExporter(juce::AudioProcessorGraph& graphRef, int64_t& currentPositionSamplesRef) :
+    graph{graphRef}, currentPositionSamples{currentPositionSamplesRef}
 {}
 
-void AudioExporter::exportToWav(const juce::File& outputFile)
+void AudioExporter::exportToWav(const juce::File& outputFile) const
 {
-    const auto [startSeconds, endSeconds] = calculateExportRange();
-
-    if(startSeconds >= endSeconds)
-        return;
-
-    renderAudioToFile(outputFile, startSeconds, endSeconds);
+    if(const auto [startSeconds, endSeconds] = calculateExportRange(); startSeconds < endSeconds)
+        renderAudioToFile(outputFile, startSeconds, endSeconds, graph.getSampleRate());
 }
 
-void AudioExporter::renderAudioToFile(const juce::File& outputFile, const double startSeconds, const double endSeconds)
+void AudioExporter::renderAudioToFile(const juce::File& outputFile, const double startSeconds, const double endSeconds,
+                                      const double sampleRate) const
 {
-    const auto sampleRate = graph.getSampleRate();
-    const auto totalSamples = static_cast<int64_t>((endSeconds - startSeconds) * sampleRate);
-
-    juce::AudioBuffer<float> mixBuffer(NUM_CHANNELS, BUFFER_SIZE);
-    juce::AudioBuffer<float> clipBuffer(NUM_CHANNELS, BUFFER_SIZE);
-
+    juce::AudioBuffer<float> mixBuffer{NUM_CHANNELS, BUFFER_SIZE};
+    juce::AudioBuffer<float> clipBuffer{NUM_CHANNELS, BUFFER_SIZE};
     std::unique_ptr<juce::AudioFormatWriter> writer;
     if(!createWriter(outputFile, writer))
         return;
 
-    int64_t samplesWritten = 0;
-    transportIsPlaying = true;
+    currentPositionSamples = static_cast<int64_t>(startSeconds * sampleRate);
+    const auto endPositionSamples = static_cast<int64_t>(endSeconds * sampleRate);
 
-    while(samplesWritten < totalSamples)
+    for(int samplesToWrite; currentPositionSamples < endPositionSamples; currentPositionSamples += samplesToWrite)
     {
-        const int samplesToWrite = juce::jmin(BUFFER_SIZE, static_cast<int>(totalSamples - samplesWritten));
+        samplesToWrite = juce::jmin(BUFFER_SIZE, static_cast<int>(endPositionSamples - currentPositionSamples));
         mixBuffer.clear();
-
-        currentPositionSamples = static_cast<int64_t>(startSeconds * sampleRate) + samplesWritten;
 
         for(const auto* node: graph.getNodes())
         {
-            if(node->nodeID == outputNodeID)
-                continue;
-
             auto* audioClip = dynamic_cast<AudioClip*>(node->getProcessor());
             if(!audioClip)
                 continue;
 
             clipBuffer.clear();
-            audioClip->setPlayHead(&playHead);
-
             juce::MidiBuffer midiBuffer;
             audioClip->processBlock(clipBuffer, midiBuffer);
 
             for(int channel = 0; channel < NUM_CHANNELS; ++channel)
                 mixBuffer.addFrom(channel, 0, clipBuffer, channel, 0, samplesToWrite);
         }
-
         writer->writeFromAudioSampleBuffer(mixBuffer, 0, samplesToWrite);
-        samplesWritten += samplesToWrite;
     }
-
-    transportIsPlaying = false;
 
     juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::InfoIcon,
                                            "Export finished",
@@ -81,9 +57,6 @@ std::pair<double, double> AudioExporter::calculateExportRange() const
 
     for(const auto* node: graph.getNodes())
     {
-        if(node->nodeID == outputNodeID)
-            continue;
-
         const auto* audioClip = dynamic_cast<AudioClip*>(node->getProcessor());
         if(!audioClip)
             continue;
@@ -101,7 +74,7 @@ std::pair<double, double> AudioExporter::calculateExportRange() const
     return {earliestStart - 1.0, latestEnd + 1.0};
 }
 
-bool AudioExporter::createWriter(const juce::File& outputFile, std::unique_ptr<juce::AudioFormatWriter>& writer)
+bool AudioExporter::createWriter(const juce::File& outputFile, std::unique_ptr<juce::AudioFormatWriter>& writer) const
 {
     juce::WavAudioFormat wavFormat;
 
