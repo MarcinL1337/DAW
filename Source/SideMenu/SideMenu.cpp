@@ -269,6 +269,10 @@ void SideMenu::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier
         const int toIndex = tree[ValueTreeIDs::reorderTracks][1];
         reorderSliderValues(fromIndex, toIndex);
     }
+    else if(property == ValueTreeIDs::trackPlayerZoomPercentage)
+    {
+        zoomSlider.setValue(tree[ValueTreeIDs::trackPlayerZoomPercentage], juce::dontSendNotification);
+    }
 }
 
 void SideMenu::displaySliderValuesForCurrentTrack()
