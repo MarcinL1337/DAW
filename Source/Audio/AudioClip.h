@@ -32,6 +32,10 @@ public:
     bool isSoloed() const { return solo; }
     void setFadeData(const Fade::Data& fadeIn, const Fade::Data& fadeOut);
     std::pair<Fade::Data, Fade::Data> getFadeData() const { return {fadeIn, fadeOut}; }
+    double getClipLengthSeconds() const
+    {
+        return reader ? static_cast<double>(reader->lengthInSamples) / reader->sampleRate : 0.0;
+    }
 
     // AudioProcessor
     void prepareToPlay(double sampleRate, int samplesPerBlock) override;

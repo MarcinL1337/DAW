@@ -74,6 +74,14 @@ set(SourceFiles
         Source/Audio/AudioClip.cpp
         Source/Audio/AudioTrack.h
         Source/Audio/AudioTrack.cpp
+        Source/Audio/AudioExporter.h
+        Source/Audio/AudioExporter.cpp
+        Source/Audio/TransportController.h
+        Source/Audio/TransportController.cpp
+        Source/Audio/AudioTrackManager.h
+        Source/Audio/AudioTrackManager.cpp
+        Source/Audio/AudioClipSplitter.h
+        Source/Audio/AudioClipSplitter.cpp
 
         Source/TrackManager.h
         Source/TrackManager.cpp

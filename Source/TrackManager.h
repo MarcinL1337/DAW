@@ -1,11 +1,6 @@
 #pragma once
 
-#include <utility>
-#include <vector>
-
-#include "Audio/AudioTrack.h"
-#include "Audio/MainAudio.h"
-#include "Constants.h"
+#include "Audio/AudioTrackManager.h"
 #include "SideMenu/SideMenu.h"
 #include "TrackPlayer/TrackGuiManager.h"
 
@@ -23,38 +18,16 @@ public:
     void clearAllTracks();
 
     NodeID addAudioClipToTrack(int trackIndex, const juce::File& file) const;
-    void setOffsetOfAudioClipInSeconds(NodeID nodeID, double offsetSeconds) const;
-    bool removeAudioClipFromTrack(const int trackIndex, const NodeID clipId) const;
-    void splitAudioClip(const int trackIndex, const NodeID clipId, const float waveformSplitRatio) const;
-    void addNewAudioClipsBySplit(const int trackIndex, const juce::File& fileToBeSplit, const float waveformSplitRatio,
-                                 const double splitClipOffset) const;
-    static void handleWriteToFile(juce::AudioFormatReader& reader, const juce::AudioFormatManager& formatManager,
-                                  const juce::File& destFile, const int numOfSamplesToWrite,
-                                  const int readerOffsetInSamples);
-
-    void setTrackProperty(int trackIndex, AudioClipProperty property, bool boolValue) const;
-    void setTrackProperty(int trackIndex, AudioClipProperty property, float floatValue) const;
-    void setTrackProperty(int trackIndex, ReverbClipProperty property, float floatValue) const;
-    void setTrackName(int trackIndex, juce::String stringValue) const;
-    TrackProperties getTrackProperties(int trackIndex) const;
-
+    void setOffsetOfAudioClipInSeconds(NodeID nodeID, int trackIndex, double offsetSeconds) const;
     void valueTreePropertyChanged(juce::ValueTree& treeWhosePropertyHasChanged,
                                   const juce::Identifier& property) override;
 
-    nlohmann::json exportTracksToJson() const;
-
 private:
-    void changeTrackOrder(int fromIndex, int toIndex);
-    juce::String getBaseName(const juce::String& fileName) const;
-    juce::String findNextAvailableName(const juce::String& baseName, const juce::String& extension) const;
-    void generateSplitFileNames(const juce::File& originalFile, juce::String& firstFileName,
-                                juce::String& secondFileName) const;
     juce::File getProjectAudioFolder() const;
 
     TrackGuiManager& trackGuiManager;
-    MainAudio& mainAudio;
+    AudioTrackManager audioTrackManager;
     SideMenu& sideMenu;
     juce::ValueTree& tree;
-    std::vector<std::unique_ptr<AudioTrack>> tracks;
     std::optional<juce::File> currentlyCopiedClipFilePath{std::nullopt};
 };
