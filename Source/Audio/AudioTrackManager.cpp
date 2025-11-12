@@ -120,4 +120,4 @@ nlohmann::json AudioTrackManager::exportToJson() const
     return projectJson;
 }
 
-void AudioTrackManager::clearAll() { tracks.clear(); }
+void AudioTrackManager::clearAllTracks() { tracks.clear(); }

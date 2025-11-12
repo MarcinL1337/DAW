@@ -303,7 +303,7 @@ void TrackManager::clearAllTracks()
 {
     trackGuiManager.clearAllTracks();
     sideMenu.clearAllTracks();
-    audioTrackManager.clearAll();
+    audioTrackManager.clearAllTracks();
 }
 
 juce::File TrackManager::getProjectAudioFolder() const

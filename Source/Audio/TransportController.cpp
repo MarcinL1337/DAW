@@ -28,8 +28,6 @@ void TransportController::setPlayingForExport(const bool shouldPlay)
 
 int64_t& TransportController::getCurrentPositionSamplesRef() { return currentPositionSamples; }
 
-void TransportController::setProjectLength(const double lengthSeconds) { projectLengthSeconds = lengthSeconds; }
-
 juce::Optional<juce::AudioPlayHead::PositionInfo> TransportController::getPosition() const
 {
     juce::ScopedLock sl{lock};
@@ -93,9 +91,9 @@ void TransportController::valueTreePropertyChanged(juce::ValueTree&, const juce:
     }
     else if(property == ValueTreeIDs::numOfSecondsChanged)
     {
-        if(const int newNumOfSeconds = tree[ValueTreeIDs::numOfSecondsChanged]; newNumOfSeconds != 0)
+        if(const int newNumOfSeconds = tree[ValueTreeIDs::numOfSecondsChanged]; newNumOfSeconds > projectLengthSeconds)
         {
-            setProjectLength(newNumOfSeconds);
+            projectLengthSeconds = newNumOfSeconds;
         }
     }
 }

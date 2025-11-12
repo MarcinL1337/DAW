@@ -3,8 +3,6 @@
 #include <optional>
 #include <utility>
 #include <vector>
-
-#include "../Constants.h"
 #include "AudioClipSplitter.h"
 #include "AudioTrack.h"
 
@@ -36,19 +34,9 @@ public:
     std::pair<Fade::Data, Fade::Data> getClipFadeData(NodeID clipId) const;
 
     nlohmann::json exportToJson() const;
-    void clearAll();
+    void clearAllTracks();
 
 private:
-    void addNewClipsBySplit(int trackIndex, const juce::File& fileToBeSplit, float ratio, double splitClipOffset,
-                            const juce::File& audioDir) const;
-    static void writeToFile(juce::AudioFormatReader& reader, const juce::AudioFormatManager& formatManager,
-                            const juce::File& destFile, int numOfSamplesToWrite, int readerOffsetInSamples);
-    static juce::String getBaseName(const juce::String& fileName);
-    static juce::String findNextAvailableName(const juce::String& baseName, const juce::String& extension,
-                                              const juce::File& audioDir);
-    static void generateSplitFileNames(const juce::File& originalFile, const juce::File& audioDir,
-                                       juce::String& firstFileName, juce::String& secondFileName);
-
     MainAudio& mainAudio;
     std::vector<std::unique_ptr<AudioTrack>> tracks;
 };
