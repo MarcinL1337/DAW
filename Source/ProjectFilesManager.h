@@ -27,6 +27,7 @@ private:
                                   const juce::Identifier& property) override;
     juce::File getTempAudioDirectory() const;
     void cleanupTempDirectory() const;
+    void exportToWav();
 
     bool isDirty{false};
     juce::ValueTree& tree;
@@ -44,4 +45,6 @@ private:
     std::string fileChooserValidFileExtensions{"*.wav;*.mp3"};
     juce::FileChooser audioFileChooser{
         fileChooserDialogText, fileChooserStartDirectory, fileChooserValidFileExtensions};
+    juce::FileChooser exportWavChooser{
+        "Export to WAV", juce::File::getSpecialLocation(juce::File::userDesktopDirectory), "*.wav"};
 };

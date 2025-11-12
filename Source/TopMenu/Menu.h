@@ -53,6 +53,7 @@ private:
         saveProject,
         saveProjectAs,
         addAudioFile,
+        exportToWav,
         // Help
         howToUse
     };
