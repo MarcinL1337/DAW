@@ -259,6 +259,8 @@ void ProjectFilesManager::valueTreePropertyChanged(juce::ValueTree&, const juce:
         markAsClean();
         cleanupUnusedAudioFiles(projectString);
     }
+    else if(property == ValueTreeIDs::exportToWav)
+        exportToWav();
     else if(property == ValueTreeIDs::trackGainChanged || property == ValueTreeIDs::trackPanChanged ||
             property == ValueTreeIDs::trackReverbChanged || property == ValueTreeIDs::trackNameChanged ||
             property == ValueTreeIDs::deleteTrackGui || property == ValueTreeIDs::duplicateTrackGui ||
@@ -338,4 +340,19 @@ void ProjectFilesManager::cleanupTempDirectory() const
 {
     const bool result = getTempAudioDirectory().deleteRecursively();
     assert(result);
+}
+
+void ProjectFilesManager::exportToWav()
+{
+    constexpr auto flags = juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles;
+    exportWavChooser.launchAsync(flags,
+                                 [this](const juce::FileChooser& chooser)
+                                 {
+                                     if(const auto file = chooser.getResult(); file != juce::File{})
+                                     {
+                                         tree.setProperty(ValueTreeIDs::performExport, file.getFullPathName(), nullptr);
+                                         tree.setProperty(
+                                             ValueTreeIDs::performExport, ValueTreeConstants::doNothing, nullptr);
+                                     }
+                                 });
 }
