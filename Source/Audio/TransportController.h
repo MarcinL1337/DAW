@@ -14,7 +14,6 @@ public:
     void advancePlayHead(int numSamples);
     void setPlayingForExport(bool shouldPlay);
     int64_t& getCurrentPositionSamplesRef();
-    void setProjectLength(double lengthSeconds);
 
     juce::Optional<PositionInfo> getPosition() const override;
 
