@@ -12,7 +12,6 @@ TrackGuiManager::TrackGuiManager(juce::ValueTree& parentTree) :
     addAndMakeVisible(trackPlayerViewport);
     addAndMakeVisible(timelineViewport);
     addAndMakeVisible(trackPlayerSideMenuViewport);
-    setMouseClickGrabsKeyboardFocus(true);
     viewportsInit();
     tree.addListener(this);
     juce::Timer::callAfterDelay(100, [&] { grabKeyboardFocus(); });

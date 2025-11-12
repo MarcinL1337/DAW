@@ -269,6 +269,10 @@ void SideMenu::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier
         const int toIndex = tree[ValueTreeIDs::reorderTracks][1];
         reorderSliderValues(fromIndex, toIndex);
     }
+    else if(property == ValueTreeIDs::trackPlayerZoomPercentage)
+    {
+        zoomSlider.setValue(tree[ValueTreeIDs::trackPlayerZoomPercentage], juce::dontSendNotification);
+    }
 }
 
 void SideMenu::displaySliderValuesForCurrentTrack()
@@ -326,7 +330,7 @@ void SideMenu::removeTrack(const int trackToBeDeletedIndex)
 void SideMenu::setTrackProperties(const int trackIndex, const float gainValue)
 {
     controlsValuesPerTrack.at(trackIndex).gainValue = gainValue;
-    displaySliderValuesForCurrentTrack(); // TODO: check if needed here
+    displaySliderValuesForCurrentTrack();  // TODO: check if needed here
 }
 
 void SideMenu::reorderSliderValues(const int fromIndex, const int toIndex)
