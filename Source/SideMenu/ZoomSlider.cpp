@@ -1,11 +1,12 @@
 #include "ZoomSlider.h"
+#include "../Constants.h"
 
 ZoomSlider::ZoomSlider()
 {
     setSliderStyle(LinearHorizontal);
     setTextBoxStyle(TextBoxBelow, true, 100, 20);
     setTextValueSuffix("%");
-    setRange(25, 500);
+    setRange(TrackPlayerConstants::minZoom, TrackPlayerConstants::maxZoom);
     setNumDecimalPlacesToDisplay(0);
     setValue(100);
 

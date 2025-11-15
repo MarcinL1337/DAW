@@ -166,6 +166,10 @@ void TrackGuiManager::setOffsetOfWaveformInSeconds(const int trackIndex, const N
 
 void TrackGuiManager::changeTrackGuiBoxWidthAndPropagate(const int newBoxWidthPercentage)
 {
+    const auto currentViewWidth = trackPlayerViewport.getViewWidth();
+    const auto centerTimePosition =
+        static_cast<double>(trackPlayerViewport.getViewPositionX() + currentViewWidth / 2) / currentTrackGuiBoxWidth;
+
     currentTrackGuiBoxWidth = baseTrackGuiBoxWidth * newBoxWidthPercentage / 100;
     resized();
     timeline.changeBoxWidth(currentTrackGuiBoxWidth);
@@ -175,6 +179,9 @@ void TrackGuiManager::changeTrackGuiBoxWidthAndPropagate(const int newBoxWidthPe
         trackGui->setSize(trackGuiComponent.getWidth(), currentTrackGuiBoxHeight);
         trackGui->changeBoxWidth(currentTrackGuiBoxWidth);
     }
+
+    const auto newViewX = static_cast<int>(centerTimePosition * currentTrackGuiBoxWidth - currentViewWidth / 2);
+    trackPlayerViewport.setViewPosition(newViewX, trackPlayerViewport.getViewPositionY());
 }
 
 void TrackGuiManager::updatePlayheadFollowing()
@@ -235,4 +242,19 @@ void TrackGuiManager::clearAllTracks()
 void TrackGuiManager::setTrackName(const int trackIndex, const juce::String& name) const
 {
     trackPlayerSideMenu.setTrackName(trackIndex, name);
+}
+
+void TrackGuiManager::mouseWheelMove(const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel)
+{
+    if(!event.mods.isCtrlDown())
+        return;
+
+    const float currentZoom = tree[ValueTreeIDs::trackPlayerZoomPercentage];
+    const float zoomStep = wheel.deltaY > 0 ? 10.0f : -10.0f;
+    const float newZoom = juce::jlimit(static_cast<float>(TrackPlayerConstants::minZoom),
+                                       static_cast<float>(TrackPlayerConstants::maxZoom),
+                                       currentZoom + zoomStep);
+
+    if(newZoom != currentZoom)
+        tree.setProperty(ValueTreeIDs::trackPlayerZoomPercentage, static_cast<int>(newZoom), nullptr);
 }
