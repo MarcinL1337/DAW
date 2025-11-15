@@ -51,10 +51,10 @@ void FadeController::mouseDrag(const juce::MouseEvent& event)
     const float newLengthSeconds = static_cast<float>(isFadeIn ? event.x : getWidth() - event.x) / currentBoxWidth;
 
     constexpr float minGapBetweenFades{0.1f};
-    const float otherFadeLength = getFadeData(!isFadeIn).lengthSeconds;
+    const float otherFadeLength = getFadeData(!isFadeIn).getLengthSeconds();
     const float maxAllowedLength = audioLengthSeconds - otherFadeLength - minGapBetweenFades;
 
-    getFadeData(isFadeIn).lengthSeconds = juce::jlimit(0.0f, juce::jmax(0.0f, maxAllowedLength), newLengthSeconds);
+    getFadeData(isFadeIn).setLengthSeconds(juce::jmin(maxAllowedLength, newLengthSeconds));
 
     rebuildPaths();
     repaint();
@@ -97,9 +97,9 @@ void FadeController::notifyAudioProcessor()
 {
     juce::Array<juce::var> fadeInfo;
     fadeInfo.add(static_cast<int>(audioClipID.uid));
-    fadeInfo.add(fadeIn.lengthSeconds);
+    fadeInfo.add(fadeIn.getLengthSeconds());
     fadeInfo.add(static_cast<int>(fadeIn.function));
-    fadeInfo.add(fadeOut.lengthSeconds);
+    fadeInfo.add(fadeOut.getLengthSeconds());
     fadeInfo.add(static_cast<int>(fadeOut.function));
 
     tree.setProperty(ValueTreeIDs::audioClipFadeChanged, fadeInfo, nullptr);
@@ -122,7 +122,7 @@ bool FadeController::hitTest(const int x, const int y)
 
 juce::Point<int> FadeController::getHandlePosition(const bool isFadeIn) const
 {
-    const auto& fadeLengthSeconds = getFadeData(isFadeIn).lengthSeconds;
+    const auto& fadeLengthSeconds = getFadeData(isFadeIn).getLengthSeconds();
     const int handleX = isFadeIn ? static_cast<int>(fadeLengthSeconds * currentBoxWidth)
                                  : getWidth() - static_cast<int>(fadeLengthSeconds * currentBoxWidth);
     return {handleX, handleSize / 2};
@@ -148,7 +148,7 @@ juce::Path FadeController::buildFadePath(const bool isFadeIn, const int width, c
 {
     const Fade::Data& fadeData = getFadeData(isFadeIn);
     juce::Path path;
-    const int fadeWidth = juce::jlimit(0, width, static_cast<int>(fadeData.lengthSeconds * currentBoxWidth));
+    const int fadeWidth = static_cast<int>(fadeData.getLengthSeconds() * currentBoxWidth);
 
     const int startX = isFadeIn ? 0 : width - fadeWidth;
     path.startNewSubPath(startX, height);
@@ -170,7 +170,7 @@ float FadeController::getFadeMultiplier(const double timePositionSeconds, const 
     return Fade::getFadeMultiplier(timePositionSeconds, totalLengthSeconds, fadeIn, fadeOut);
 }
 
-bool FadeController::hasFade() const { return fadeIn.lengthSeconds > 0.0f || fadeOut.lengthSeconds > 0.0f; }
+bool FadeController::hasFade() const { return fadeIn.getLengthSeconds() > 0.0f || fadeOut.getLengthSeconds() > 0.0f; }
 
 void FadeController::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
 {
@@ -183,9 +183,9 @@ void FadeController::valueTreePropertyChanged(juce::ValueTree&, const juce::Iden
         const NodeID clipID{static_cast<uint32_t>(static_cast<int>(fadeInfo[0]))};
         if(clipID == audioClipID)
         {
-            fadeIn.lengthSeconds = fadeInfo[1];
+            fadeIn.setLengthSeconds(fadeInfo[1]);
             fadeIn.function = static_cast<Fade::Function>(static_cast<int>(fadeInfo[2]));
-            fadeOut.lengthSeconds = fadeInfo[3];
+            fadeOut.setLengthSeconds(fadeInfo[3]);
             fadeOut.function = static_cast<Fade::Function>(static_cast<int>(fadeInfo[4]));
 
             rebuildPaths();
