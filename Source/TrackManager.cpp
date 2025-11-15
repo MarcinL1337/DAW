@@ -52,9 +52,9 @@ int TrackManager::createTrackFromJson(const nlohmann::json& trackJson)
             const auto fadeOutData = Fade::fadeDataFromJson(clipJson["fadeOut"]);
 
             juce::Array<juce::var> fadeInfo{static_cast<int>(clipId.uid),
-                                            fadeInData.lengthSeconds,
+                                            fadeInData.getLengthSeconds(),
                                             static_cast<int>(fadeInData.function),
-                                            fadeOutData.lengthSeconds,
+                                            fadeOutData.getLengthSeconds(),
                                             static_cast<int>(fadeOutData.function)};
 
             tree.setProperty(ValueTreeIDs::audioClipFadeChanged, fadeInfo, nullptr);
@@ -432,9 +432,9 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         setOffsetOfAudioClipInSeconds(newClipID, newOffsetSeconds);
 
         const juce::Array<juce::var> fadeInfo{static_cast<int>(newClipID.uid),
-                                              fadeIn.lengthSeconds,
+                                              fadeIn.getLengthSeconds(),
                                               static_cast<int>(fadeIn.function),
-                                              fadeOut.lengthSeconds,
+                                              fadeOut.getLengthSeconds(),
                                               static_cast<int>(fadeOut.function)};
         tree.setProperty(ValueTreeIDs::audioClipFadeChanged, fadeInfo, nullptr);
         tree.setProperty(ValueTreeIDs::audioClipFadeChanged, ValueTreeConstants::doNothing, nullptr);

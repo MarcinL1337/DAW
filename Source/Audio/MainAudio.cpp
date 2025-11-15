@@ -38,7 +38,8 @@ NodeID MainAudio::addAudioClip(const juce::File& file)
                              audioDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples());
 
     const auto node = graph.addNode(std::move(audioClip));
-    rebuildGraph();
+    graph.addConnection({{node->nodeID, 0}, {outputNodeID, 0}});
+    graph.addConnection({{node->nodeID, 1}, {outputNodeID, 1}});
     return node->nodeID;
 }
 
@@ -46,7 +47,6 @@ void MainAudio::removeAudioClip(const NodeID nodeID)
 {
     juce::ScopedLock sl(lock);
     graph.removeNode(nodeID);
-    rebuildGraph();
 }
 
 void MainAudio::setPanOfAudioClip(const NodeID nodeID, const float pan) const
@@ -134,20 +134,6 @@ void MainAudio::setPlayheadPosition(const int64_t positionSamples)
     currentPositionSamples = positionSamples;
     const double positionInSeconds = static_cast<double>(currentPositionSamples) / getSampleRate();
     tree.setProperty("timeBarTime", positionInSeconds, nullptr);
-}
-
-void MainAudio::rebuildGraph()
-{
-    juce::ScopedLock sl(lock);
-    auto connections = graph.getConnections();
-    for(const auto& connection: connections) graph.removeConnection(connection);
-    for(auto& node: graph.getNodes())
-    {
-        if(node->nodeID == outputNodeID)
-            continue;
-        graph.addConnection({{node->nodeID, 0}, {outputNodeID, 0}});
-        graph.addConnection({{node->nodeID, 1}, {outputNodeID, 1}});
-    }
 }
 
 juce::Optional<juce::AudioPlayHead::PositionInfo> MainAudio::getPosition() const
