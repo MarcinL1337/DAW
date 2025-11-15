@@ -38,7 +38,8 @@ NodeID MainAudio::addAudioClip(const juce::File& file)
                              audioDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples());
 
     const auto node = graph.addNode(std::move(audioClip));
-    rebuildGraph();
+    graph.addConnection({{node->nodeID, 0}, {outputNodeID, 0}});
+    graph.addConnection({{node->nodeID, 1}, {outputNodeID, 1}});
     return node->nodeID;
 }
 
@@ -46,7 +47,6 @@ void MainAudio::removeAudioClip(const NodeID nodeID)
 {
     juce::ScopedLock sl(lock);
     graph.removeNode(nodeID);
-    rebuildGraph();
 }
 
 void MainAudio::setPanOfAudioClip(const NodeID nodeID, const float pan) const
@@ -102,20 +102,6 @@ void MainAudio::setWidthOfAudioClip(const NodeID nodeID, const float newWidthVal
 void MainAudio::setFreezeOfAudioClip(const NodeID nodeID, const float newFreezeValue) const
 {
     dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setFreeze(newFreezeValue);
-}
-
-void MainAudio::rebuildGraph()
-{
-    juce::ScopedLock sl(lock);
-    auto connections = graph.getConnections();
-    for(const auto& connection: connections) graph.removeConnection(connection);
-    for(auto& node: graph.getNodes())
-    {
-        if(node->nodeID == outputNodeID)
-            continue;
-        graph.addConnection({{node->nodeID, 0}, {outputNodeID, 0}});
-        graph.addConnection({{node->nodeID, 1}, {outputNodeID, 1}});
-    }
 }
 
 bool MainAudio::isAnySoloed() const
