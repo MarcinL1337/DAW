@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.24)
 
 project(GuiAppTemplate VERSION 0.0.1)
 
-
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_XCODE_GENERATE_SCHEME OFF)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -31,8 +30,11 @@ CPMAddPackage(
         "JSON_BuildTests OFF"
 )
 
-set(SourceFiles
+set(AppEntryPoint
         Source/Main.cpp
+)
+
+set(SourceFiles
         Source/MainComponent.h
         Source/MainComponent.cpp
         Source/MainWindow.h
@@ -87,13 +89,19 @@ set(SourceFiles
 )
 
 juce_add_gui_app(${PROJECT_NAME}
-        PRODUCT_NAME "DAW")
+        PRODUCT_NAME "DAW"
+)
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SourceFiles})
+target_sources(${PROJECT_NAME}
+        PRIVATE
+        ${AppEntryPoint}
+)
 
-target_sources(${PROJECT_NAME} PRIVATE ${SourceFiles})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${AppEntryPoint} ${SourceFiles})
 
-target_compile_definitions(${PROJECT_NAME}
+add_library(${PROJECT_NAME}_lib STATIC ${SourceFiles})
+
+target_compile_definitions(${PROJECT_NAME}_lib
         PUBLIC
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
@@ -108,7 +116,7 @@ juce_add_binary_data(BinaryData SOURCES
         Assets/ToolbarImages/split.png
 )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}_lib
         PUBLIC
         BinaryData
         juce::juce_analytics
@@ -127,3 +135,42 @@ target_link_libraries(${PROJECT_NAME}
         juce::juce_recommended_warning_flags
         nlohmann_json::nlohmann_json
 )
+
+target_link_libraries(${PROJECT_NAME}
+        PRIVATE
+        ${PROJECT_NAME}_lib
+)
+
+# =================================================================
+#                            Unit tests
+# =================================================================
+
+CPMAddPackage(
+        NAME GoogleTest
+        GITHUB_REPOSITORY google/googletest
+        VERSION 1.15.0
+        OPTIONS
+        "INSTALL_GTEST OFF"
+        "BUILD_GMOCK ON"
+        "BUILD_GTEST ON"
+)
+
+if (GoogleTest_ADDED)
+    enable_testing()
+
+    file(GLOB_RECURSE TEST_SOURCES
+            ${CMAKE_CURRENT_SOURCE_DIR}/Tests/**/*.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/Tests/**/*.h
+    )
+
+    add_executable(${PROJECT_NAME}_tests ${TEST_SOURCES})
+
+    target_link_libraries(${PROJECT_NAME}_tests
+            PRIVATE
+            GTest::gtest_main
+            ${PROJECT_NAME}_lib
+    )
+
+    include(GoogleTest)
+    gtest_discover_tests(${PROJECT_NAME}_tests)
+endif ()
