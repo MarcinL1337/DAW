@@ -16,9 +16,9 @@ void AudioExporter::renderAudioToFile(const juce::File& outputFile, const double
 {
     juce::AudioBuffer<float> mixBuffer{NUM_CHANNELS, BUFFER_SIZE};
     juce::AudioBuffer<float> clipBuffer{NUM_CHANNELS, BUFFER_SIZE};
+    juce::MidiBuffer midiBuffer;
     std::unique_ptr<juce::AudioFormatWriter> writer;
-    if(!createWriter(outputFile, writer))
-        return;
+    assert(createWriter(outputFile, writer));
 
     currentPositionSamples = static_cast<int64_t>(startSeconds * sampleRate);
     const auto endPositionSamples = static_cast<int64_t>(endSeconds * sampleRate);
@@ -35,7 +35,6 @@ void AudioExporter::renderAudioToFile(const juce::File& outputFile, const double
                 continue;
 
             clipBuffer.clear();
-            juce::MidiBuffer midiBuffer;
             audioClip->processBlock(clipBuffer, midiBuffer);
 
             for(int channel = 0; channel < NUM_CHANNELS; ++channel)
