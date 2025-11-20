@@ -9,6 +9,8 @@ MainAudio::MainAudio(juce::ValueTree& valueTree) : tree{valueTree}
     graph.setPlayHead(this);
     tree.addListener(this);
     startTimer(20);
+
+    audioExporter = std::make_unique<AudioExporter>(graph, currentPositionSamples);
 }
 
 void MainAudio::audioProcessorGraphInit()
@@ -219,6 +221,15 @@ void MainAudio::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifie
         {
             projectLengthSeconds = newNumOfSeconds;
         }
+    }
+    else if(property == ValueTreeIDs::performExport)
+    {
+        audioDeviceManager.removeAudioCallback(this);
+        const juce::String filePath = tree[ValueTreeIDs::performExport].toString();
+        transportIsPlaying = true;
+        audioExporter->exportToWav(juce::File{filePath});
+        transportIsPlaying = false;
+        audioDeviceManager.addAudioCallback(this);
     }
 }
 
