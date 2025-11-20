@@ -4,28 +4,19 @@
 #include "../Constants.h"
 #include "AudioClip.h"
 #include "AudioExporter.h"
+#include "TransportController.h"
 
 using NodeID = juce::AudioProcessorGraph::NodeID;
 
-class MainAudio final : public juce::AudioPlayHead,
-                        public juce::ValueTree::Listener,
-                        public juce::Timer,
+class MainAudio final : public juce::ValueTree::Listener,
                         public juce::AudioIODeviceCallback
 {
 public:
     explicit MainAudio(juce::ValueTree& valueTree);
     ~MainAudio() override;
 
-    void play();
-    void pause();
-    void stop();
-    void setPlayheadPosition(int64_t positionSamples);
-    bool isPlaying() const { return transportIsPlaying; }
-    juce::Optional<PositionInfo> getPosition() const override;
     bool isAnySoloed() const;
     double getSampleRate() const { return audioDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate(); }
-
-    void timerCallback() override;
 
     juce::File getAudioClipPath(NodeID nodeID) const;
     double getAudioClipOffsetInSeconds(NodeID nodeID) const;
@@ -70,9 +61,7 @@ private:
     juce::AudioProcessorPlayer processorPlayer;
     juce::AudioProcessorGraph graph;
     NodeID outputNodeID;
-    bool transportIsPlaying{false};
-    mutable int64_t currentPositionSamples{0};
-    double projectLengthSeconds{TrackPlayerConstants::startNumOfBoxes};
     juce::CriticalSection lock;
     std::unique_ptr<AudioExporter> audioExporter;
+    std::unique_ptr<TransportController> transportController;
 };
