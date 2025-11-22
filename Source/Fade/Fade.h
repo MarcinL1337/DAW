@@ -13,9 +13,17 @@ enum class Function
 
 struct Data
 {
-    float lengthSeconds = 0.0f;
-    Function function = Function::Linear;
+    Data() = default;
+    Data(const float lengthSeconds, const Function function) : function{function} { setLengthSeconds(lengthSeconds); }
+    static constexpr float minLengthSeconds{0.01};
+    Function function{Function::Linear};
     juce::Path Path;
+
+    void setLengthSeconds(const float newLength) { lengthSeconds = juce::jmax(minLengthSeconds, newLength); }
+    auto getLengthSeconds() const { return lengthSeconds; }
+
+private:
+    float lengthSeconds{minLengthSeconds};
 };
 
 inline float getFadeValue(float position, const Function function, const bool isFadeIn)
@@ -39,16 +47,16 @@ inline float getFadeValue(float position, const Function function, const bool is
 inline float getFadeMultiplier(const double timePositionSeconds, const double totalLengthSeconds,
                                const Data& fadeInData, const Data& fadeOutData)
 {
-    if(timePositionSeconds < fadeInData.lengthSeconds)
+    if(timePositionSeconds < fadeInData.getLengthSeconds())
     {
-        const float position = static_cast<float>(timePositionSeconds) / fadeInData.lengthSeconds;
+        const float position = static_cast<float>(timePositionSeconds) / fadeInData.getLengthSeconds();
         return getFadeValue(position, fadeInData.function, true);
     }
-    if(timePositionSeconds > totalLengthSeconds - fadeOutData.lengthSeconds)
+    if(timePositionSeconds > totalLengthSeconds - fadeOutData.getLengthSeconds())
     {
         const float position =
-            static_cast<float>(timePositionSeconds - (totalLengthSeconds - fadeOutData.lengthSeconds)) /
-            fadeOutData.lengthSeconds;
+            static_cast<float>(timePositionSeconds - (totalLengthSeconds - fadeOutData.getLengthSeconds())) /
+            fadeOutData.getLengthSeconds();
         return getFadeValue(position, fadeOutData.function, false);
     }
     return 1.0f;
@@ -57,7 +65,7 @@ inline float getFadeMultiplier(const double timePositionSeconds, const double to
 inline nlohmann::json fadeDataToJson(const Data& fadeData)
 {
     nlohmann::json j;
-    j["lengthSeconds"] = fadeData.lengthSeconds;
+    j["lengthSeconds"] = fadeData.getLengthSeconds();
     j["function"] = fadeData.function;
     return j;
 }
@@ -65,7 +73,7 @@ inline nlohmann::json fadeDataToJson(const Data& fadeData)
 inline Data fadeDataFromJson(const nlohmann::json& j)
 {
     Data fadeData;
-    fadeData.lengthSeconds = j.value("lengthSeconds", 0.0f);
+    fadeData.setLengthSeconds(j.value("lengthSeconds", Data::minLengthSeconds));
     fadeData.function = static_cast<Function>(j.value("function", static_cast<int>(Function::Linear)));
     return fadeData;
 }
