@@ -129,16 +129,16 @@ void Waveform::mouseDrag(const juce::MouseEvent& event)
 juce::Image Waveform::createDragThumbnail() const
 {
     juce::Image dragImage(
-        juce::Image::ARGB, TrackPlayerConstants::maxDragWidth, TrackPlayerConstants::maxDragHeight, true);
+        juce::Image::ARGB, getWidth(), getHeight(), true);
     juce::Graphics g(dragImage);
 
     g.setColour(juce::Colour(30, 30, 30).withAlpha(0.75f));
-    g.fillRect(0, 0, TrackPlayerConstants::maxDragWidth, TrackPlayerConstants::maxDragHeight);
+    g.fillRect(0, 0, getWidth(), getHeight());
 
     g.setColour(juce::Colour(10, 190, 150).withAlpha(0.9f));
     audioThumbnail->drawChannel(
         g,
-        juce::Rectangle(0, 0, TrackPlayerConstants::maxDragWidth, TrackPlayerConstants::maxDragHeight),
+        juce::Rectangle(0, 0, getWidth(), getHeight()),
         0.0,
         audioThumbnail->getTotalLength(),
         0,
