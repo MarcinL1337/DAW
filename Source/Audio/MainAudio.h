@@ -64,4 +64,6 @@ private:
     juce::CriticalSection lock;
     std::unique_ptr<AudioExporter> audioExporter;
     std::unique_ptr<TransportController> transportController;
+
+    static constexpr auto updateAsync = juce::AudioProcessorGraph::UpdateKind::async;
 };

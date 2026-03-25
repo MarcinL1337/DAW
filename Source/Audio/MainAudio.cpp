@@ -37,16 +37,16 @@ NodeID MainAudio::addAudioClip(const juce::File& file)
     audioClip->prepareToPlay(audioDeviceManager.getCurrentAudioDevice()->getCurrentSampleRate(),
                              audioDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples());
 
-    const auto node = graph.addNode(std::move(audioClip));
-    graph.addConnection({{node->nodeID, 0}, {outputNodeID, 0}});
-    graph.addConnection({{node->nodeID, 1}, {outputNodeID, 1}});
+    const auto node = graph.addNode(std::move(audioClip), std::nullopt, updateAsync);
+    graph.addConnection({{node->nodeID, 0}, {outputNodeID, 0}}, updateAsync);
+    graph.addConnection({{node->nodeID, 1}, {outputNodeID, 1}}, updateAsync);
     return node->nodeID;
 }
 
 void MainAudio::removeAudioClip(const NodeID nodeID)
 {
     juce::ScopedLock sl(lock);
-    graph.removeNode(nodeID);
+    graph.removeNode(nodeID, updateAsync);
 }
 
 void MainAudio::setPanOfAudioClip(const NodeID nodeID, const float pan) const
