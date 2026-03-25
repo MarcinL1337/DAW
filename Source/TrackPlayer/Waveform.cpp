@@ -119,8 +119,10 @@ void Waveform::mouseDrag(const juce::MouseEvent& event)
             juce::var dragDescription;
             dragDescription.append(static_cast<int>(audioClipID.uid));
             dragDescription.append("waveform");
+            dragDescription.append(dragClickOffsetX);
             const auto dragImage = createDragThumbnail();
-            const juce::Point dragOffset{0, -dragImage.getHeight() / 2};
+            const juce::Point dragOffset{-dragClickOffsetX, -dragImage.getHeight() / 2};
+            setAlpha(0.4f);
             dragContainer->startDragging(dragDescription, this, dragImage, false, &dragOffset);
         }
     }
@@ -128,8 +130,7 @@ void Waveform::mouseDrag(const juce::MouseEvent& event)
 
 juce::Image Waveform::createDragThumbnail() const
 {
-    juce::Image dragImage(
-        juce::Image::ARGB, getWidth(), getHeight(), true);
+    juce::Image dragImage(juce::Image::ARGB, getWidth(), getHeight(), true);
     juce::Graphics g(dragImage);
 
     g.setColour(juce::Colour(30, 30, 30).withAlpha(0.75f));
@@ -137,18 +138,15 @@ juce::Image Waveform::createDragThumbnail() const
 
     g.setColour(juce::Colour(10, 190, 150).withAlpha(0.9f));
     audioThumbnail->drawChannel(
-        g,
-        juce::Rectangle(0, 0, getWidth(), getHeight()),
-        0.0,
-        audioThumbnail->getTotalLength(),
-        0,
-        1.0f);
+        g, juce::Rectangle(0, 0, getWidth(), getHeight()), 0.0, audioThumbnail->getTotalLength(), 0, 1.0f);
 
     return dragImage;
 }
 
 void Waveform::mouseDown(const juce::MouseEvent& event)
 {
+    dragClickOffsetX = event.x;
+
     if(auto* parent = getParentComponent())
         parent->mouseDown(event.getEventRelativeTo(parent));
 }
@@ -173,3 +171,5 @@ void Waveform::mouseExit(const juce::MouseEvent& event)
         if(auto* parent = getParentComponent())
             parent->mouseExit(event.getEventRelativeTo(parent));
 }
+
+void Waveform::mouseUp(const juce::MouseEvent&) { setAlpha(1.0f); }

@@ -315,7 +315,9 @@ void TrackGui::itemDropped(const SourceDetails& dragSourceDetails)
     const int audioClipUid = dragSourceDetails.description[0];
     const NodeID audioClipID{static_cast<uint32_t>(audioClipUid)};
 
-    float newOffsetSeconds = dragSourceDetails.localPosition.x / static_cast<float>(currentBoxWidth);
+    const int clickOffsetX = dragSourceDetails.description[2];
+    float newOffsetSeconds = (dragSourceDetails.localPosition.x - clickOffsetX) / static_cast<float>(currentBoxWidth);
+    newOffsetSeconds = juce::jmax(0.0f, newOffsetSeconds);
 
     const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
     const int targetTrackIndex = static_cast<int>(std::distance(
