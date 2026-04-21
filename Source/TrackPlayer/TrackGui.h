@@ -62,6 +62,8 @@ private:
     void itemDropped(const SourceDetails& dragSourceDetails) override;
     void itemDragEnter(const SourceDetails& dragSourceDetails) override;
     void itemDragExit(const SourceDetails& dragSourceDetails) override;
+    void paintOverChildren(juce::Graphics& g) override;
+    void itemDragMove(const SourceDetails& dragSourceDetails) override;
 
     enum popUpMenuOptions
     {
@@ -84,4 +86,9 @@ private:
     uint16_t currentBoxWidth;
     uint16_t currentBoxHeight{TrackPlayerConstants::startBoxHeight};
     int currentNumOfSeconds{};
+
+    bool isDragOver{false};
+    int dragImageX{0};
+    int maxDragImageWidth{0};
+    juce::Image waveformDragImage{};
 };

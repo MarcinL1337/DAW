@@ -36,7 +36,6 @@ private:
     void resized() override;
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
     static void initStaticData();
-    juce::Image createDragThumbnail() const;
 
     juce::AudioFormatReader* formatReader{nullptr};
     static juce::AudioFormatManager formatManager;
