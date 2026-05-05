@@ -145,6 +145,7 @@ juce::PopupMenu TrackGui::initPopUpMenuForClip()
     clipMenu.addItem(deleteAudioClip, "Delete audio clip");
     clipMenu.addItem(copyAudioClip, "Copy audio clip");
     clipMenu.addItem(cutAudioClip, "Cut audio clip");
+    clipMenu.addItem(duplicateAudioClip, "Duplicate audio clip");
 
     return clipMenu;
 }
@@ -167,6 +168,9 @@ void TrackGui::showPopUpMenuForClip(const Waveform& clipWaveform)
                                        break;
                                    case cutAudioClip:
                                        handleClipCut(clipWaveform);
+                                       break;
+                                   case duplicateAudioClip:
+                                       handleClipDuplicate(clipWaveform);
                                        break;
                                    default:
                                        std::unreachable();
@@ -290,6 +294,13 @@ void TrackGui::handleClipSplit(const juce::MouseEvent& event)
             return;
         }
     }
+}
+
+void TrackGui::handleClipDuplicate(const Waveform& clipWaveform)
+{
+    handleClipCopy(clipWaveform);
+    const float pasteOffset = clipWaveform.getBounds().getRight();
+    handleClipPaste(pasteOffset);
 }
 
 void TrackGui::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
