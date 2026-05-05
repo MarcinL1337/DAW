@@ -198,6 +198,7 @@ void TrackPlayerSideMenu::setupSoloButton(const std::unique_ptr<juce::TextButton
         const bool currentState = soloButtonPtr->getToggleState();
         soloButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
     };
+    soloButton->setTooltip("Solo playing");
 }
 
 void TrackPlayerSideMenu::setupMuteButton(const std::unique_ptr<juce::TextButton>& muteButton,
@@ -214,6 +215,7 @@ void TrackPlayerSideMenu::setupMuteButton(const std::unique_ptr<juce::TextButton
         const bool currentState = muteButtonPtr->getToggleState();
         muteButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
     };
+    muteButton->setTooltip("Mute track");
 }
 
 void TrackPlayerSideMenu::setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel,
@@ -221,6 +223,7 @@ void TrackPlayerSideMenu::setupTrackNameLabel(const std::unique_ptr<juce::Label>
 {
     trackNameLabel->setBounds(trackNameArea.removeFromRight(0.9 * trackNameArea.getWidth()));
     trackNameLabel->setEditable(false, true, false);
+    trackNameLabel->setTooltip("Double click to change");
 
     trackNameLabel->onTextChange = [this, currentRow, labelPtr = trackNameLabel.get()]()
     {

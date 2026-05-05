@@ -20,7 +20,10 @@ MainComponent::MainComponent() :
 
     // projectFilesManager.openTestProject();
     setWantsKeyboardFocus(true);
+    tooltipWindow.setLookAndFeel(&tooltipLF);
 }
+
+MainComponent::~MainComponent() { tooltipWindow.setLookAndFeel(nullptr); }
 
 void MainComponent::paint(juce::Graphics& g)
 {
