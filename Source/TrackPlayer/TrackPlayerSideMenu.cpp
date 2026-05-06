@@ -199,6 +199,10 @@ void TrackPlayerSideMenu::setupSoloButton(const std::unique_ptr<juce::TextButton
         soloButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
     };
     soloButton->setTooltip("Solo playing");
+    soloButton->setColour(juce::TextButton::buttonColourId, juce::Colour{0xff2e2e2e});
+    soloButton->setColour(juce::TextButton::buttonOnColourId, juce::Colour{0xff6ebe6e});
+    soloButton->setColour(juce::TextButton::textColourOffId, juce::Colours::whitesmoke);
+    soloButton->setColour(juce::TextButton::textColourOnId, juce::Colours::white);
 }
 
 void TrackPlayerSideMenu::setupMuteButton(const std::unique_ptr<juce::TextButton>& muteButton,
@@ -216,6 +220,10 @@ void TrackPlayerSideMenu::setupMuteButton(const std::unique_ptr<juce::TextButton
         muteButtonPtr->setToggleState(!currentState, juce::dontSendNotification);
     };
     muteButton->setTooltip("Mute track");
+    muteButton->setColour(juce::TextButton::buttonColourId, juce::Colour{0xff2e2e2e});
+    muteButton->setColour(juce::TextButton::buttonOnColourId, juce::Colour{0xffe2824a});
+    muteButton->setColour(juce::TextButton::textColourOffId, juce::Colours::whitesmoke);
+    muteButton->setColour(juce::TextButton::textColourOnId, juce::Colours::white);
 }
 
 void TrackPlayerSideMenu::setupTrackNameLabel(const std::unique_ptr<juce::Label>& trackNameLabel,
