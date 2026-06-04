@@ -11,7 +11,8 @@
 
 class TrackGuiManager final : public juce::Component,
                               public juce::ValueTree::Listener,
-                              public juce::DragAndDropContainer
+                              public juce::DragAndDropContainer,
+                              public juce::FileDragAndDropTarget
 {
 public:
     explicit TrackGuiManager(juce::ValueTree& parentTree);
@@ -31,6 +32,7 @@ private:
     friend class TrackGuiComponent;
 
     void paint(juce::Graphics& g) override;
+    void paintOverChildren(juce::Graphics& g) override;
     void resized() override;
 
     void makeNewTrackGui();
@@ -55,6 +57,11 @@ private:
 
     void autoScrollDuringWaveformDrag(const Component& sourceComponent, juce::Point<int> positionInSource);
 
+    bool isInterestedInFileDrag(const juce::StringArray& files) override;
+    void filesDropped(const juce::StringArray& files, int x, int y) override;
+    void fileDragEnter(const juce::StringArray& files, int x, int y) override;
+    void fileDragExit(const juce::StringArray& files) override;
+
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
     juce::Viewport trackPlayerSideMenuViewport{};
@@ -73,4 +80,6 @@ private:
     uint16_t currentTrackGuiBoxWidth{baseTrackGuiBoxWidth};
     uint16_t currentTrackGuiBoxHeight{TrackPlayerConstants::startBoxHeight};
     PlayheadFollowConstants::Mode followMode{PlayheadFollowConstants::Mode::NoFollow};
+
+    bool isFileDragActive{false};
 };

@@ -273,3 +273,60 @@ void TrackGuiManager::autoScrollDuringWaveformDrag(const Component& sourceCompon
     trackPlayerSideMenuViewport.setViewPosition(trackPlayerSideMenuViewport.getViewPositionX(),
                                                 trackPlayerViewport.getViewPositionY());
 }
+
+bool TrackGuiManager::isInterestedInFileDrag(const juce::StringArray& files)
+{
+    for(const auto& path: files)
+    {
+        if(const juce::File file{path}; file.hasFileExtension(".wav;.mp3"))
+            return true;
+    }
+    return false;
+}
+
+void TrackGuiManager::fileDragEnter(const juce::StringArray& files, int, int)
+{
+    if(isInterestedInFileDrag(files))
+    {
+        isFileDragActive = true;
+        repaint();
+    }
+}
+
+void TrackGuiManager::fileDragExit(const juce::StringArray&)
+{
+    isFileDragActive = false;
+    repaint();
+}
+
+void TrackGuiManager::filesDropped(const juce::StringArray& files, int, int)
+{
+    isFileDragActive = false;
+    repaint();
+
+    for(const auto& path: files)
+    {
+        const juce::File file{path};
+        if(!file.existsAsFile() or !file.hasFileExtension(".wav;.mp3"))
+            continue;
+
+        tree.setProperty(ValueTreeIDs::addAudioFileToNewTrack, file.getFullPathName(), nullptr);
+        tree.setProperty(ValueTreeIDs::addAudioFileToNewTrack, ValueTreeConstants::doNothing, nullptr);
+    }
+}
+
+void TrackGuiManager::paintOverChildren(juce::Graphics& g)
+{
+    if(!isFileDragActive)
+        return;
+
+    g.setColour(juce::Colour{0xff0e345a}.withAlpha(0.55f));
+    g.fillRect(getLocalBounds());
+
+    g.setColour(juce::Colours::whitesmoke);
+    g.setFont(20.0f);
+    g.drawText("Drop audio file here", getLocalBounds().withSizeKeepingCentre(400, 60), juce::Justification::centred);
+
+    g.setColour(juce::Colour{0xff0e345a}.withAlpha(0.0f));
+    g.drawRect(getLocalBounds().reduced(8), 2);
+}
