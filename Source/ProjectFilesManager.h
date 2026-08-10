@@ -8,14 +8,17 @@ public:
     explicit ProjectFilesManager(juce::ValueTree& parentTree);
     ~ProjectFilesManager() override;
 
+    void openTestProject();
+
+private:
     void createNewProject();
     void openProject();
     void saveProject();
     void saveAsProject();
     void addAudioFile();
-    void openTestProject();
+    void addDroppedAudioFile(const juce::File& file) const;
+    void importAudioFileIntoProject(const juce::File& sourceFile) const;
 
-private:
     void markAsDirty();
     void markAsClean();
     void saveProjectToFile(const juce::File& file) const;

@@ -189,42 +189,50 @@ void ProjectFilesManager::loadProjectFromFile(const juce::File& file)
 
 void ProjectFilesManager::addAudioFile()
 {
-    static long long counter = 1;
     constexpr auto folderChooserFlags = juce::FileBrowserComponent::openMode |
                                         juce::FileBrowserComponent::canSelectFiles |
                                         juce::FileBrowserComponent::canSelectDirectories;
-    audioFileChooser.launchAsync(
-        folderChooserFlags,
-        [this](const juce::FileChooser& chooser)
-        {
-            if(const auto file = chooser.getResult(); file.existsAsFile())
-            {
-                juce::File audioDir;
+    audioFileChooser.launchAsync(folderChooserFlags,
+                                 [this](const juce::FileChooser& chooser)
+                                 {
+                                     if(const auto file = chooser.getResult(); file.existsAsFile())
+                                     {
+                                         importAudioFileIntoProject(file);
+                                     }
+                                 });
+}
 
-                if(currentProjectFile.existsAsFile())
-                {
-                    const auto currentProjectDir = currentProjectFile.getParentDirectory();
-                    audioDir = currentProjectDir.getChildFile(currentProjectFile.getFileNameWithoutExtension() +
-                                                              audioDirSuffix);
-                }
-                else
-                {
-                    audioDir = getTempAudioDirectory();
-                    tree.setProperty(ValueTreeIDs::projectAudioDir, audioDir.getFullPathName(), nullptr);
-                }
+void ProjectFilesManager::addDroppedAudioFile(const juce::File& file) const
+{
+    if(file.existsAsFile())
+        importAudioFileIntoProject(file);
+}
 
-                const juce::File dstFile = audioDir.getChildFile(file.getFileNameWithoutExtension() +
-                                                                 std::to_string(counter++) + file.getFileExtension());
-                if(!dstFile.existsAsFile())
-                {
-                    const auto result = file.copyFileTo(dstFile);
-                    assert(result);
-                }
+void ProjectFilesManager::importAudioFileIntoProject(const juce::File& sourceFile) const
+{
+    static long long counter = 1;
+    juce::File audioDir;
+    if(currentProjectFile.existsAsFile())
+    {
+        const auto currentProjectDir = currentProjectFile.getParentDirectory();
+        audioDir = currentProjectDir.getChildFile(currentProjectFile.getFileNameWithoutExtension() + audioDirSuffix);
+    }
+    else
+    {
+        audioDir = getTempAudioDirectory();
+        tree.setProperty(ValueTreeIDs::projectAudioDir, audioDir.getFullPathName(), nullptr);
+    }
 
-                tree.setProperty(ValueTreeIDs::addAudioFileToNewTrack, dstFile.getFullPathName(), nullptr);
-                tree.setProperty(ValueTreeIDs::addAudioFileToNewTrack, ValueTreeConstants::doNothing, nullptr);
-            }
-        });
+    const juce::File dstFile = audioDir.getChildFile(sourceFile.getFileNameWithoutExtension() +
+                                                     std::to_string(counter++) + sourceFile.getFileExtension());
+    if(!dstFile.existsAsFile())
+    {
+        const auto result = sourceFile.copyFileTo(dstFile);
+        assert(result);
+    }
+
+    tree.setProperty(ValueTreeIDs::addAudioFileToNewTrack, dstFile.getFullPathName(), nullptr);
+    tree.setProperty(ValueTreeIDs::addAudioFileToNewTrack, ValueTreeConstants::doNothing, nullptr);
 }
 
 void ProjectFilesManager::openTestProject()
@@ -251,6 +259,8 @@ void ProjectFilesManager::valueTreePropertyChanged(juce::ValueTree&, const juce:
         saveAsProject();
     else if(property == ValueTreeIDs::addAudioFile)
         addAudioFile();
+    else if(property == ValueTreeIDs::droppedAudioFile)
+        addDroppedAudioFile(juce::File(tree[ValueTreeIDs::droppedAudioFile].toString()));
     else if(property == ValueTreeIDs::tracksJsonExported)
     {
         const auto projectString = tree[ValueTreeIDs::tracksJsonExported].toString();

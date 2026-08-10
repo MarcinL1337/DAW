@@ -310,8 +310,8 @@ void TrackGuiManager::filesDropped(const juce::StringArray& files, int, int)
         if(!file.existsAsFile() or !file.hasFileExtension(".wav;.mp3"))
             continue;
 
-        tree.setProperty(ValueTreeIDs::addAudioFileToNewTrack, file.getFullPathName(), nullptr);
-        tree.setProperty(ValueTreeIDs::addAudioFileToNewTrack, ValueTreeConstants::doNothing, nullptr);
+        tree.setProperty(ValueTreeIDs::droppedAudioFile, file.getFullPathName(), nullptr);
+        tree.setProperty(ValueTreeIDs::droppedAudioFile, ValueTreeConstants::doNothing, nullptr);
     }
 }
 
