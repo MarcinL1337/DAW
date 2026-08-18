@@ -31,7 +31,7 @@ public:
 
     juce::File getClipPath(NodeID clipId) const;
     double getClipOffset(NodeID clipId) const;
-    std::pair<Fade::Data, Fade::Data> getClipFadeData(NodeID clipId) const;
+    Fade::ClipData getClipFadeData(NodeID clipId) const;
 
     nlohmann::json exportToJson() const;
     void clearAllTracks();
