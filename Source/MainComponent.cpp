@@ -56,6 +56,11 @@ bool MainComponent::keyPressed(const juce::KeyPress& key)
         return topLevelMenu.keyPressed(key);
     }
 
+    if(key == juce::KeyPress('e', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::ctrlModifier, 0))
+    {
+        return topLevelMenu.keyPressed(key);
+    }
+
     if(key == juce::KeyPress('h', juce::ModifierKeys::ctrlModifier, 0))
     {
         return topLevelMenu.keyPressed(key);

@@ -52,9 +52,7 @@ bool AudioClip::processBlockChecker() const
     // TODO: isAnySoloed value should be in value tree, mainAudio ref should be out
     const bool muteAndSoloCheck = !mute && (!mainAudio.isAnySoloed() || solo);
     // TODO: what if someone deletes audio file?
-    // TODO: isPlaying value is in value tree, mainAudio ref should be out
-    // alternative: isPlaying from audioPlayHead in processBlock?
-    return isPrepared && mainAudio.isPlaying() && muteAndSoloCheck;
+    return isPrepared && muteAndSoloCheck;
 }
 
 void AudioClip::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
