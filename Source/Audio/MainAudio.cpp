@@ -185,6 +185,7 @@ void MainAudio::audioDeviceAboutToStart(juce::AudioIODevice* device)
 }
 
 void MainAudio::audioDeviceStopped() { processorPlayer.audioDeviceStopped(); }
+
 std::pair<Fade::Data, Fade::Data> MainAudio::getAudioClipFadeData(const NodeID nodeID) const
 {
     const auto* audioClip = dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor());
