@@ -52,11 +52,14 @@ void Timeline::mouseDown(const juce::MouseEvent& event)
     {
         isCurrentlyDraggingTimeBar = true;
         tree.setProperty(ValueTreeIDs::isCurrentlyDraggingTimeBar, true, nullptr);
+        beginDragAutoRepeat(16);
+        mouseDrag(event);
     }
 }
 
 void Timeline::mouseUp(const juce::MouseEvent& event)
 {
+    beginDragAutoRepeat(0);
     if(isCurrentlyDraggingTimeBar)
     {
         tree.setProperty(ValueTreeIDs::setPlayheadPosition, ValueTreeConstants::doNothing, nullptr);
@@ -68,13 +71,16 @@ void Timeline::mouseUp(const juce::MouseEvent& event)
 
 void Timeline::mouseDrag(const juce::MouseEvent& event)
 {
-    // TODO: add screen moving right/left when dragging to borders
-    if(isCurrentlyDraggingTimeBar)
-    {
-        timeBarTimeInSeconds = juce::jlimit(0.0f, 1.0f, static_cast<float>(event.x) / getWidth()) * currentNumOfSeconds;
-        tree.setProperty(ValueTreeIDs::timeBarTime, timeBarTimeInSeconds, nullptr);
-        resized();
-    }
+    if(!isCurrentlyDraggingTimeBar)
+        return;
+
+    timeBarTimeInSeconds = juce::jlimit(0.0f, 1.0f, static_cast<float>(event.x) / static_cast<float>(getWidth())) *
+                           static_cast<float>(currentNumOfSeconds);
+    tree.setProperty(ValueTreeIDs::timeBarTime, timeBarTimeInSeconds, nullptr);
+    resized();
+
+    if(auto* trackGuiManager = findParentComponentOfClass<TrackGuiManager>())
+        trackGuiManager->autoScrollDuringTimelineDrag(this, event.getPosition());
 }
 
 void Timeline::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier& property)
@@ -90,4 +96,8 @@ void Timeline::valueTreePropertyChanged(juce::ValueTree&, const juce::Identifier
 
 void Timeline::mouseMove(const juce::MouseEvent& event) { setMouseCursor(juce::MouseCursor::LeftRightResizeCursor); }
 
-bool Timeline::hitTest(const int x, const int y) { return timeBar.getBounds().contains(juce::Point(x, y)); }
+bool Timeline::hitTest(const int x, const int y)
+{
+    juce::ignoreUnused(x, y);
+    return true;
+}

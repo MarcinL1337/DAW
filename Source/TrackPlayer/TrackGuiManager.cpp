@@ -259,29 +259,42 @@ void TrackGuiManager::mouseWheelMove(const juce::MouseEvent& event, const juce::
         tree.setProperty(ValueTreeIDs::trackPlayerZoomPercentage, static_cast<int>(newZoom), nullptr);
 }
 
-void TrackGuiManager::autoScrollDuringWaveformDrag(const Component& sourceComponent,
-                                                   const juce::Point<int> positionInSource)
+void TrackGuiManager::autoScrollViewportForDrag(const juce::Point<int> mouseInViewport)
 {
-    const auto mouseInViewport{trackPlayerViewport.getLocalPoint(&sourceComponent, positionInSource)};
     constexpr int edgeMargin{48};
     constexpr int maxSpeed{20};
 
     trackPlayerViewport.autoScroll(mouseInViewport.x, mouseInViewport.y, edgeMargin, maxSpeed);
 
     timelineViewport.setViewPosition(trackPlayerViewport.getViewPositionX(), timelineViewport.getViewPositionY());
-
     trackPlayerSideMenuViewport.setViewPosition(trackPlayerSideMenuViewport.getViewPositionX(),
                                                 trackPlayerViewport.getViewPositionY());
 }
 
+void TrackGuiManager::autoScrollDuringWaveformDrag(const Component* sourceComponent,
+                                                   const juce::Point<int> positionInSource)
+{
+    const auto mouseInViewport{trackPlayerViewport.getLocalPoint(sourceComponent, positionInSource)};
+    autoScrollViewportForDrag(mouseInViewport);
+}
+
+void TrackGuiManager::autoScrollDuringTimelineDrag(const Component* sourceComponent,
+                                                   const juce::Point<int> positionInSource)
+{
+    auto mouseInViewport{trackPlayerViewport.getLocalPoint(sourceComponent, positionInSource)};
+    const auto turnOffUpDownAutoScroll{trackPlayerViewport.getHeight() / 2};
+    mouseInViewport.y = turnOffUpDownAutoScroll;
+    autoScrollViewportForDrag(mouseInViewport);
+}
+
 bool TrackGuiManager::isInterestedInFileDrag(const juce::StringArray& files)
 {
-    for(const auto& path: files)
+    auto isMusicFile = [](const juce::String& path)
     {
-        if(const juce::File file{path}; file.hasFileExtension(".wav;.mp3"))
-            return true;
-    }
-    return false;
+        const juce::File file{path};
+        return file.hasFileExtension(".wav;.mp3");
+    };
+    return std::ranges::any_of(files, isMusicFile);
 }
 
 void TrackGuiManager::fileDragEnter(const juce::StringArray& files, int, int)
