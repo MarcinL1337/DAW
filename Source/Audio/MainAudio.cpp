@@ -38,7 +38,8 @@ NodeID MainAudio::addAudioClip(const juce::File& file)
                              audioDeviceManager.getCurrentAudioDevice()->getCurrentBufferSizeSamples());
 
     const auto node = graph.addNode(std::move(audioClip));
-    rebuildGraph();
+    graph.addConnection({{node->nodeID, 0}, {outputNodeID, 0}});
+    graph.addConnection({{node->nodeID, 1}, {outputNodeID, 1}});
     return node->nodeID;
 }
 
@@ -46,7 +47,6 @@ void MainAudio::removeAudioClip(const NodeID nodeID)
 {
     juce::ScopedLock sl(lock);
     graph.removeNode(nodeID);
-    rebuildGraph();
 }
 
 void MainAudio::setPanOfAudioClip(const NodeID nodeID, const float pan) const
@@ -104,18 +104,47 @@ void MainAudio::setFreezeOfAudioClip(const NodeID nodeID, const float newFreezeV
     dynamic_cast<AudioClip*>(graph.getNodeForId(nodeID)->getProcessor())->setFreeze(newFreezeValue);
 }
 
-void MainAudio::rebuildGraph()
+void MainAudio::play()
 {
     juce::ScopedLock sl(lock);
-    auto connections = graph.getConnections();
-    for(const auto& connection: connections) graph.removeConnection(connection);
-    for(auto& node: graph.getNodes())
-    {
-        if(node->nodeID == outputNodeID)
-            continue;
-        graph.addConnection({{node->nodeID, 0}, {outputNodeID, 0}});
-        graph.addConnection({{node->nodeID, 1}, {outputNodeID, 1}});
-    }
+    transportIsPlaying = true;
+    tree.setProperty(ValueTreeIDs::isPlaying, true, nullptr);
+}
+
+void MainAudio::pause()
+{
+    juce::ScopedLock sl(lock);
+    transportIsPlaying = false;
+    tree.setProperty(ValueTreeIDs::isPlaying, false, nullptr);
+}
+
+void MainAudio::stop()
+{
+    juce::ScopedLock sl(lock);
+    transportIsPlaying = false;
+    setPlayheadPosition(0);
+    tree.setProperty(ValueTreeIDs::isPlaying, false, nullptr);
+}
+
+void MainAudio::setPlayheadPosition(const int64_t positionSamples)
+{
+    juce::ScopedLock sl(lock);
+    if(transportIsPlaying)
+        return;
+    currentPositionSamples = positionSamples;
+    const double positionInSeconds = static_cast<double>(currentPositionSamples) / getSampleRate();
+    tree.setProperty("timeBarTime", positionInSeconds, nullptr);
+}
+
+juce::Optional<juce::AudioPlayHead::PositionInfo> MainAudio::getPosition() const
+{
+    juce::ScopedLock sl(lock);
+    PositionInfo info;
+
+    info.setTimeInSamples(currentPositionSamples);
+    info.setIsPlaying(transportIsPlaying);
+    info.setIsRecording(false);
+    return info;
 }
 
 bool MainAudio::isAnySoloed() const
