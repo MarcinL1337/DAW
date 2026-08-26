@@ -28,6 +28,7 @@ public:
     void mouseMove(const juce::MouseEvent& event) override;
     void mouseEnter(const juce::MouseEvent& event) override;
     void mouseExit(const juce::MouseEvent& event) override;
+    void mouseUp(const juce::MouseEvent& event) override;
 
 private:
     void paint(juce::Graphics& g) override;
@@ -35,7 +36,6 @@ private:
     void resized() override;
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
     static void initStaticData();
-    juce::Image createDragThumbnail() const;
 
     juce::AudioFormatReader* formatReader{nullptr};
     static juce::AudioFormatManager formatManager;
@@ -50,6 +50,7 @@ private:
 
     double offsetSeconds{0.0};
     NodeID audioClipID;
+    int dragClickOffsetX{0};
 
     std::unique_ptr<FadeController> fadeController;
 };

@@ -25,9 +25,6 @@ constexpr float trackPlayerSideMenuWidthRatio{0.12f};
 
 constexpr int noTrackChosen{-1};
 
-constexpr int maxDragWidth{startBoxWidth * 4};
-constexpr int maxDragHeight{static_cast<int>(startBoxHeight * 0.7)};
-
 constexpr int minZoom{25};
 constexpr int maxZoom{500};
 }  // namespace TrackPlayerConstants

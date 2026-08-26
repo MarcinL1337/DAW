@@ -258,3 +258,18 @@ void TrackGuiManager::mouseWheelMove(const juce::MouseEvent& event, const juce::
     if(newZoom != currentZoom)
         tree.setProperty(ValueTreeIDs::trackPlayerZoomPercentage, static_cast<int>(newZoom), nullptr);
 }
+
+void TrackGuiManager::autoScrollDuringWaveformDrag(const Component& sourceComponent,
+                                                   const juce::Point<int> positionInSource)
+{
+    const auto mouseInViewport{trackPlayerViewport.getLocalPoint(&sourceComponent, positionInSource)};
+    constexpr int edgeMargin{48};
+    constexpr int maxSpeed{20};
+
+    trackPlayerViewport.autoScroll(mouseInViewport.x, mouseInViewport.y, edgeMargin, maxSpeed);
+
+    timelineViewport.setViewPosition(trackPlayerViewport.getViewPositionX(), timelineViewport.getViewPositionY());
+
+    trackPlayerSideMenuViewport.setViewPosition(trackPlayerSideMenuViewport.getViewPositionX(),
+                                                trackPlayerViewport.getViewPositionY());
+}

@@ -312,10 +312,16 @@ void TrackGui::itemDropped(const SourceDetails& dragSourceDetails)
     if(!isInterestedInDragSource(dragSourceDetails))
         return;
 
+    isDragOver = false;
+    waveformDragImage = {};
+    beginDragAutoRepeat(0);
+
     const int audioClipUid = dragSourceDetails.description[0];
     const NodeID audioClipID{static_cast<uint32_t>(audioClipUid)};
 
-    float newOffsetSeconds = dragSourceDetails.localPosition.x / static_cast<float>(currentBoxWidth);
+    const int clickOffsetX = dragSourceDetails.description[2];
+    float newOffsetSeconds = (dragSourceDetails.localPosition.x - clickOffsetX) / static_cast<float>(currentBoxWidth);
+    newOffsetSeconds = juce::jmax(0.0f, newOffsetSeconds);
 
     const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();
     const int targetTrackIndex = static_cast<int>(std::distance(
@@ -333,8 +339,60 @@ void TrackGui::itemDropped(const SourceDetails& dragSourceDetails)
 
 void TrackGui::itemDragEnter(const SourceDetails& dragSourceDetails)
 {
-    if(isInterestedInDragSource(dragSourceDetails))
-        repaint();
+    if(!isInterestedInDragSource(dragSourceDetails))
+        return;
+
+    isDragOver = true;
+    const int clickOffsetX = dragSourceDetails.description[2];
+    dragImageX = dragSourceDetails.localPosition.x - clickOffsetX + juce::jmax(clickOffsetX - maxDragImageWidth / 2, 0);
+
+    const auto waveformRef = dragSourceDetails.sourceComponent.get();
+    auto dragImageBounds = waveformRef->getLocalBounds();
+
+    if(const auto* vp = findParentComponentOfClass<juce::Viewport>())
+    {
+        maxDragImageWidth = vp->getViewWidth() * 4;
+        dragImageBounds = dragImageBounds.withWidth(maxDragImageWidth).withX(clickOffsetX - maxDragImageWidth / 2);
+    }
+    waveformDragImage = waveformRef->createComponentSnapshot(dragImageBounds);
+
+    repaint();
+    beginDragAutoRepeat(16);
 }
 
-void TrackGui::itemDragExit(const SourceDetails& dragSourceDetails) { repaint(); }
+void TrackGui::itemDragMove(const SourceDetails& dragSourceDetails)
+{
+    if(!isInterestedInDragSource(dragSourceDetails))
+        return;
+
+    const int clickOffsetX = dragSourceDetails.description[2];
+    dragImageX = dragSourceDetails.localPosition.x - clickOffsetX + juce::jmax(clickOffsetX - maxDragImageWidth / 2, 0);
+
+    if(auto* trackGuiManager{findParentComponentOfClass<TrackGuiManager>()})
+    {
+        trackGuiManager->autoScrollDuringWaveformDrag(*this, dragSourceDetails.localPosition);
+    }
+    repaint();
+}
+
+void TrackGui::itemDragExit(const SourceDetails& dragSourceDetails)
+{
+    juce::ignoreUnused(dragSourceDetails);
+    isDragOver = false;
+    repaint();
+    waveformDragImage = {};
+    beginDragAutoRepeat(0);
+}
+
+void TrackGui::paintOverChildren(juce::Graphics& g)
+{
+    if(!isDragOver)
+        return;
+
+    const juce::Rectangle ghostBounds{dragImageX, 0, waveformDragImage.getWidth(), getHeight()};
+    g.setOpacity(0.75f);
+    g.drawImage(waveformDragImage, ghostBounds.toFloat());
+    g.setOpacity(1.0f);
+    g.setColour(juce::Colours::white.withAlpha(0.65f));
+    g.drawRect(ghostBounds, 2);
+}

@@ -53,6 +53,8 @@ private:
     void updatePlayheadFollowing();
     void mouseWheelMove(const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel) override;
 
+    void autoScrollDuringWaveformDrag(const Component& sourceComponent, juce::Point<int> positionInSource);
+
     juce::Viewport trackPlayerViewport{};
     juce::Viewport timelineViewport{};
     juce::Viewport trackPlayerSideMenuViewport{};
