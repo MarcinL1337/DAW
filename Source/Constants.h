@@ -51,7 +51,6 @@ inline static const juce::Identifier followModeChanged{"followModeChanged"};
 inline static const juce::Identifier isPlaying{"isPlaying"};
 inline static const juce::Identifier soloButtonClicked{"soloButtonClicked"};
 inline static const juce::Identifier muteButtonClicked{"muteButtonClicked"};
-inline static const juce::Identifier newAudioFile{"newAudioFile"};
 
 inline static const juce::Identifier trackGainChanged{"trackGainChanged"};
 inline static const juce::Identifier trackPanChanged{"trackPanChanged"};
@@ -98,6 +97,7 @@ inline static const juce::Identifier tracksJsonExported{"tracksJsonExported"};
 inline static const juce::Identifier createTrackFromJson{"createTrackFromJson"};
 inline static const juce::Identifier exportTracksToJson{"exportTracksToJson"};
 inline static const juce::Identifier addAudioFileToNewTrack{"addAudioFileToNewTrack"};
+inline static const juce::Identifier droppedAudioFile{"droppedAudioFile"};
 
 inline static const juce::Identifier moveAudioClip{"moveAudioClip"};
 }  // namespace ValueTreeIDs
