@@ -54,6 +54,7 @@ private:
     void handleClipCut(const Waveform& clipWaveform);
     void handleClipPaste(const float clickOffset);
     void handleClipSplit(const juce::MouseEvent& event);
+    void handleClipDuplicate(const Waveform& clipWaveform);
 
     void handleLeftMouseClick(const juce::MouseEvent& event);
     void handleRightMouseClick(const juce::MouseEvent& event);
@@ -73,7 +74,8 @@ private:
         deleteAudioClip,
         copyAudioClip,
         cutAudioClip,
-        pasteAudioClip
+        pasteAudioClip,
+        duplicateAudioClip
     };
 
     inline static bool isAnyWaveformCopied{false};
