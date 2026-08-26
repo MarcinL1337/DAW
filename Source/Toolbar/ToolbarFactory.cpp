@@ -88,8 +88,10 @@ juce::ToolbarButton* ToolbarFactory::createButtonFromImage(int itemId,
 
     assert(png.has_value() and pngSize.has_value());
 
-    return new juce::ToolbarButton(
-        itemId, "juce!", juce::Drawable::createFromImageData(png.value(), pngSize.value()), {});
+    const auto button =
+        new juce::ToolbarButton(itemId, "juce!", juce::Drawable::createFromImageData(png.value(), pngSize.value()), {});
+    button->setTooltip(shortDescription);
+    return button;
 }
 
 void ToolbarFactory::buttonClicked(juce::Button* button)
