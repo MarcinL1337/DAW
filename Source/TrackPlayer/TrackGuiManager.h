@@ -26,6 +26,9 @@ public:
     void setFollowMode(const PlayheadFollowConstants::Mode mode) { followMode = mode; }
     PlayheadFollowConstants::Mode getFollowMode() const { return followMode; }
 
+    void autoScrollDuringWaveformDrag(const Component* sourceComponent, juce::Point<int> positionInSource);
+    void autoScrollDuringTimelineDrag(const Component* sourceComponent, juce::Point<int> positionInSource);
+
 private:
     friend class TrackManager;
     friend class TrackGui;
@@ -55,7 +58,7 @@ private:
     void updatePlayheadFollowing();
     void mouseWheelMove(const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel) override;
 
-    void autoScrollDuringWaveformDrag(const Component& sourceComponent, juce::Point<int> positionInSource);
+    void autoScrollViewportForDrag(juce::Point<int> mouseInViewport);
 
     bool isInterestedInFileDrag(const juce::StringArray& files) override;
     void filesDropped(const juce::StringArray& files, int x, int y) override;

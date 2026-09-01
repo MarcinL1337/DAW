@@ -381,7 +381,7 @@ void TrackGui::itemDragMove(const SourceDetails& dragSourceDetails)
 
     if(auto* trackGuiManager{findParentComponentOfClass<TrackGuiManager>()})
     {
-        trackGuiManager->autoScrollDuringWaveformDrag(*this, dragSourceDetails.localPosition);
+        trackGuiManager->autoScrollDuringWaveformDrag(this, dragSourceDetails.localPosition);
     }
     repaint();
 }
