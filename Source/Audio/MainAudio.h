@@ -21,7 +21,7 @@ public:
     juce::File getAudioClipPath(NodeID nodeID) const;
     double getAudioClipOffsetInSeconds(NodeID nodeID) const;
     void setFadeOfAudioClip(NodeID nodeID, const Fade::Data& fadeIn, const Fade::Data& fadeOut) const;
-    std::pair<Fade::Data, Fade::Data> getAudioClipFadeData(NodeID nodeID) const;
+    Fade::ClipData getAudioClipFadeData(NodeID nodeID) const;
 
 private:
     void audioProcessorGraphInit();

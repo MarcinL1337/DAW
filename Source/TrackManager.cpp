@@ -233,7 +233,7 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
         const NodeID audioClipID{static_cast<uint32_t>(audioClipUid)};
         const float waveformSplit = tree[ValueTreeIDs::splitAudioClip][2];
 
-        auto [firstFile, firstOffset, secondFile, secondOffset] =
+        auto [firstFile, firstOffset, firstFadeInfo, secondFile, secondOffset, secondFadeInfo] =
             audioTrackManager.splitClip(trackIndex, audioClipID, waveformSplit, getProjectAudioFolder());
 
         const auto firstSplitNodeId = addAudioClipToTrack(trackIndex, firstFile);
@@ -241,6 +241,22 @@ void TrackManager::valueTreePropertyChanged(juce::ValueTree&, const juce::Identi
 
         const auto secondSplitNodeId = addAudioClipToTrack(trackIndex, secondFile);
         setOffsetOfAudioClipInSeconds(secondSplitNodeId, trackIndex, secondOffset);
+
+        const juce::Array<juce::var> fadeInfo1{static_cast<int>(firstSplitNodeId.uid),
+                                               firstFadeInfo.getLengthSeconds(),
+                                               static_cast<int>(firstFadeInfo.function),
+                                               Fade::Data::minLengthSeconds,
+                                               static_cast<int>(Fade::Data{}.function)};
+
+        const juce::Array<juce::var> fadeInfo2{static_cast<int>(secondSplitNodeId.uid),
+                                               Fade::Data::minLengthSeconds,
+                                               static_cast<int>(Fade::Data{}.function),
+                                               secondFadeInfo.getLengthSeconds(),
+                                               static_cast<int>(secondFadeInfo.function)};
+
+        tree.setProperty(ValueTreeIDs::audioClipFadeChanged, fadeInfo1, nullptr);
+        tree.setProperty(ValueTreeIDs::audioClipFadeChanged, fadeInfo2, nullptr);
+        tree.setProperty(ValueTreeIDs::audioClipFadeChanged, ValueTreeConstants::doNothing, nullptr);
 
         const bool result = audioTrackManager.removeClipFromTrack(trackIndex, audioClipID);
         assert(result);
