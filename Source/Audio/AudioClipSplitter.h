@@ -6,8 +6,10 @@ struct SplitClipResult
 {
     juce::File firstFile;
     double firstOffset;
+    Fade::Data firstFadeInfo;
     juce::File secondFile;
     double secondOffset;
+    Fade::Data secondFadeInfo;
 };
 
 class AudioClipSplitter
@@ -17,7 +19,7 @@ public:
     ~AudioClipSplitter() = default;
 
     static SplitClipResult splitClipFile(const juce::File& originalFile, float ratio, double originalOffset,
-                                         const juce::File& audioDir);
+                                         const juce::File& audioDir, const Fade::ClipData& splitClipFadeData);
 
 private:
     static void writeToFile(juce::AudioFormatReader& reader, const juce::AudioFormatManager& formatManager,

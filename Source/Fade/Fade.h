@@ -26,6 +26,12 @@ private:
     float lengthSeconds{minLengthSeconds};
 };
 
+struct ClipData
+{
+    Data in{};
+    Data out{};
+};
+
 inline float getFadeValue(float position, const Function function, const bool isFadeIn)
 {
     position = isFadeIn ? position : 1.0f - position;

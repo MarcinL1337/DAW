@@ -1,7 +1,8 @@
 #include "AudioClipSplitter.h"
 
 SplitClipResult AudioClipSplitter::splitClipFile(const juce::File& originalFile, const float ratio,
-                                                 const double originalOffset, const juce::File& audioDir)
+                                                 const double originalOffset, const juce::File& audioDir,
+                                                 const Fade::ClipData& splitClipFadeData)
 {
     assert(audioDir.exists());
 
@@ -28,7 +29,20 @@ SplitClipResult AudioClipSplitter::splitClipFile(const juce::File& originalFile,
 
     const double secondSplitOffset{static_cast<double>(firstSamplesToWrite) / reader->sampleRate};
 
-    return SplitClipResult{firstDestFile, originalOffset, secondDestFile, originalOffset + secondSplitOffset};
+    const auto& [originalFadeIn, originalFadeOut] = splitClipFadeData;
+
+    const auto fadeInSamples = static_cast<int64_t>(originalFadeIn.getLengthSeconds() * reader->sampleRate);
+    const auto fadeOutSamples = static_cast<int64_t>(originalFadeOut.getLengthSeconds() * reader->sampleRate);
+
+    const Fade::Data firstFadeInfo = (firstSamplesToWrite >= fadeInSamples) ? originalFadeIn : Fade::Data{};
+    const Fade::Data secondFadeInfo = (secondSamplesToWrite >= fadeOutSamples) ? originalFadeOut : Fade::Data{};
+
+    return SplitClipResult{firstDestFile,
+                           originalOffset,
+                           firstFadeInfo,
+                           secondDestFile,
+                           originalOffset + secondSplitOffset,
+                           secondFadeInfo};
 }
 
 void AudioClipSplitter::writeToFile(juce::AudioFormatReader& reader, const juce::AudioFormatManager& formatManager,

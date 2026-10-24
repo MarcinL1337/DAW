@@ -13,7 +13,14 @@ void TrackGui::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightgrey);
 
-    for(auto i{0u}; i < currentNumOfSeconds; i++)
+    constexpr int margin{TrackPlayerConstants::startBoxHeight * 3};
+    const auto visibleBounds{g.getClipBounds().expanded(margin, margin).getIntersection(getLocalBounds())};
+    const int firstSecond{
+        juce::jmax(0, static_cast<int>(static_cast<float>(visibleBounds.getX()) / getBoxWidthToFloat()))};
+    const int lastSecond{juce::jmin(
+        currentNumOfSeconds, static_cast<int>(static_cast<float>(visibleBounds.getRight()) / getBoxWidthToFloat()))};
+
+    for(auto i{firstSecond}; i < lastSecond; i++)
     {
         // TODO: take this into consideration: https://forum.juce.com/t/best-practice-for-2d-graph-scrolling/13359/5
         g.drawRect(i * getBoxWidthToFloat(), 0.0, getBoxWidthToFloat(), getBoxHeightToFloat(), 0.75);
@@ -381,7 +388,7 @@ void TrackGui::itemDragMove(const SourceDetails& dragSourceDetails)
 
     if(auto* trackGuiManager{findParentComponentOfClass<TrackGuiManager>()})
     {
-        trackGuiManager->autoScrollDuringWaveformDrag(*this, dragSourceDetails.localPosition);
+        trackGuiManager->autoScrollDuringWaveformDrag(this, dragSourceDetails.localPosition);
     }
     repaint();
 }

@@ -94,7 +94,9 @@ SplitClipResult AudioTrackManager::splitClip(const int trackIndex, const NodeID 
 {
     const auto splitFile = getClipPath(clipId);
     const auto splitClipOffset = mainAudio.getAudioClipOffsetInSeconds(clipId);
-    const auto splitResult = AudioClipSplitter::splitClipFile(splitFile, ratio, splitClipOffset, audioDir);
+    const auto splitClipFadeData = mainAudio.getAudioClipFadeData(clipId);
+    const auto splitResult =
+        AudioClipSplitter::splitClipFile(splitFile, ratio, splitClipOffset, audioDir, splitClipFadeData);
     return splitResult;
 }
 
@@ -105,7 +107,7 @@ double AudioTrackManager::getClipOffset(const NodeID clipId) const
     return mainAudio.getAudioClipOffsetInSeconds(clipId);
 }
 
-std::pair<Fade::Data, Fade::Data> AudioTrackManager::getClipFadeData(const NodeID clipId) const
+Fade::ClipData AudioTrackManager::getClipFadeData(const NodeID clipId) const
 {
     return mainAudio.getAudioClipFadeData(clipId);
 }
