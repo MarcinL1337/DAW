@@ -13,7 +13,16 @@ Timeline::Timeline(const int numOfSeconds, const juce::ValueTree& parentTree) :
 void Timeline::paint(juce::Graphics& g)
 {
     g.setColour(juce::Colours::lightgrey);
-    for(auto i{0}; i <= currentNumOfSeconds; i++)
+
+    constexpr int margin{3};
+    const auto visibleBounds{g.getClipBounds()};
+    const int firstSecond{
+        juce::jmax(0, static_cast<int>(visibleBounds.getX() / static_cast<float>(currentTrackGuiBoxWidth)) - margin)};
+    const int lastSecond{
+        juce::jmin(currentNumOfSeconds,
+                   static_cast<int>(visibleBounds.getRight() / static_cast<float>(currentTrackGuiBoxWidth)) + margin)};
+
+    for(int i{firstSecond}; i < lastSecond; ++i)
     {
         g.drawText(std::to_string(i),
                    i * currentTrackGuiBoxWidth + 3,

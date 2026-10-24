@@ -25,8 +25,8 @@ constexpr float trackPlayerSideMenuWidthRatio{0.12f};
 
 constexpr int noTrackChosen{-1};
 
-constexpr int minZoom{25};
-constexpr int maxZoom{500};
+constexpr int minZoom{20};
+constexpr int maxZoom{1000};
 }  // namespace TrackPlayerConstants
 
 namespace SideMenuConstants

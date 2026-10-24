@@ -32,7 +32,7 @@ public:
 
 private:
     void paint(juce::Graphics& g) override;
-    void drawWaveformWithFade(juce::Graphics& g, const juce::Rectangle<int>& bounds);
+    void drawWaveformWithFade(juce::Graphics& g, const juce::Rectangle<int>& bounds) const;
     void resized() override;
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
     static void initStaticData();

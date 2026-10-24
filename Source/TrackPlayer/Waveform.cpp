@@ -51,31 +51,34 @@ void Waveform::paint(juce::Graphics& g)
     g.setColour(juce::Colours::white.withAlpha(0.3f));
     g.drawRect(getLocalBounds());
 
-    drawWaveformWithFade(g, getLocalBounds());
+    constexpr int margin{TrackPlayerConstants::startBoxHeight * 3};
+    const auto visibleBounds{g.getClipBounds().expanded(margin, margin).getIntersection(getLocalBounds())};
+    if(not visibleBounds.isEmpty())
+        drawWaveformWithFade(g, visibleBounds);
 }
 
-void Waveform::drawWaveformWithFade(juce::Graphics& g, const juce::Rectangle<int>& bounds)
+void Waveform::drawWaveformWithFade(juce::Graphics& g, const juce::Rectangle<int>& bounds) const
 {
-    const auto totalLength = audioThumbnail->getTotalLength();
+    const auto totalLength{audioThumbnail->getTotalLength()};
 
     g.setColour(juce::Colour(10, 190, 150).withAlpha(0.9f));
 
     if(!fadeController->hasFade())
     {
-        audioThumbnail->drawChannel(g, bounds, 0.0, totalLength, 0, 1.0f);
+        const auto timeStart{static_cast<double>(bounds.getX()) / getWidth() * totalLength};
+        const auto timeEnd{static_cast<double>(bounds.getRight()) / getWidth() * totalLength};
+        audioThumbnail->drawChannel(g, bounds, timeStart, timeEnd, 0, 1.0f);
         return;
     }
 
-    constexpr int segmentSize = 16;
-    for(int x = 0; x < bounds.getWidth(); x += segmentSize)
+    constexpr int segmentSize{16};
+    for(int x{bounds.getX()}; x < bounds.getRight(); x += segmentSize)
     {
-        const int segmentWidth = juce::jmin(segmentSize, bounds.getWidth() - x);
-        const auto timeStart = (static_cast<double>(x) / bounds.getWidth()) * totalLength;
-        const auto timeEnd = (static_cast<double>(x + segmentWidth) / bounds.getWidth()) * totalLength;
-
-        const float fadeMultiplier = fadeController->getFadeMultiplier((timeStart + timeEnd) * 0.5, totalLength);
-        const auto segmentBounds = juce::Rectangle(bounds.getX() + x, bounds.getY(), segmentWidth, bounds.getHeight());
-
+        const int segmentWidth{juce::jmin(segmentSize, bounds.getRight() - x)};
+        const auto timeStart{static_cast<double>(x) / getWidth() * totalLength};
+        const auto timeEnd{static_cast<double>(x + segmentWidth) / getWidth() * totalLength};
+        const float fadeMultiplier{fadeController->getFadeMultiplier((timeStart + timeEnd) * 0.5, totalLength)};
+        const auto segmentBounds{juce::Rectangle(x, bounds.getY(), segmentWidth, bounds.getHeight())};
         audioThumbnail->drawChannel(g, segmentBounds, timeStart, timeEnd, 0, fadeMultiplier);
     }
 }
