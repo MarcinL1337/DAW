@@ -20,7 +20,7 @@ protected:
 private:
     void paint(juce::Graphics& g) override;
     void resized() override;
-    void drawLineOnTimeline(juce::Graphics& g, uint32_t lineNumber) const;
+    void drawLineOnTimeline(const juce::Graphics& g, uint32_t lineNumber) const;
 
     void mouseDown(const juce::MouseEvent& event) override;
     void mouseDrag(const juce::MouseEvent& event) override;

@@ -248,7 +248,7 @@ void TrackGui::handleClipDelete(const NodeID audioClipID)
         waveforms, [&audioClipID](auto& waveformPtr) { return waveformPtr->getAudioClipID() == audioClipID; }));
 }
 
-void TrackGui::handleClipCopy(const Waveform& clipWaveform)
+void TrackGui::handleClipCopy(const Waveform& clipWaveform) const
 {
     isAnyWaveformCopied = true;
     tree.setProperty(ValueTreeIDs::copyAudioClip, static_cast<int>(clipWaveform.getAudioClipID().uid), nullptr);
@@ -306,7 +306,7 @@ void TrackGui::handleClipSplit(const juce::MouseEvent& event)
 void TrackGui::handleClipDuplicate(const Waveform& clipWaveform)
 {
     handleClipCopy(clipWaveform);
-    const float pasteOffset = clipWaveform.getBounds().getRight();
+    const auto pasteOffset = static_cast<float>(clipWaveform.getBounds().getRight());
     handleClipPaste(pasteOffset);
 }
 
@@ -338,7 +338,9 @@ void TrackGui::itemDropped(const SourceDetails& dragSourceDetails)
     const NodeID audioClipID{static_cast<uint32_t>(audioClipUid)};
 
     const int clickOffsetX = dragSourceDetails.description[2];
-    float newOffsetSeconds = (dragSourceDetails.localPosition.x - clickOffsetX) / static_cast<float>(currentBoxWidth);
+    float newOffsetSeconds =
+        (static_cast<float>(dragSourceDetails.localPosition.x) - static_cast<float>(clickOffsetX)) /
+        static_cast<float>(currentBoxWidth);
     newOffsetSeconds = juce::jmax(0.0f, newOffsetSeconds);
 
     const auto trackPlayer = findParentComponentOfClass<TrackGuiManager>();

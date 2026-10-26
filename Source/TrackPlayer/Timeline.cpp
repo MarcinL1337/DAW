@@ -16,11 +16,14 @@ void Timeline::paint(juce::Graphics& g)
 
     constexpr int margin{3};
     const auto visibleBounds{g.getClipBounds()};
-    const int firstSecond{
-        juce::jmax(0, static_cast<int>(visibleBounds.getX() / static_cast<float>(currentTrackGuiBoxWidth)) - margin)};
-    const int lastSecond{
-        juce::jmin(currentNumOfSeconds,
-                   static_cast<int>(visibleBounds.getRight() / static_cast<float>(currentTrackGuiBoxWidth)) + margin)};
+    const int firstSecond{juce::jmax(
+        0,
+        static_cast<int>(static_cast<float>(visibleBounds.getX()) / static_cast<float>(currentTrackGuiBoxWidth)) -
+            margin)};
+    const int lastSecond{juce::jmin(
+        currentNumOfSeconds,
+        static_cast<int>(static_cast<float>(visibleBounds.getRight()) / static_cast<float>(currentTrackGuiBoxWidth)) +
+            margin)};
 
     for(int i{firstSecond}; i < lastSecond; ++i)
     {
@@ -35,20 +38,21 @@ void Timeline::paint(juce::Graphics& g)
     }
 }
 
-void Timeline::drawLineOnTimeline(juce::Graphics& g, const uint32_t lineNumber) const
+void Timeline::drawLineOnTimeline(const juce::Graphics& g, const uint32_t lineNumber) const
 {
     const auto heightScale = lineNumber % 5 ? 0.66f : 0.5f;
-    g.drawLine(currentTrackGuiBoxWidth * lineNumber,
-               getHeight(),
-               currentTrackGuiBoxWidth * lineNumber,
-               getHeight() * heightScale,
+    g.drawLine(static_cast<float>(currentTrackGuiBoxWidth) * static_cast<float>(lineNumber),
+               static_cast<float>(getHeight()),
+               static_cast<float>(currentTrackGuiBoxWidth * lineNumber),
+               static_cast<float>(getHeight()) * heightScale,
                0.75);
 }
 
 void Timeline::resized()
 {
-    timeBarXOffset =
-        (timeBarTimeInSeconds * getWidth() / currentNumOfSeconds) - (TrackPlayerConstants::timeBarBoxSize / 2.0f);
+    timeBarXOffset = static_cast<int>(timeBarTimeInSeconds * static_cast<float>(getWidth()) /
+                                          static_cast<float>(currentNumOfSeconds) -
+                                      TrackPlayerConstants::timeBarBoxSize / 2.0f);
     timeBar.setBounds(timeBarXOffset,
                       getHeight() - TrackPlayerConstants::timeBarBoxSize,
                       TrackPlayerConstants::timeBarBoxSize,

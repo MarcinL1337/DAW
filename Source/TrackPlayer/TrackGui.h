@@ -50,7 +50,7 @@ private:
     void triggerTrackGuiAction(const juce::Identifier& actionId) const;
     void handleClipDelete(const Waveform& clipWaveform);
     void handleClipDelete(NodeID audioClipID);
-    void handleClipCopy(const Waveform& clipWaveform);
+    void handleClipCopy(const Waveform& clipWaveform) const;
     void handleClipCut(const Waveform& clipWaveform);
     void handleClipPaste(const float clickOffset);
     void handleClipSplit(const juce::MouseEvent& event);

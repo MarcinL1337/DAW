@@ -85,7 +85,7 @@ void Waveform::drawWaveformWithFade(juce::Graphics& g, const juce::Rectangle<int
 
 void Waveform::resized()
 {
-    const float offsetPixels = offsetSeconds * currentTrackGuiBoxWidth;
+    const int offsetPixels = static_cast<int>(offsetSeconds) * currentTrackGuiBoxWidth;
     const auto waveformLengthInPixels{audioThumbnail->getTotalLength() * currentTrackGuiBoxWidth};
     setBounds(offsetPixels, 0, std::ceil(waveformLengthInPixels), getHeight());
     fadeController->setBounds(getLocalBounds());
@@ -103,7 +103,7 @@ void Waveform::changeBoxHeight(const uint16_t newBoxHeight) { currentTrackGuiBox
 void Waveform::setOffsetSeconds(const double newOffsetSeconds)
 {
     offsetSeconds = newOffsetSeconds;
-    const float offsetPixels = offsetSeconds * currentTrackGuiBoxWidth;
+    const double offsetPixels = offsetSeconds * currentTrackGuiBoxWidth;
     const auto waveformLengthInPixels{audioThumbnail->getTotalLength() * currentTrackGuiBoxWidth};
     if(waveformLengthInPixels + offsetPixels > getWidth())
     {
